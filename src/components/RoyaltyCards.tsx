@@ -71,7 +71,7 @@ export function RoyaltyCards() {
                   <div className="flex justify-between items-start gap-2">
                     <div className="min-w-0">
                       <div className="font-extrabold text-lg sm:text-2xl tracking-tight mb-0.5 truncate" style={{ color: t.c }}>{t.name}</div>
-                      <div className="text-[8px] sm:text-[10px] text-white/35 tracking-widest uppercase font-semibold">{t.sub}</div>
+                      <div className="text-[8px] sm:text-[10px] text-white tracking-widest uppercase font-semibold">{t.sub}</div>
                     </div>
                     <div
                       className="w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-lg flex items-center justify-center"
@@ -85,7 +85,7 @@ export function RoyaltyCards() {
                     </div>
                   </div>
                   <div>
-                    <div className="text-[8px] sm:text-[9px] text-white/30 uppercase tracking-[0.2em] mb-1 font-semibold">Daily Cap</div>
+                    <div className="text-[8px] sm:text-[9px] text-white uppercase tracking-[0.2em] mb-1 font-semibold"> Cap</div>
                     <div className="font-black text-xl sm:text-3xl leading-none tracking-tight" style={{ color: t.c }}>{t.cap}</div>
                   </div>
                 </div>
