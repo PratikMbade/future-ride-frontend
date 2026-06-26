@@ -66,12 +66,12 @@ export function GradientStatCard({ title, value, subtitle, gradient, icon, botto
       <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.8) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.8) 1px,transparent 1px)', backgroundSize: '20px 20px' }} />
       <div className="relative z-10 flex flex-col h-full">
         <div className="flex items-center justify-between mb-1">
-          <p className="text-[10px] font-semibold tracking-widest uppercase text-white/60">{title}</p>
+          <p className="text-[15px] font-semibold tracking-widest uppercase text-white/60">{title}</p>
           {icon && <div className="text-white/50">{icon}</div>}
         </div>
-        <p className="text-2xl font-black text-white mt-auto">{value}</p>
-        {subtitle && <p className="text-xs text-white/50 mt-0.5">{subtitle}</p>}
-        {bottomText && <p className="text-xs text-white/40 mt-1">{bottomText}</p>}
+        <p className="text-5xl font-black text-white mt-auto">{value}</p>
+        {subtitle && <p className="text-md text-white/80 mt-0.5">{subtitle}</p>}
+        {bottomText && <p className="text-xs text-white/80 mt-1">{bottomText}</p>}
       </div>
     </div>
   )

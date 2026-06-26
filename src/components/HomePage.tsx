@@ -14,6 +14,7 @@ import { FAQAccordion } from './FAQAccordion'
 import { CTASection } from './CTASection'
 import { Footer } from './Footer'
 import { SpaceBackground } from './SpaceBackground'
+import PackagesTemplate from './PackagesCard'
 
 export function HomePage() {
   return (
@@ -28,6 +29,7 @@ export function HomePage() {
           <Features />
           <HowItWorks />
           <IncomeDistribution />
+          <PackagesTemplate/>
           <Packages />
           <RoyaltyCards />
           <Benefits />

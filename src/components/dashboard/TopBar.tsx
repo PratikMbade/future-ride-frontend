@@ -11,7 +11,7 @@ export function TopBar({ title, walletAddress, onMenuOpen }: Props) {
   return (
     <header
       data-testid="topbar"
-      className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 h-14 bg-[#050A18]/90 backdrop-blur-md border-b border-white/[0.05]"
+      className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 h-17 bg-[#050A18]/90 backdrop-blur-md border-b border-white/[0.05]"
     >
       {/* Left */}
       <div className="flex items-center gap-3">

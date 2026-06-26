@@ -9,38 +9,96 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardGenerationTreeRouteImport } from './routes/dashboard/generation-tree'
+import { Route as DashboardDirectTeamRouteImport } from './routes/dashboard/direct-team'
 
+const DashboardRouteRoute = DashboardRouteRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardGenerationTreeRoute = DashboardGenerationTreeRouteImport.update({
+  id: '/generation-tree',
+  path: '/generation-tree',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardDirectTeamRoute = DashboardDirectTeamRouteImport.update({
+  id: '/direct-team',
+  path: '/direct-team',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/dashboard/direct-team': typeof DashboardDirectTeamRoute
+  '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
+  '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard/direct-team': typeof DashboardDirectTeamRoute
+  '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
+  '/dashboard': typeof DashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/dashboard/direct-team': typeof DashboardDirectTeamRoute
+  '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
+  '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/dashboard/direct-team'
+    | '/dashboard/generation-tree'
+    | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/dashboard/direct-team'
+    | '/dashboard/generation-tree'
+    | '/dashboard'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/dashboard/direct-team'
+    | '/dashboard/generation-tree'
+    | '/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +106,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/generation-tree': {
+      id: '/dashboard/generation-tree'
+      path: '/generation-tree'
+      fullPath: '/dashboard/generation-tree'
+      preLoaderRoute: typeof DashboardGenerationTreeRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/direct-team': {
+      id: '/dashboard/direct-team'
+      path: '/direct-team'
+      fullPath: '/dashboard/direct-team'
+      preLoaderRoute: typeof DashboardDirectTeamRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
   }
 }
 
+interface DashboardRouteRouteChildren {
+  DashboardDirectTeamRoute: typeof DashboardDirectTeamRoute
+  DashboardGenerationTreeRoute: typeof DashboardGenerationTreeRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardDirectTeamRoute: DashboardDirectTeamRoute,
+  DashboardGenerationTreeRoute: DashboardGenerationTreeRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
+  DashboardRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRouteRoute: DashboardRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

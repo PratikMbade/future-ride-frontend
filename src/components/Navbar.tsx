@@ -50,12 +50,12 @@ export function Navbar() {
           onClick={() => go('#home')}
           className="flex items-center gap-2.5 flex-shrink-0 group"
         >
-          <div className="relative w-20 h-20 rounded-full overflow-hidden  flex-shrink-0">
+          <div className="relative w-20 h-20  overflow-hidden  flex-shrink-0">
             <img
               src={LOGO_URL}
               alt="FutureRide"
               className="w-full h-full object-contain"
-              style={{ mixBlendMode: 'screen' }}
+              // style={{ mixBlendMode: 'screen' }}
             />
           </div>
           <span className="text-white font-extrabold text-[18px] tracking-tight leading-none hidden sm:block">

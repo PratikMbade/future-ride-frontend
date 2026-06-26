@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { AnimatedRocket } from './AnimatedRocket'
 import { LOGO_URL } from '../constants/assets'
 import { ChevronDown, Shield, Zap, Globe } from 'lucide-react'
+import LaunchCountdown from './LaunchCountdown'
 
 const TRUST = [
   { icon: Shield, label: 'Verified Smart Contract' },
@@ -72,6 +73,9 @@ export function Hero() {
             Community Growth & Reward Ecosystem
           </span>
         </motion.div>
+
+        <LaunchCountdown />
+
 
         {/* Headline */}
         <motion.div

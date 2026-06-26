@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 
 const PKGS = [
@@ -11,6 +11,97 @@ const PKGS = [
 const fmt = (p: number) => p >= 1000 ? `$${(p / 1000).toFixed(p % 1000 === 0 ? 0 : 1)}K` : `$${p}`
 const accent = (l: number) => l === 12 ? '#F5A623' : l === 1 ? '#38BDF8' : l <= 4 ? '#38BDF840' : l <= 8 ? '#38BDF870' : '#38BDF8'
 
+// income at each level = price * members / 2 (matches LevelIncomeTable income formula)
+const TOTAL_INCOME = PKGS.reduce((sum, p) => sum + (p.p * p.m) / 2, 0)
+const TOTAL_MEMBERS = PKGS.reduce((sum, p) => sum + p.m, 0)
+
+function useCountUp(target: number, durationMs = 1600, run = true): number {
+  const [value, setValue] = useState(0)
+  useEffect(() => {
+    if (!run) return
+    let raf = 0
+    const start = performance.now()
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / durationMs)
+      const eased = 1 - Math.pow(1 - t, 3)
+      setValue(Math.round(target * eased))
+      if (t < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [target, durationMs, run])
+  return value
+}
+
+function TotalHighlightCard() {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [inView, setInView] = useState(false)
+
+  useEffect(() => {
+    const node = containerRef.current
+    if (!node) return
+    const obs = new IntersectionObserver(
+      ([entry]) => entry?.isIntersecting && setInView(true),
+      { threshold: 0.15 },
+    )
+    obs.observe(node)
+    return () => obs.disconnect()
+  }, [])
+
+  const animatedTotal = useCountUp(TOTAL_INCOME, 1800, inView)
+
+  return (
+    <motion.div
+      ref={containerRef}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+      data-testid="packages-total-card"
+      className="mb-8 flex flex-col gap-6 overflow-hidden rounded-2xl border border-[#F5A623]/20 p-6 md:flex-row md:items-center md:justify-between md:p-8"
+      style={{ background: 'rgba(3,13,40,0.9)' }}
+    >
+      <div>
+        <div className="inline-flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#F5A623] animate-pulse" />
+          <span className="font-mono-custom text-[10px] uppercase tracking-[0.25em] text-[#F5A623]">
+            Max-Cycle Income Potential
+          </span>
+        </div>
+        <div className="mt-2 font-mono-custom text-4xl font-extrabold text-white sm:text-5xl">
+          ${animatedTotal.toLocaleString()}{' '}
+          <span className="text-white/25 text-2xl sm:text-3xl">USDT</span>
+        </div>
+        <p className="mt-2 max-w-md text-xs text-white/40">
+          Theoretical max payout if all 12 levels of the 2×2 matrix are completely filled.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: 'Levels', value: '12', color: '#38BDF8' },
+          { label: 'Max Members', value: TOTAL_MEMBERS.toLocaleString(), color: '#A855F7' },
+          { label: 'Entry Point', value: '$5', color: '#34D399' },
+        ].map((s) => (
+          <div
+            key={s.label}
+            className="rounded-xl border border-white/8 bg-black/30 px-4 py-3 text-center"
+          >
+            <div className="font-mono-custom text-[9px] uppercase tracking-[0.18em] text-white/30">
+              {s.label}
+            </div>
+            <div
+              className="mt-1 font-mono-custom text-base font-bold"
+              style={{ color: s.color }}
+            >
+              {s.value}
+            </div>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
 export function Packages() {
   return (
     <section id="packages" data-testid="packages-section" className="relative py-28 md:py-36 overflow-hidden">
@@ -32,6 +123,8 @@ export function Packages() {
             Start from just $5 and scale through 12 levels. Every upgrade unlocks greater rewards and team income.
           </p>
         </motion.div>
+
+        <TotalHighlightCard/>
 
         {/* Terminal window */}
         <div className="rounded-2xl overflow-hidden border border-[#38BDF8]/18" style={{ background: 'rgba(3,13,40,0.9)' }}>

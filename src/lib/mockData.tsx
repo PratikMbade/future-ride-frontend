@@ -32,11 +32,12 @@ function spark(n = 7): SparklineData[] {
 
 export const mockDashboardData: DashboardData = {
   user: {
-    userId: 'FR-10042',
+    userId: '2',
     walletAddress: '0xA1B2C3D4E5F6789012345678901234567890ABCD',
-    referralCode: 'FR-A1B2C3',
+    referralCode: '1',
     referralLink: 'https://futureride.live/join?ref=FR-A1B2C3',
     referredBy: '0xB2C3D4E5F67890123456789012345678901BCDE',
+    referrerId: '1',
     currentPackage: '$160',
     highestPackage: '$320',
     walletBalance: 2.847,
@@ -49,7 +50,7 @@ export const mockDashboardData: DashboardData = {
     id: `inc-${i}`,
     fromWallet: w,
     amount: parseFloat(rnd(0.1, 5).toFixed(4)),
-    incomeType: (['direct','generation','upgrade'] as const)[i % 3],
+    incomeType: (['direct','generation','upgrade-income'] as const)[i % 3],
     level: (i % 12) + 1,
     date: rndDate(new Date('2024-12-01'), new Date('2025-01-30')),
   })),
@@ -77,7 +78,7 @@ export const mockIncomeRecords: IncomeRecord[] = Array.from({ length: 30 }, (_, 
   id: `ir-${i}`,
   fromWallet: WALLETS[i % WALLETS.length],
   amount: parseFloat(rnd(0.05, 8).toFixed(4)),
-  incomeType: (['direct','generation','upgrade'] as const)[i % 3],
+  incomeType: (['total-income','direct','generation','auto-upgrade-holding','laps-credit','lost-income'] as const)[i % 3],
   level: (i % 12) + 1,
   date: rndDate(new Date('2024-10-01'), new Date('2025-01-30')),
 }))

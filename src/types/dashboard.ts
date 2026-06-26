@@ -1,4 +1,4 @@
-export type IncomeType = 'direct' | 'generation' | 'upgrade' | 'lost'
+export type IncomeType ='total-income'| 'direct' | 'generation' | 'auto-upgrade-holding' | 'laps-credit' | 'lost-income'
 export type MemberStatus = 'active' | 'inactive'
 export type PackageStatus = 'active' | 'expired' | 'pending'
 
@@ -8,6 +8,7 @@ export interface DashboardUser {
   referralCode: string
   referralLink: string
   referredBy: string
+  referrerId: string
   currentPackage: string
   highestPackage: string
   walletBalance: number
