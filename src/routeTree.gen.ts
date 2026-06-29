@@ -9,12 +9,34 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RegistrationRouteRouteImport } from './routes/registration/route'
+import { Route as LoginRouteRouteImport } from './routes/login/route'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardRoyaltyRouteImport } from './routes/dashboard/royalty'
+import { Route as DashboardOtherUserRouteImport } from './routes/dashboard/other-user'
 import { Route as DashboardGenerationTreeRouteImport } from './routes/dashboard/generation-tree'
+import { Route as DashboardFutureRideSystemRouteImport } from './routes/dashboard/future-ride-system'
 import { Route as DashboardDirectTeamRouteImport } from './routes/dashboard/direct-team'
+import { Route as DashboardTeamGenerationTeamRouteImport } from './routes/dashboard/team/generation-team'
+import { Route as DashboardTeamDirectTeamRouteImport } from './routes/dashboard/team/direct-team'
+import { Route as DashboardIncomeLostIncomeRouteImport } from './routes/dashboard/income/lost-income'
+import { Route as DashboardIncomeLapsIncomeRouteImport } from './routes/dashboard/income/laps-income'
+import { Route as DashboardIncomeGenerationIncomeRouteImport } from './routes/dashboard/income/generation-income'
+import { Route as DashboardIncomeDirectIncomeRouteImport } from './routes/dashboard/income/direct-income'
 
+const RegistrationRouteRoute = RegistrationRouteRouteImport.update({
+  id: '/registration',
+  path: '/registration',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRouteRoute = LoginRouteRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -25,9 +47,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LoginRouteRoute,
+} as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardRoyaltyRoute = DashboardRoyaltyRouteImport.update({
+  id: '/royalty',
+  path: '/royalty',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardOtherUserRoute = DashboardOtherUserRouteImport.update({
+  id: '/other-user',
+  path: '/other-user',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardGenerationTreeRoute = DashboardGenerationTreeRouteImport.update({
@@ -35,63 +72,190 @@ const DashboardGenerationTreeRoute = DashboardGenerationTreeRouteImport.update({
   path: '/generation-tree',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardFutureRideSystemRoute =
+  DashboardFutureRideSystemRouteImport.update({
+    id: '/future-ride-system',
+    path: '/future-ride-system',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 const DashboardDirectTeamRoute = DashboardDirectTeamRouteImport.update({
   id: '/direct-team',
   path: '/direct-team',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardTeamGenerationTeamRoute =
+  DashboardTeamGenerationTeamRouteImport.update({
+    id: '/team/generation-team',
+    path: '/team/generation-team',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
+const DashboardTeamDirectTeamRoute = DashboardTeamDirectTeamRouteImport.update({
+  id: '/team/direct-team',
+  path: '/team/direct-team',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardIncomeLostIncomeRoute =
+  DashboardIncomeLostIncomeRouteImport.update({
+    id: '/income/lost-income',
+    path: '/income/lost-income',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
+const DashboardIncomeLapsIncomeRoute =
+  DashboardIncomeLapsIncomeRouteImport.update({
+    id: '/income/laps-income',
+    path: '/income/laps-income',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
+const DashboardIncomeGenerationIncomeRoute =
+  DashboardIncomeGenerationIncomeRouteImport.update({
+    id: '/income/generation-income',
+    path: '/income/generation-income',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
+const DashboardIncomeDirectIncomeRoute =
+  DashboardIncomeDirectIncomeRouteImport.update({
+    id: '/income/direct-income',
+    path: '/income/direct-income',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/login': typeof LoginRouteRouteWithChildren
+  '/registration': typeof RegistrationRouteRoute
   '/dashboard/direct-team': typeof DashboardDirectTeamRoute
+  '/dashboard/future-ride-system': typeof DashboardFutureRideSystemRoute
   '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
+  '/dashboard/other-user': typeof DashboardOtherUserRoute
+  '/dashboard/royalty': typeof DashboardRoyaltyRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/dashboard/income/direct-income': typeof DashboardIncomeDirectIncomeRoute
+  '/dashboard/income/generation-income': typeof DashboardIncomeGenerationIncomeRoute
+  '/dashboard/income/laps-income': typeof DashboardIncomeLapsIncomeRoute
+  '/dashboard/income/lost-income': typeof DashboardIncomeLostIncomeRoute
+  '/dashboard/team/direct-team': typeof DashboardTeamDirectTeamRoute
+  '/dashboard/team/generation-team': typeof DashboardTeamGenerationTeamRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/registration': typeof RegistrationRouteRoute
   '/dashboard/direct-team': typeof DashboardDirectTeamRoute
+  '/dashboard/future-ride-system': typeof DashboardFutureRideSystemRoute
   '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
+  '/dashboard/other-user': typeof DashboardOtherUserRoute
+  '/dashboard/royalty': typeof DashboardRoyaltyRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/dashboard/income/direct-income': typeof DashboardIncomeDirectIncomeRoute
+  '/dashboard/income/generation-income': typeof DashboardIncomeGenerationIncomeRoute
+  '/dashboard/income/laps-income': typeof DashboardIncomeLapsIncomeRoute
+  '/dashboard/income/lost-income': typeof DashboardIncomeLostIncomeRoute
+  '/dashboard/team/direct-team': typeof DashboardTeamDirectTeamRoute
+  '/dashboard/team/generation-team': typeof DashboardTeamGenerationTeamRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/login': typeof LoginRouteRouteWithChildren
+  '/registration': typeof RegistrationRouteRoute
   '/dashboard/direct-team': typeof DashboardDirectTeamRoute
+  '/dashboard/future-ride-system': typeof DashboardFutureRideSystemRoute
   '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
+  '/dashboard/other-user': typeof DashboardOtherUserRoute
+  '/dashboard/royalty': typeof DashboardRoyaltyRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/dashboard/income/direct-income': typeof DashboardIncomeDirectIncomeRoute
+  '/dashboard/income/generation-income': typeof DashboardIncomeGenerationIncomeRoute
+  '/dashboard/income/laps-income': typeof DashboardIncomeLapsIncomeRoute
+  '/dashboard/income/lost-income': typeof DashboardIncomeLostIncomeRoute
+  '/dashboard/team/direct-team': typeof DashboardTeamDirectTeamRoute
+  '/dashboard/team/generation-team': typeof DashboardTeamGenerationTeamRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/login'
+    | '/registration'
     | '/dashboard/direct-team'
+    | '/dashboard/future-ride-system'
     | '/dashboard/generation-tree'
+    | '/dashboard/other-user'
+    | '/dashboard/royalty'
     | '/dashboard/'
+    | '/login/'
+    | '/dashboard/income/direct-income'
+    | '/dashboard/income/generation-income'
+    | '/dashboard/income/laps-income'
+    | '/dashboard/income/lost-income'
+    | '/dashboard/team/direct-team'
+    | '/dashboard/team/generation-team'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/registration'
     | '/dashboard/direct-team'
+    | '/dashboard/future-ride-system'
     | '/dashboard/generation-tree'
+    | '/dashboard/other-user'
+    | '/dashboard/royalty'
     | '/dashboard'
+    | '/login'
+    | '/dashboard/income/direct-income'
+    | '/dashboard/income/generation-income'
+    | '/dashboard/income/laps-income'
+    | '/dashboard/income/lost-income'
+    | '/dashboard/team/direct-team'
+    | '/dashboard/team/generation-team'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/login'
+    | '/registration'
     | '/dashboard/direct-team'
+    | '/dashboard/future-ride-system'
     | '/dashboard/generation-tree'
+    | '/dashboard/other-user'
+    | '/dashboard/royalty'
     | '/dashboard/'
+    | '/login/'
+    | '/dashboard/income/direct-income'
+    | '/dashboard/income/generation-income'
+    | '/dashboard/income/laps-income'
+    | '/dashboard/income/lost-income'
+    | '/dashboard/team/direct-team'
+    | '/dashboard/team/generation-team'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
+  LoginRouteRoute: typeof LoginRouteRouteWithChildren
+  RegistrationRouteRoute: typeof RegistrationRouteRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/registration': {
+      id: '/registration'
+      path: '/registration'
+      fullPath: '/registration'
+      preLoaderRoute: typeof RegistrationRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -106,11 +270,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login/': {
+      id: '/login/'
+      path: '/'
+      fullPath: '/login/'
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof LoginRouteRoute
+    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/royalty': {
+      id: '/dashboard/royalty'
+      path: '/royalty'
+      fullPath: '/dashboard/royalty'
+      preLoaderRoute: typeof DashboardRoyaltyRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/other-user': {
+      id: '/dashboard/other-user'
+      path: '/other-user'
+      fullPath: '/dashboard/other-user'
+      preLoaderRoute: typeof DashboardOtherUserRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/generation-tree': {
@@ -120,6 +305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardGenerationTreeRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/future-ride-system': {
+      id: '/dashboard/future-ride-system'
+      path: '/future-ride-system'
+      fullPath: '/dashboard/future-ride-system'
+      preLoaderRoute: typeof DashboardFutureRideSystemRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/direct-team': {
       id: '/dashboard/direct-team'
       path: '/direct-team'
@@ -127,28 +319,102 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDirectTeamRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/team/generation-team': {
+      id: '/dashboard/team/generation-team'
+      path: '/team/generation-team'
+      fullPath: '/dashboard/team/generation-team'
+      preLoaderRoute: typeof DashboardTeamGenerationTeamRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/team/direct-team': {
+      id: '/dashboard/team/direct-team'
+      path: '/team/direct-team'
+      fullPath: '/dashboard/team/direct-team'
+      preLoaderRoute: typeof DashboardTeamDirectTeamRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/income/lost-income': {
+      id: '/dashboard/income/lost-income'
+      path: '/income/lost-income'
+      fullPath: '/dashboard/income/lost-income'
+      preLoaderRoute: typeof DashboardIncomeLostIncomeRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/income/laps-income': {
+      id: '/dashboard/income/laps-income'
+      path: '/income/laps-income'
+      fullPath: '/dashboard/income/laps-income'
+      preLoaderRoute: typeof DashboardIncomeLapsIncomeRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/income/generation-income': {
+      id: '/dashboard/income/generation-income'
+      path: '/income/generation-income'
+      fullPath: '/dashboard/income/generation-income'
+      preLoaderRoute: typeof DashboardIncomeGenerationIncomeRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/income/direct-income': {
+      id: '/dashboard/income/direct-income'
+      path: '/income/direct-income'
+      fullPath: '/dashboard/income/direct-income'
+      preLoaderRoute: typeof DashboardIncomeDirectIncomeRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
   }
 }
 
 interface DashboardRouteRouteChildren {
   DashboardDirectTeamRoute: typeof DashboardDirectTeamRoute
+  DashboardFutureRideSystemRoute: typeof DashboardFutureRideSystemRoute
   DashboardGenerationTreeRoute: typeof DashboardGenerationTreeRoute
+  DashboardOtherUserRoute: typeof DashboardOtherUserRoute
+  DashboardRoyaltyRoute: typeof DashboardRoyaltyRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardIncomeDirectIncomeRoute: typeof DashboardIncomeDirectIncomeRoute
+  DashboardIncomeGenerationIncomeRoute: typeof DashboardIncomeGenerationIncomeRoute
+  DashboardIncomeLapsIncomeRoute: typeof DashboardIncomeLapsIncomeRoute
+  DashboardIncomeLostIncomeRoute: typeof DashboardIncomeLostIncomeRoute
+  DashboardTeamDirectTeamRoute: typeof DashboardTeamDirectTeamRoute
+  DashboardTeamGenerationTeamRoute: typeof DashboardTeamGenerationTeamRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardDirectTeamRoute: DashboardDirectTeamRoute,
+  DashboardFutureRideSystemRoute: DashboardFutureRideSystemRoute,
   DashboardGenerationTreeRoute: DashboardGenerationTreeRoute,
+  DashboardOtherUserRoute: DashboardOtherUserRoute,
+  DashboardRoyaltyRoute: DashboardRoyaltyRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardIncomeDirectIncomeRoute: DashboardIncomeDirectIncomeRoute,
+  DashboardIncomeGenerationIncomeRoute: DashboardIncomeGenerationIncomeRoute,
+  DashboardIncomeLapsIncomeRoute: DashboardIncomeLapsIncomeRoute,
+  DashboardIncomeLostIncomeRoute: DashboardIncomeLostIncomeRoute,
+  DashboardTeamDirectTeamRoute: DashboardTeamDirectTeamRoute,
+  DashboardTeamGenerationTeamRoute: DashboardTeamGenerationTeamRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
   DashboardRouteRouteChildren,
 )
 
+interface LoginRouteRouteChildren {
+  LoginIndexRoute: typeof LoginIndexRoute
+}
+
+const LoginRouteRouteChildren: LoginRouteRouteChildren = {
+  LoginIndexRoute: LoginIndexRoute,
+}
+
+const LoginRouteRouteWithChildren = LoginRouteRoute._addFileChildren(
+  LoginRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  LoginRouteRoute: LoginRouteRouteWithChildren,
+  RegistrationRouteRoute: RegistrationRouteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

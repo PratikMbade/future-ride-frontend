@@ -1,11 +1,20 @@
+// future ride dashboard sidebar
 import React, { useState } from 'react'
-import { Link, useRouterState } from '@tanstack/react-router'
+import { Link, useRouterState, useNavigate } from '@tanstack/react-router'
 import {
   Home, Settings, Users, GitBranch, TrendingUp,
   DollarSign, Search, User, LogOut, ChevronDown,
   ChevronRight, X, Zap,
+  LucideCardSim,
+  Link2,
+  Merge,
+  Layers,
+  Copy,
+  Check,
 } from 'lucide-react'
+import { useActiveAccount, useActiveWallet, useDisconnect } from 'thirdweb/react'
 import { LOGO_URL } from '../../constants/assets'
+import { authClient } from '#/lib/authClient'
 
 interface NavChild { label: string; href: string; icon: React.ReactNode }
 interface NavItem {
@@ -16,30 +25,79 @@ interface NavItem {
 const NAV: NavItem[] = [
   { label: 'Home',              href: '/dashboard/',                icon: <Home size={17} /> },
   { label: 'Future Ride System',href: '/dashboard/future-ride-system',  icon: <Zap size={17} /> },
-  { label: 'Direct Team',       href: '/dashboard/direct-team',         icon: <Users size={17} /> },
+    { label: 'Royalty',href: '/dashboard/royalty',  icon: <Layers size={17} /> },
+    { label: 'User Register & Package Buy',href: '/dashboard/other-user',  icon: <Users size={17} /> },
+
+   {
+    label: 'Team', href: '/dashboard/team/', icon: <Users size={17} />,
+    children: [
+      { label: 'Direct Team',     href: '/dashboard/team/direct-team',       icon: <Link2 size={14} /> },
+      { label: 'Generation Team', href: '/dashboard/team/generation-team',    icon: <Merge size={14} /> },
+    ],
+  },
   { label: 'Generation Tree',   href: '/dashboard/generation-tree',     icon: <GitBranch size={17} /> },
   {
     label: 'Income', href: '/dashboard/income/direct', icon: <TrendingUp size={17} />,
     children: [
-      { label: 'Direct Income',     href: '/dashboard/income/direct',       icon: <DollarSign size={14} /> },
-      { label: 'Generation Income', href: '/dashboard/income/generation',    icon: <TrendingUp size={14} /> },
-      { label: 'Preview Other User',href: '/dashboard/income/preview-user',  icon: <Search size={14} /> },
+      { label: 'Direct Income',     href: '/dashboard/income/direct-income',       icon: <DollarSign size={14} /> },
+      { label: 'Generation Income', href: '/dashboard/income/generation-income',    icon: <TrendingUp size={14} /> },
+            { label: 'Laps Income', href: '/dashboard/income/laps-income',    icon: <DollarSign size={14} /> },
+                  { label: 'Royalty Income', href: '/dashboard/income/royalty-income',    icon: <LucideCardSim size={14} /> },
+                  { label: 'Lost Income', href: '/dashboard/income/lost-income',    icon: <DollarSign size={14} /> },
+
     ],
   },
-  { label: 'Profile', href: '/dashboard/profile', icon: <User size={17} /> },
+
 ]
 
 interface Props { open: boolean; onClose: () => void }
 
+// ─── copy address button ──────────────────────────────────
+function CopyAddress({ address }: { address: string }) {
+  const [copied, setCopied] = useState(false)
+  const handleCopy = () => {
+    navigator.clipboard.writeText(address)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
+  return (
+    <button
+      onClick={handleCopy}
+      className="p-1.5 rounded-[6px] text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-all shrink-0"
+      title="Copy address"
+    >
+      {copied
+        ? <Check className="h-3 w-3 text-[#17c964]" />
+        : <Copy className="h-3 w-3" />}
+    </button>
+  )
+}
+
 export function Sidebar({ open, onClose }: Props) {
   const state = useRouterState()
+  const navigate = useNavigate()
   const pathname = state.location.pathname
   const [expanded, setExpanded] = useState<string[]>([])
+
+  const account = useActiveAccount()
+  const wallet = useActiveWallet()
+  const { disconnect } = useDisconnect()
 
   const toggle = (label: string) =>
     setExpanded((e) => e.includes(label) ? e.filter((x) => x !== label) : [...e, label])
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
+
+  const shortAddr = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`
+
+  // ── logout: disconnect wallet ──────────────────────────
+  const handleLogout = async () => {
+    try {
+      await authClient.signOut();
+    } catch {}
+    if (wallet) disconnect(wallet);
+    await navigate({ to: "/login" as any });
+  };
 
   return (
     <>
@@ -52,15 +110,15 @@ export function Sidebar({ open, onClose }: Props) {
       )}
 
       {/* Sidebar panel */}
+
       <aside
         data-testid="sidebar"
         className={`
-          fixed lg:static inset-y-0 left-0 z-40 flex flex-col
-          w-[250px] bg-[#050D24] border-r border-white/[0.05]
+          fixed lg:sticky inset-y-0 lg:top-0 left-0 z-40 flex flex-col
+          w-[250px] h-screen lg:h-screen bg-[#050D24] border-r border-white/[0.05]
           transition-transform duration-300 ease-in-out
           ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
-        style={{ minHeight: '100dvh' }}
       >
         {/* Logo */}
         <div className="flex items-center justify-between p-1.5 border-b border-white/[0.05]">
@@ -101,7 +159,7 @@ export function Sidebar({ open, onClose }: Props) {
                       {item.children.map((child) => (
                         <Link
                           key={child.href}
-                          to={child.href as '/dashboard/income/direct'}
+                          to={child.href as '/dashboard/income/direct-income'}
                           onClick={onClose}
                           data-testid={`nav-${child.label.toLowerCase().replace(/\s+/g, '-')}`}
                           className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-md font-medium transition-all duration-200
@@ -133,10 +191,30 @@ export function Sidebar({ open, onClose }: Props) {
           })}
         </nav>
 
-        {/* Logout */}
-        <div className="p-3 border-t border-white/[0.05]">
+        {/* Wallet + Logout */}
+        <div className="p-3 border-t border-white/[0.05] space-y-2">
+          {/* connected wallet card */}
+          {account && (
+            <div className="rounded-[10px] border border-white/[0.08] bg-white/[0.025] px-3 py-2.5">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-white/35 mb-1">
+                Connected Wallet
+              </p>
+              <div className="flex items-center gap-1.5">
+                <div
+                  className="w-1.5 h-1.5 rounded-full bg-[#17c964] shrink-0"
+                  style={{ boxShadow: '0 0 6px rgba(23,201,100,0.7)' }}
+                />
+                <span className="flex-1 min-w-0 truncate font-mono text-[12px] text-white/80">
+                  {shortAddr(account.address)}
+                </span>
+                <CopyAddress address={account.address} />
+              </div>
+            </div>
+          )}
+
           <button
             data-testid="nav-logout"
+            onClick={handleLogout}
             className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400/70 hover:text-red-400 hover:bg-red-400/8 transition-all duration-200"
           >
             <LogOut size={16} />

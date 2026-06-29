@@ -5,6 +5,9 @@ import { QueryClientProvider } from '@tanstack/react-query'
 
 import appCss from '../styles.css?url'
 import { queryClient } from '../lib/query-client'
+import { AutoConnect, ThirdwebProvider } from 'thirdweb/react'
+import { createWallet, inAppWallet } from 'thirdweb/wallets'
+import { client } from "@/lib/client";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -23,6 +26,13 @@ export const Route = createRootRoute({
   ),
   shellComponent: RootDocument,
 })
+const wallets = [
+  createWallet("io.metamask"),
+  createWallet("com.coinbase.wallet"),
+  createWallet("me.rainbow"),
+  inAppWallet(),
+];
+
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -31,7 +41,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <QueryClientProvider client={queryClient}>
+    <ThirdwebProvider>
+           <AutoConnect
+        client={client}
+        wallets={wallets}
+        timeout={10000}
+      />
+          <QueryClientProvider client={queryClient}>
           {children}
           <TanStackDevtools
             config={{ position: 'bottom-right' }}
@@ -40,6 +56,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             ]}
           />
         </QueryClientProvider>
+    </ThirdwebProvider>
         <Scripts />
       </body>
     </html>

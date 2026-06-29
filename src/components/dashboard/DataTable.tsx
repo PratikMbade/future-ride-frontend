@@ -195,7 +195,7 @@ export function DataTable<T extends object>({
                   className={`px-5 py-4 text-left text-xs font-bold tracking-wider uppercase text-white whitespace-nowrap ${col.sortable ? 'cursor-pointer hover:text-[#38BDF8] select-none' : ''} ${col.className ?? ''}`}
                   onClick={() => col.sortable && handleSort(String(col.key))}
                 >
-                  <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-flex items-center  gap-1.5">
                     {col.header}
                     {col.sortable && sortKey === String(col.key) && (
                       sortDir === 'asc' ? <ChevronUp size={13} /> : <ChevronDown size={13} />
@@ -215,7 +215,7 @@ export function DataTable<T extends object>({
             {!loading && paged.map((row, ri) => (
               <tr key={ri} className="border-b border-white/[0.06] hover:bg-white/[0.04] transition-colors">
                 {columns.map((col) => (
-                  <td key={String(col.key)} className={`px-5 py-4 text-white whitespace-nowrap ${col.className ?? ''}`}>
+                  <td key={String(col.key)} className={`px-5 py-4 text-white  whitespace-nowrap ${col.className ?? ''}`}>
                     {col.render ? col.render(row) : String(row[col.key as keyof T] ?? '-')}
                   </td>
                 ))}

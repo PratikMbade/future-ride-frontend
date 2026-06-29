@@ -21,10 +21,10 @@ export function DashboardLayout() {
   const title = TITLES[pathname] ?? 'Dashboard'
 
   return (
-    <div data-testid="dashboard-layout" className="flex min-h-screen bg-[#050A18] font-sans">
+    <div data-testid="dashboard-layout" className="flex h-screen overflow-hidden bg-[#050A18] font-sans">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         <TopBar
           title={title}
           walletAddress="0xA1B2C3D4E5F6789012345678901234567890ABCD"

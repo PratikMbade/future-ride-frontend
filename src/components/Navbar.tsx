@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
 import { LOGO_URL } from '../constants/assets'
+import { Link } from '@tanstack/react-router'
 
 const navLinks = [
   { label: 'About', href: '#about' },
@@ -85,13 +86,20 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
+          {/* <Link
             data-testid="navbar-cta-button"
-            onClick={() => go('#packages')}
+            to={'/registration'}
             className="hidden lg:block px-6 py-2.5 text-sm font-bold text-black rounded-xl btn-gold"
           >
-            Get Started
-          </button>
+            Register
+          </Link>
+           <Link
+            data-testid="navbar-cta-button"
+            to={'/login'}
+            className="hidden lg:block px-6 py-2.5 text-sm font-bold text-black rounded-xl bg-white"
+          >
+            Login
+          </Link> */}
           <button
             data-testid="navbar-mobile-toggle"
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -119,13 +127,26 @@ export function Navbar() {
               >
                 {l.label}
               </button>
+
+              
             ))}
-            <button
-              onClick={() => go('#packages')}
-              className="w-full mt-2 py-3 text-sm font-bold text-black rounded-xl btn-gold"
-            >
-              Get Started
-            </button>
+            <div className='flex flex-col w-fit gap-4'>
+                         {/* <Link
+            data-testid="navbar-cta-button"
+            to={'/registration'}
+            className=" lg:hidden px-6 py-2.5 text-sm font-bold text-black rounded-xl btn-gold"
+          >
+            Register
+          </Link>
+           <Link
+            data-testid="navbar-cta-button"
+            to={'/login'}
+            className=" lg:hidden px-6 py-2.5 text-sm font-bold text-black rounded-xl bg-white"
+          >
+            Login
+          </Link> */}
+            </div>
+
           </div>
         </div>
       )}

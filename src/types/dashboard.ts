@@ -100,3 +100,144 @@ export interface DashboardData {
     upgrade: number
   }
 }
+
+
+export interface DirectTeamMember {
+  id: string
+  rank: number
+  userAddress: string
+  contractRegId: number | null
+  isRegistered: boolean
+  joinedAt: string
+  highestPackage: number
+  packageName: string
+  directTeam: number
+
+  // income breakdown
+  directIncome: number
+  generationIncome: number
+  lapsIncome: number
+  royaltyIncome: number
+  totalIncome: number
+}
+
+export interface DirectTeamResponse {
+  success: boolean
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  members: DirectTeamMember[]
+}
+
+export interface GenerationTeamMember {
+  id: string
+  rank: number
+  userAddress: string
+  contractRegId: number | null
+  referralAddress: string | null
+  isRegistered: boolean
+  joinedAt: string
+  generationLevel: number
+  highestPackage: number
+  packageName: string
+
+  directIncome: number
+  generationIncome: number
+  lapsIncome: number
+  royaltyIncome: number
+  totalIncome: number
+}
+
+export interface GenerationTeamResponse {
+  success: boolean
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  members: GenerationTeamMember[]
+}
+
+export interface DirectIncomeRecord {
+  id: string
+  contractRegId: number | null
+  fromUserAddress: string
+  packageNumber: number
+  packageName: string
+  amount: number
+  creditedAt: string
+  transactionHash: string
+}
+
+export interface DirectIncomeResponse {
+  success: boolean
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  records: DirectIncomeRecord[]
+}
+
+export interface GenerationIncomeRecord {
+  id: string
+  contractRegId: number | null
+  fromUserAddress: string
+  packageNumber: number
+  packageName: string
+  amount: number
+  level: number
+  creditedAt: string
+  transactionHash: string
+}
+
+export interface GenerationIncomeResponse {
+  success: boolean
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  records: GenerationIncomeRecord[]
+}
+
+export interface LapsIncomeRecord {
+  id: string
+  contractRegId: number | null
+  fromUserAddress: string
+  packageNumber: number
+  packageName: string
+  amount: number
+  creditedAt: string
+  transactionHash: string
+}
+
+export interface LapsIncomeResponse {
+  success: boolean
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  records: LapsIncomeRecord[]
+}
+
+
+export interface LostIncomeRecord {
+  id: string
+  contractRegId: number | null
+  lapsedAddress: string
+  redirectedToAddress: string
+  packageNumber: number
+  packageName: string
+  amount: number
+  level: number
+  missedAt: string
+  transactionHash: string
+}
+
+export interface LostIncomeResponse {
+  success: boolean
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  records: LostIncomeRecord[]
+}

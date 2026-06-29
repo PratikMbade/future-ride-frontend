@@ -16,6 +16,23 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
+// ─── API ───────────────────────────────────────────────────
+// Adjust this to whatever your app already uses to reach the backend
+// (axios instance, env var, etc). Left as a plain constant + fetch so
+// this file has no extra dependency.
+const API_BASE = import.meta.env.VITE_API_URL
+const FETCH_DEPTH = 3; // root + 3 generations = 1+2+4+8 = 15 nodes, matches the layout below
+
+async function fetchSubtree(address: string): Promise<TreeNode> {
+  const res = await fetch(`${API_BASE}/api/tree/${address}?depth=${FETCH_DEPTH}`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({} as { error?: string }));
+    throw new Error(body.error ?? `Failed to load tree (${res.status})`);
+  }
+  const json = await res.json() as { tree: TreeNode };
+  return json.tree;
+}
+
 // ─── brand colours — dark blue / sky blue, no gold ───────────────
 const SKY    = '#38BDF8'; // bright sky blue — primary accent, root, active text
 const DEEP   = '#3B82F6'; // deeper blue — secondary accent, ring gradients
@@ -24,49 +41,39 @@ const SKY45  = 'rgba(56,189,248,0.45)';
 const SKY25  = 'rgba(56,189,248,0.25)';
 const SKY16  = 'rgba(56,189,248,0.16)';
 const SKY10  = 'rgba(56,189,248,0.10)';
-// light, high-contrast blue-white used for body text so it stays "clear" to read
 const TEXT_BRIGHT = '#E0F2FE';
 const TEXT_DIM     = 'rgba(224,242,254,0.75)';
 
 // ─── device tiers ─────────────────────────────────────────
-// Three tiers instead of a single mobile/desktop split — this is what
-// was breaking the layout on tablets (it was silently reusing desktop
-// sizing on a narrower screen, causing overlap).
 type Device = 'mobile' | 'tablet' | 'desktop';
 const getDevice = (w: number): Device => (w < 640 ? 'mobile' : w < 1024 ? 'tablet' : 'desktop');
 
 interface SizeConfig {
   nodeW:      number;
-  ava:        number; // avatar diameter, normal node
-  avaRoot:    number; // avatar diameter, root node
-  gapY:       number; // vertical spacing between levels
-  leafGap:    number; // horizontal spacing between adjacent leaf centres
-  height:     number; // canvas height
-  fitPad:     number; // react-flow fitView padding
+  ava:        number;
+  avaRoot:    number;
+  gapY:       number;
+  leafGap:    number;
+  height:     number;
+  fitPad:     number;
   addrFont:   number;
   badgeFont:  number;
-  edgeRadius: number; // smoothstep corner radius — 0 = sharp elbow
+  edgeRadius: number;
   minZoom:    number;
   maxZoom:    number;
 }
 
-// leafGap is always a fixed multiple of nodeW so horizontal spacing scales
-// with node size and never overlaps, on any screen.
-// Mobile/tablet get extra gapY + fitPad headroom and a tiny corner radius
-// on the connectors — at small scale a perfectly sharp 90° elbow sitting
-// right above an avatar reads as broken/misaligned; this gives it room.
 const SIZES: Record<Device, SizeConfig> = {
-  desktop: { nodeW:152, ava:86, avaRoot:98, gapY:200, leafGap:152*1.35, height:790, fitPad:0.13, addrFont:12, badgeFont:10, edgeRadius:0, minZoom:0.1,  maxZoom:2   },
-  tablet:  { nodeW:118, ava:68, avaRoot:78, gapY:190, leafGap:118*1.35, height:680, fitPad:0.10, addrFont:11, badgeFont:10, edgeRadius:3, minZoom:0.5,  maxZoom:2.5 },
-  mobile:  { nodeW:94,  ava:58, avaRoot:66, gapY:165, leafGap:94*1.35,  height:600, fitPad:0.09, addrFont:10, badgeFont:9,  edgeRadius:4, minZoom:0.4,  maxZoom:2.5 },
+  desktop: { nodeW:152, ava:86, avaRoot:98, gapY:200, leafGap:152*1.35, height:790, fitPad:0.13, addrFont:12, badgeFont:10, edgeRadius:0, minZoom:0.1, maxZoom:2   },
+  tablet:  { nodeW:118, ava:68, avaRoot:78, gapY:190, leafGap:118*1.35, height:680, fitPad:0.10, addrFont:11, badgeFont:10, edgeRadius:3, minZoom:0.5, maxZoom:2.5 },
+  mobile:  { nodeW:94,  ava:58, avaRoot:66, gapY:165, leafGap:94*1.35,  height:600, fitPad:0.09, addrFont:10, badgeFont:9,  edgeRadius:4, minZoom:0.4, maxZoom:2.5 },
 };
 
-// ─── X centres, derived bottom-up so the tree is always symmetric ──
 function buildCenters(leafGap: number) {
-  const rootCenter = leafGap * 4; // guarantees every coordinate stays positive
+  const rootCenter = leafGap * 4;
   const leaves = Array.from({ length: 8 }, (_, i) => rootCenter + (i - 3.5) * leafGap);
-  const lvl3   = [0, 2, 4, 6].map(i => (leaves[i] + leaves[i + 1]) / 2); // ll, lr, rl, rr
-  const lvl2   = [0, 2].map(i => (lvl3[i] + lvl3[i + 1]) / 2);           // left, right
+  const lvl3   = [0, 2, 4, 6].map(i => (leaves[i] + leaves[i + 1]) / 2);
+  const lvl2   = [0, 2].map(i => (lvl3[i] + lvl3[i + 1]) / 2);
   const root   = (lvl2[0] + lvl2[1]) / 2;
 
   return {
@@ -86,26 +93,31 @@ const CENTERS: Record<Device, ReturnType<typeof buildCenters>> = {
   mobile:  buildCenters(SIZES.mobile.leafGap),
 };
 
-// Single, flat node style — no per-level rainbow, just the sky-blue accent.
 function nodeStyle() {
   return { bg: SKY16, border: SKY45, text: SKY };
 }
 
-// ─── types ────────────────────────────────────────────────
+// ─── types — mirrors the backend's TreeNodeResponse ───────
+interface HighestPackage {
+  packageNumber: number;
+  packageName:   string;
+  packageAmount: number;
+}
+
 interface TreeNode {
   id:              string;
   address:         string;
   referralAddress: string;
-  contractRegId:   number;
+  contractRegId:   number | null;
   isRegistered:    boolean;
+  highestPackage:  HighestPackage | null;
   absoluteLevel?:  number;
-  level?:          number;
   left?:           TreeNode | null;
   right?:          TreeNode | null;
 }
 
 interface MemberNodeData extends Record<string, unknown> {
-  treeNodeId:      string;
+  nodeAddress:     string;
   address:         string;
   referralAddress: string;
   contractRegId:   number | null;
@@ -116,55 +128,24 @@ interface MemberNodeData extends Record<string, unknown> {
   device:          Device;
 }
 
-// ─── assign absolute levels once on the full tree ────────
-function assignAbsoluteLevels(node: TreeNode, level = 0): TreeNode {
+// Stamps absoluteLevel onto every node in a freshly-fetched subtree.
+// `startLevel` lets drill-downs keep a globally-consistent level number
+// instead of resetting to 0 every time you re-root the view.
+function assignAbsoluteLevels(node: TreeNode, startLevel = 0): TreeNode {
   return {
     ...node,
-    absoluteLevel: level,
-    left:  node.left  ? assignAbsoluteLevels(node.left,  level + 1) : node.left,
-    right: node.right ? assignAbsoluteLevels(node.right, level + 1) : node.right,
+    absoluteLevel: startLevel,
+    left:  node.left  ? assignAbsoluteLevels(node.left,  startLevel + 1) : node.left,
+    right: node.right ? assignAbsoluteLevels(node.right, startLevel + 1) : node.right,
   };
 }
 
-// ─── mock data (4 levels deep: ids 1 → 15) ───────
-const RAW_TREE: TreeNode = {
-  id:'1', address:'0xA302...Da501', referralAddress:'0xA302...Da501', contractRegId:1, isRegistered:true,
-  left:{
-    id:'2', address:'0xC548...Af6bE', referralAddress:'0xA302...Da501', contractRegId:2, isRegistered:true,
-    left:{
-      id:'4', address:'0xF1A2...B3C4', referralAddress:'0xC548...Af6bE', contractRegId:4, isRegistered:true,
-      left: {id:'8',  address:'0x8B2C...D4E5', referralAddress:'0xF1A2...B3C4', contractRegId:8,  isRegistered:true,  left:null, right:null},
-      right:{id:'9',  address:'0x9C3D...E5F6', referralAddress:'0xF1A2...B3C4', contractRegId:9,  isRegistered:true,  left:null, right:null},
-    },
-    right:{
-      id:'5', address:'0xA2B3...C4D5', referralAddress:'0xC548...Af6bE', contractRegId:5, isRegistered:true,
-      left: {id:'10', address:'0x1D4E...F607', referralAddress:'0xA2B3...C4D5', contractRegId:10, isRegistered:false, left:null, right:null},
-      right:{id:'11', address:'0x2E5F...0718', referralAddress:'0xA2B3...C4D5', contractRegId:11, isRegistered:true,  left:null, right:null},
-    },
-  },
-  right:{
-    id:'3', address:'0xD912...Cc3F', referralAddress:'0xA302...Da501', contractRegId:3, isRegistered:true,
-    left:{
-      id:'6', address:'0xB3C4...D5E6', referralAddress:'0xD912...Cc3F', contractRegId:6, isRegistered:true,
-      left: {id:'12', address:'0x3F60...1829', referralAddress:'0xB3C4...D5E6', contractRegId:12, isRegistered:true,  left:null, right:null},
-      right:{id:'13', address:'0x4071...293A', referralAddress:'0xB3C4...D5E6', contractRegId:13, isRegistered:false, left:null, right:null},
-    },
-    right:{
-      id:'7', address:'0xC4D5...E6F7', referralAddress:'0xD912...Cc3F', contractRegId:7, isRegistered:true,
-      left: {id:'14', address:'0x5182...3A4B', referralAddress:'0xC4D5...E6F7', contractRegId:14, isRegistered:true,  left:null, right:null},
-      right:{id:'15', address:'0x6293...4B5C', referralAddress:'0xC4D5...E6F7', contractRegId:15, isRegistered:false, left:null, right:null},
-    },
-  },
-};
-const MOCK_TREE = assignAbsoluteLevels(RAW_TREE);
-
 function flattenTree(n: TreeNode, m: Map<string,TreeNode> = new Map()): Map<string,TreeNode> {
-  m.set(n.id, n);
+  m.set(n.address, n);
   if (n.left)  flattenTree(n.left,  m);
   if (n.right) flattenTree(n.right, m);
   return m;
 }
-const NODE_MAP = flattenTree(MOCK_TREE);
 
 // ─── build graph — 4 levels, orthogonal "elbow" connectors ───────
 function buildGraph(root: TreeNode, device: Device): { nodes: Node[]; edges: Edge[] } {
@@ -193,7 +174,7 @@ function buildGraph(root: TreeNode, device: Device): { nodes: Node[]; edges: Edg
     width: cfg.nodeW,
     data: data
       ? {
-          treeNodeId:      data.id,
+          nodeAddress:     data.address,
           address:         data.address,
           referralAddress: data.referralAddress,
           contractRegId:   data.contractRegId,
@@ -204,7 +185,7 @@ function buildGraph(root: TreeNode, device: Device): { nodes: Node[]; edges: Edg
           device,
         }
       : {
-          treeNodeId:'', address:'', referralAddress:'',
+          nodeAddress:'', address:'', referralAddress:'',
           contractRegId:null, isRegistered:false,
           displayLevel: (root.absoluteLevel ?? 0) + layoutLvl - 1,
           isEmpty:true, isRoot:false, device,
@@ -212,9 +193,6 @@ function buildGraph(root: TreeNode, device: Device): { nodes: Node[]; edges: Edg
     draggable:false, selectable:false,
   });
 
-  // Orthogonal "elbow" connector — sharp right angles on desktop; mobile
-  // and tablet get a small corner radius (cfg.edgeRadius) since a hard 90°
-  // bend right above a small avatar reads as broken at that scale.
   const mkEdge = (src: string, tgt: string): Edge & { pathOptions?: SmoothStepPathOptions } => ({
     id:`${src}→${tgt}`, source:src, target:tgt,
     sourceHandle:'bot', targetHandle:'top',
@@ -371,6 +349,18 @@ const MemberNode = ({ data }: NodeProps<Node<MemberNodeData>>) => {
 
 const nodeTypes = { member: MemberNode };
 
+// ─── shared "package" row used by both tooltip and tap panel ──
+const PackageRow = ({ pkg }: { pkg: HighestPackage | null }) => (
+  <div style={{ display:'flex', gap:10, marginBottom:7, alignItems:'flex-start' }}>
+    <span style={{ color:'rgba(56,189,248,0.45)', fontSize:10, fontFamily:'Chivo Mono,monospace', minWidth:56, flexShrink:0, paddingTop:1, fontWeight:600 }}>
+      Package
+    </span>
+    <span style={{ color: pkg ? TEXT_BRIGHT : 'rgba(224,242,254,0.4)', fontSize:11, fontFamily:'Chivo Mono,monospace', lineHeight:1.4 }}>
+      {pkg ? `${pkg.packageName} · #${pkg.packageNumber} · ${pkg.packageAmount}` : 'No package yet'}
+    </span>
+  </div>
+);
+
 // ─── touch tap panel (mobile + tablet) ────────────────────
 const TapPanel = ({ node, onClose }: { node: TreeNode; onClose: () => void }) => {
   const style = nodeStyle();
@@ -419,7 +409,7 @@ const TapPanel = ({ node, onClose }: { node: TreeNode; onClose: () => void }) =>
       </div>
 
       {([
-        ['ID',       `#${node.contractRegId}`],
+        ['ID',       node.contractRegId != null ? `#${node.contractRegId}` : '—'],
         ['Address',  node.address],
         ['Referral', node.referralAddress],
         ['Status',   node.isRegistered ? '● Active' : '○ Inactive'],
@@ -438,6 +428,7 @@ const TapPanel = ({ node, onClose }: { node: TreeNode; onClose: () => void }) =>
           </span>
         </div>
       ))}
+      <PackageRow pkg={node.highestPackage}/>
     </div>
   );
 };
@@ -456,7 +447,7 @@ const CursorTooltip = ({ node, cursor, containerRef }: {
   const ry   = cursor.y - rect.top;
   const TW   = 270;
   const left = rx + TW + 20 > rect.width ? rx - TW - 14 : rx + 16;
-  const top  = Math.max(8, Math.min(ry - 10, rect.height - 210));
+  const top  = Math.max(8, Math.min(ry - 10, rect.height - 230));
   const style = nodeStyle();
 
   return (
@@ -483,7 +474,7 @@ const CursorTooltip = ({ node, cursor, containerRef }: {
       </div>
 
       {([
-        ['ID',       `#${node.contractRegId}`],
+        ['ID',       node.contractRegId != null ? `#${node.contractRegId}` : '—'],
         ['Address',  node.address],
         ['Referral', node.referralAddress],
         ['Status',   node.isRegistered ? '● Active' : '○ Inactive'],
@@ -502,6 +493,7 @@ const CursorTooltip = ({ node, cursor, containerRef }: {
           </span>
         </div>
       ))}
+      <PackageRow pkg={node.highestPackage}/>
     </div>
   );
 };
@@ -514,7 +506,7 @@ const Breadcrumb = ({ trail, onJump }: { trail:TreeNode[]; onJump:(i:number)=>vo
       {trail.map((node, i) => {
         const isActive = i === trail.length - 1;
         return (
-          <div key={node.id} style={{ display:'flex', alignItems:'center', gap:5 }}>
+          <div key={node.address} style={{ display:'flex', alignItems:'center', gap:5 }}>
             {i > 0 && <span style={{ color:'rgba(56,189,248,0.35)', fontSize:13 }}>›</span>}
             <button onClick={() => onJump(i)} style={{
               display:'flex', alignItems:'center', gap:6,
@@ -552,22 +544,27 @@ const TreeFlow = ({
   hoveredNode: TreeNode | null;
   cursor:      CursorPos;
   containerRef:React.RefObject<HTMLDivElement|null>;
-  onNodeClick: (id:string)=>void;
-  onNodeEnter: (id:string)=>void;
+  onNodeClick: (address:string)=>void;
+  onNodeEnter: (address:string)=>void;
   onNodeLeave: ()=>void;
   device:      Device;
 }) => {
   const { nodes, edges } = useMemo(() => buildGraph(root, device), [root, device]);
   const cfg = SIZES[device];
 
-  const handleClick: NodeMouseHandler = useCallback((_e,n) => {
+  // stopPropagation here is the actual tap fix: without it, the click
+  // bubbles up to the page wrapper's onClick (which dismisses the tap
+  // panel on any outside tap) and immediately closes the panel we just
+  // opened, on the same tap.
+  const handleClick: NodeMouseHandler = useCallback((e,n) => {
+    e.stopPropagation();
     const d = n.data as MemberNodeData;
-    if (!d.isEmpty && d.treeNodeId) onNodeClick(d.treeNodeId);
+    if (!d.isEmpty && d.nodeAddress) onNodeClick(d.nodeAddress);
   }, [onNodeClick]);
 
   const handleEnter: NodeMouseHandler = useCallback((_e,n) => {
     const d = n.data as MemberNodeData;
-    if (!d.isEmpty && d.treeNodeId) onNodeEnter(d.treeNodeId);
+    if (!d.isEmpty && d.nodeAddress) onNodeEnter(d.nodeAddress);
   }, [onNodeEnter]);
 
   const handleLeave: NodeMouseHandler = useCallback(() => onNodeLeave(), [onNodeLeave]);
@@ -585,9 +582,6 @@ const TreeFlow = ({
         fitViewOptions={{ padding: cfg.fitPad }}
         nodesDraggable={false} nodesConnectable={false}
         elementsSelectable={false}
-        // Desktop stays fixed (untouched, as requested). Mobile + tablet
-        // get pan and pinch/scroll/double-click zoom so the tree can be
-        // explored on a small screen.
         panOnDrag={device !== 'desktop'}
         zoomOnScroll={device !== 'desktop'}
         zoomOnPinch={device !== 'desktop'}
@@ -634,16 +628,50 @@ const LevelLegend = ({ rootLevel }: { rootLevel: number }) => {
   );
 };
 
+// ─── spinner ──────────────────────────────────────────────
+const Spinner = () => (
+  <div style={{
+    width:34, height:34, borderRadius:'50%',
+    border:'3px solid rgba(56,189,248,0.2)', borderTopColor:SKY,
+    animation:'gt-spin 0.8s linear infinite',
+  }}/>
+);
+
 // ─── main ─────────────────────────────────────────────────
-export const GenerationTree = () => {
-  const [trail,       setTrail]       = useState<TreeNode[]>([MOCK_TREE]);
+export const GenerationTree = ({ rootAddress }: { rootAddress: string }) => {
+  const [trail,       setTrail]       = useState<TreeNode[]>([]);
   const [hoveredNode, setHoveredNode] = useState<TreeNode | null>(null);
   const [tappedNode,  setTappedNode]  = useState<TreeNode | null>(null);
   const [cursor,      setCursor]      = useState<CursorPos>({ x:0, y:0 });
-  const [device,      setDevice]      = useState<Device>(() => globalThis.window === undefined ? 'desktop' : getDevice(window.innerWidth));
+  const [device,      setDevice]      = useState<Device>(() => getDevice(window.innerWidth));
+  const [loading,     setLoading]     = useState(true);  // initial load
+  const [drilling,    setDrilling]    = useState(false); // subsequent loads
+  const [error,       setError]       = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement|null>(null);
-  const currentRoot  = trail[trail.length - 1];
-  const isTouch = device !== 'desktop'; // tablets behave like mobile (tap, not hover)
+
+  const currentRoot = trail[trail.length - 1] ?? null;
+  const isTouch = device !== 'desktop';
+
+  // current subtree's address → node lookup, for hover/tap/click
+  const currentMap = useMemo(
+    () => (currentRoot ? flattenTree(currentRoot) : new Map<string, TreeNode>()),
+    [currentRoot],
+  );
+
+  const loadRoot = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const fresh = await fetchSubtree(rootAddress);
+      setTrail([assignAbsoluteLevels(fresh, 0)]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load tree');
+    } finally {
+      setLoading(false);
+    }
+  }, [rootAddress]);
+
+  useEffect(() => { loadRoot(); }, [loadRoot]);
 
   useEffect(() => {
     const fn = () => setDevice(getDevice(window.innerWidth));
@@ -655,30 +683,45 @@ export const GenerationTree = () => {
     setCursor({ x: e.clientX, y: e.clientY });
   }, []);
 
-  const handleNodeClick = useCallback((id: string) => {
-    const n = NODE_MAP.get(id);
+  // Drilling into a node always re-fetches: the currently loaded subtree
+  // only has data down to FETCH_DEPTH below the *current* root, so a
+  // clicked node (especially a leaf) won't have its own children loaded
+  // yet — a fresh fetch rooted at it is required either way.
+  const drillInto = useCallback(async (clicked: TreeNode) => {
+    if (!currentRoot || clicked.address === currentRoot.address) return;
+    setDrilling(true);
+    setError(null);
+    try {
+      const fresh = await fetchSubtree(clicked.address);
+      const leveled = assignAbsoluteLevels(fresh, clicked.absoluteLevel ?? 0);
+      setTrail(prev => [...prev, leveled]);
+      setHoveredNode(null);
+      setTappedNode(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load subtree');
+    } finally {
+      setDrilling(false);
+    }
+  }, [currentRoot]);
+
+  const handleNodeClick = useCallback((address: string) => {
+    const n = currentMap.get(address);
     if (!n) return;
 
     if (isTouch) {
-      if (tappedNode?.id === id) {
-        if (n.id !== currentRoot.id) {
-          setTrail(prev => [...prev, n]);
-          setTappedNode(null);
-        }
+      if (tappedNode?.address === address) {
+        void drillInto(n); // second tap on the same node → drill down
       } else {
-        setTappedNode(n);
+        setTappedNode(n);  // first tap → just show the info panel
       }
     } else {
-      if (n.id !== currentRoot.id) {
-        setTrail(prev => [...prev, n]);
-        setHoveredNode(null);
-      }
+      void drillInto(n);
     }
-  }, [isTouch, tappedNode, currentRoot]);
+  }, [isTouch, tappedNode, currentMap, drillInto]);
 
-  const handleNodeEnter = useCallback((id: string) => {
-    if (!isTouch) setHoveredNode(NODE_MAP.get(id) ?? null);
-  }, [isTouch]);
+  const handleNodeEnter = useCallback((address: string) => {
+    if (!isTouch) setHoveredNode(currentMap.get(address) ?? null);
+  }, [isTouch, currentMap]);
 
   const handleNodeLeave = useCallback(() => {
     if (!isTouch) setHoveredNode(null);
@@ -690,7 +733,13 @@ export const GenerationTree = () => {
     setTappedNode(null);
   }, []);
 
-  const rootLevel = currentRoot.absoluteLevel ?? 0;
+  const handleReset = useCallback(() => {
+    setHoveredNode(null);
+    setTappedNode(null);
+    loadRoot();
+  }, [loadRoot]);
+
+  const rootLevel = currentRoot?.absoluteLevel ?? 0;
   const style = nodeStyle();
 
   return (
@@ -699,25 +748,29 @@ export const GenerationTree = () => {
       onMouseMove={handleMouseMove}
       onClick={() => { if (isTouch) setTappedNode(null); }}
     >
+      <style>{'@keyframes gt-spin { to { transform: rotate(360deg); } }'}</style>
+
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16, flexWrap:'wrap', gap:10 }}>
         <div style={{ display:'flex', alignItems:'center', gap:9, flexWrap:'wrap' }}>
           <UserAvatarIcon size={20} color={SKY} glow="rgba(56,189,248,0.7)"/>
           <span style={{ color:SKY, fontSize:13, fontFamily:'Chivo Mono,monospace', letterSpacing:'0.1em', textTransform:'uppercase', fontWeight:700 }}>
             Generation Tree
           </span>
-          <span style={{
-            background: style.bg,
-            border:`1px solid ${style.border}`,
-            borderRadius:20, padding:'2px 10px',
-            color: style.text,
-            fontSize:10, fontFamily:'Chivo Mono,monospace', fontWeight:700,
-          }}>
-            Viewing from L{rootLevel}
-          </span>
+          {currentRoot && (
+            <span style={{
+              background: style.bg,
+              border:`1px solid ${style.border}`,
+              borderRadius:20, padding:'2px 10px',
+              color: style.text,
+              fontSize:10, fontFamily:'Chivo Mono,monospace', fontWeight:700,
+            }}>
+              Viewing from L{rootLevel}
+            </span>
+          )}
         </div>
         {trail.length > 1 && (
           <button
-            onClick={() => { setTrail([MOCK_TREE]); setHoveredNode(null); setTappedNode(null); }}
+            onClick={handleReset}
             style={{
               background:'rgba(56,189,248,0.08)', border:'1px solid rgba(56,189,248,0.28)',
               borderRadius:6, color:SKY70, fontSize:11, fontWeight:600,
@@ -731,30 +784,71 @@ export const GenerationTree = () => {
 
       {trail.length > 1 && <Breadcrumb trail={trail} onJump={handleJump}/>}
 
-      <p style={{ color:TEXT_DIM, fontSize:11, fontFamily:'Chivo Mono,monospace', marginBottom:12 }}>
-        {isTouch
-          ? 'Tap any node to inspect · Tap again to drill down'
-          : 'Click any node to drill into its subtree · Hover to inspect'}
-      </p>
-
-      <ReactFlowProvider>
-        <TreeFlow
-          root={currentRoot}
-          hoveredNode={hoveredNode}
-          cursor={cursor}
-          containerRef={containerRef}
-          onNodeClick={handleNodeClick}
-          onNodeEnter={handleNodeEnter}
-          onNodeLeave={handleNodeLeave}
-          device={device}
-        />
-      </ReactFlowProvider>
-
-      {isTouch && tappedNode && (
-        <TapPanel node={tappedNode} onClose={() => setTappedNode(null)} />
+      {error && (
+        <div style={{
+          display:'flex', alignItems:'center', justifyContent:'space-between', gap:12,
+          background:'rgba(243,18,96,0.08)', border:'1px solid rgba(243,18,96,0.3)',
+          borderRadius:10, padding:'10px 14px', marginBottom:12,
+        }}>
+          <span style={{ color:'#f31260', fontSize:11, fontFamily:'Chivo Mono,monospace' }}>{error}</span>
+          <button onClick={loadRoot} style={{
+            background:'rgba(243,18,96,0.12)', border:'1px solid rgba(243,18,96,0.4)',
+            borderRadius:6, color:'#f31260', fontSize:10, fontFamily:'Chivo Mono,monospace',
+            padding:'3px 9px', cursor:'pointer', flexShrink:0,
+          }}>
+            Retry
+          </button>
+        </div>
       )}
 
-      <LevelLegend rootLevel={rootLevel}/>
+      {!error && (
+        <p style={{ color:TEXT_DIM, fontSize:11, fontFamily:'Chivo Mono,monospace', marginBottom:12 }}>
+          {isTouch
+            ? 'Tap any node to inspect · Tap again to drill down'
+            : 'Click any node to drill into its subtree · Hover to inspect'}
+        </p>
+      )}
+
+      {loading ? (
+        <div style={{
+          width:'100%', height:SIZES[device].height, borderRadius:14,
+          background:'#020817', border:'1px solid rgba(56,189,248,0.16)',
+          display:'flex', alignItems:'center', justifyContent:'center',
+        }}>
+          <Spinner/>
+        </div>
+      ) : currentRoot ? (
+        <div style={{ position:'relative' }}>
+          <ReactFlowProvider>
+            <TreeFlow
+              root={currentRoot}
+              hoveredNode={hoveredNode}
+              cursor={cursor}
+              containerRef={containerRef}
+              onNodeClick={handleNodeClick}
+              onNodeEnter={handleNodeEnter}
+              onNodeLeave={handleNodeLeave}
+              device={device}
+            />
+          </ReactFlowProvider>
+
+          {drilling && (
+            <div style={{
+              position:'absolute', inset:0, borderRadius:14,
+              background:'rgba(2,8,23,0.6)', backdropFilter:'blur(2px)',
+              display:'flex', alignItems:'center', justifyContent:'center', zIndex:50,
+            }}>
+              <Spinner/>
+            </div>
+          )}
+
+          {isTouch && tappedNode && (
+            <TapPanel node={tappedNode} onClose={() => setTappedNode(null)} />
+          )}
+        </div>
+      ) : null}
+
+      {currentRoot && <LevelLegend rootLevel={rootLevel}/>}
     </div>
   );
 };

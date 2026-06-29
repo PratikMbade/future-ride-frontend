@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
 // 6:00 PM IST, June 29, 2026 → IST is UTC+5:30
-const LAUNCH_DATE = new Date('2026-06-29T18:00:00+05:30').getTime()
+const LAUNCH_DATE = new Date('2026-06-29T20:00:00+05:30').getTime()
 
 interface TimeLeft {
   days: number
@@ -106,7 +106,7 @@ export default function LaunchCountdown() {
 
             {/* Date line */}
             <p className="mt-6 text-center font-mono-custom text-xs sm:text-sm font-semibold tracking-[0.1em] text-white/45">
-              29 JUNE 2026 &nbsp;·&nbsp; 6:00 PM IST
+              29 JUNE 2026 &nbsp;·&nbsp; 8:00 PM IST
             </p>
           </>
         )}
