@@ -1,5 +1,6 @@
 import { Menu, User, Bell } from 'lucide-react'
 import { WalletAddress } from './WalletAddress'
+import { useActiveAccount } from 'thirdweb/react'
 
 interface Props {
   title: string
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function TopBar({ title, walletAddress, onMenuOpen }: Props) {
+  const account = useActiveAccount()
   return (
     <header
       data-testid="topbar"
@@ -31,14 +33,11 @@ export function TopBar({ title, walletAddress, onMenuOpen }: Props) {
 
       {/* Right */}
       <div className="flex items-center gap-2">
-        {walletAddress && (
+        {account && (
           <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">
-            <WalletAddress address={walletAddress} truncate showCopy={false} className="text-xs text-white/50" />
+            <WalletAddress address={account.address!} truncate showCopy={false} className="text-xs text-white/50" />
           </div>
         )}
-        <button data-testid="topbar-notifications" className="p-2 rounded-lg text-white/40 hover:text-white/70 hover:bg-white/5 transition-colors relative">
-          <Bell size={17} />
-        </button>
         <button data-testid="topbar-profile" className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1B4FD8] to-[#38BDF8] flex items-center justify-center text-white hover:opacity-90 transition-opacity">
           <User size={15} />
         </button>
