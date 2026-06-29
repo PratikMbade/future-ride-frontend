@@ -86,7 +86,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* <Link
+          <Link
             data-testid="navbar-cta-button"
             to={'/registration'}
             className="hidden lg:block px-6 py-2.5 text-sm font-bold text-black rounded-xl btn-gold"
@@ -99,7 +99,7 @@ export function Navbar() {
             className="hidden lg:block px-6 py-2.5 text-sm font-bold text-black rounded-xl bg-white"
           >
             Login
-          </Link> */}
+          </Link>
           <button
             data-testid="navbar-mobile-toggle"
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -131,7 +131,7 @@ export function Navbar() {
               
             ))}
             <div className='flex flex-col w-fit gap-4'>
-                         {/* <Link
+                         <Link
             data-testid="navbar-cta-button"
             to={'/registration'}
             className=" lg:hidden px-6 py-2.5 text-sm font-bold text-black rounded-xl btn-gold"
@@ -144,7 +144,7 @@ export function Navbar() {
             className=" lg:hidden px-6 py-2.5 text-sm font-bold text-black rounded-xl bg-white"
           >
             Login
-          </Link> */}
+          </Link>
             </div>
 
           </div>
