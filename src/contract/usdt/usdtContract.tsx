@@ -4,8 +4,8 @@ import { client, MainnetChain } from '@/lib/client';
 import { ethers } from 'ethers';
 import USDT_CONTRACT_ABI from './usdtContract.abi.json'
 
-// export const  USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955"
-export const  USDT_ADDRESS ="0xBe9a1d75c68cfA6E558E597CAf538376708862c4"
+
+export const  USDT_ADDRESS ="0x55d398326f99059fF775485246999027B3197955"
 
 export async function usdtContractInstance (activeAccount: Account){
     try {

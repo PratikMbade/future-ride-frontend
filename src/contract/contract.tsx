@@ -4,7 +4,7 @@ import { client, MainnetChain } from '@/lib/client';
 import { ethers } from 'ethers';
 import FUTUR_RIDE_CONTRACT_ABI from './futurerideContract.abi.json'
 
-export const  FUTURE_RIDE_CONTRACT_ADDRESS = "0x7380F66a88a8959F3877ee375573C3F3b1378EBe"
+export const  FUTURE_RIDE_CONTRACT_ADDRESS = "0x4b723b4E500d99493ed4003705Bd7840927AEa62"
 
 export async function contractInstance (activeAccount: Account){
     try {

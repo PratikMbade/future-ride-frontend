@@ -42,7 +42,7 @@ const NAV: NavItem[] = [
       { label: 'Direct Income',     href: '/dashboard/income/direct-income',       icon: <DollarSign size={14} /> },
       { label: 'Generation Income', href: '/dashboard/income/generation-income',    icon: <TrendingUp size={14} /> },
             { label: 'Laps Income', href: '/dashboard/income/laps-income',    icon: <DollarSign size={14} /> },
-                  { label: 'Royalty Income', href: '/dashboard/income/royalty-income',    icon: <LucideCardSim size={14} /> },
+                  // { label: 'Royalty Income', href: '/dashboard/income/royalty-income',    icon: <LucideCardSim size={14} /> },
                   { label: 'Lost Income', href: '/dashboard/income/lost-income',    icon: <DollarSign size={14} /> },
 
     ],

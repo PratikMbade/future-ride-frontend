@@ -27,13 +27,13 @@ const TIERS: CardTier[] = [
     id: 'silver', name: 'Silver',
     base: '#A6ACB4', light: '#F4F6F8', dark: '#5B6168',
     sheen: 'rgba(255,255,255,0.85)', textColor: '#2A2E33', accentColor: '#3A3F45',
-    badge: 'SLV', icon: Medal, locked: false, cap: 500, claimed: 120, remaining: 180,
+    badge: 'SLV', icon: Medal, locked: false, cap: 500, claimed: 0, remaining: 300,
   },
   {
     id: 'gold', name: 'Gold',
     base: '#C99A3B', light: '#FBE8AE', dark: '#6B4A12',
     sheen: 'rgba(255,244,210,0.9)', textColor: '#2C1F08', accentColor: '#4A330D',
-    badge: 'GLD', icon: Crown, locked: false, cap: 1000, claimed: 300, remaining: 1200
+    badge: 'GLD', icon: Crown, locked: false, cap: 1000, claimed: 0, remaining: 1500
 ,
   },
 {
@@ -211,12 +211,35 @@ function useClaimCountdown() {
   return { canClaim, claim, formatted }
 }
 
+// ─── coming-soon blur overlay ───────────────────────────────
+function ClaimingSoonOverlay() {
+  return (
+    <div
+      className="absolute inset-0 z-30 flex items-center justify-center rounded-3xl px-6"
+      style={{
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        background: 'rgba(5,8,20,0.40)',
+      }}
+    >
+      <p
+        className="text-center font-extrabold leading-tight text-white drop-shadow-[0_4px_18px_rgba(0,0,0,0.6)]"
+        style={{ fontSize: 'clamp(2rem, 5vw, 3.75rem)' }}
+      >
+        Royalty Reward Claiming
+        <br />
+        Starts within 24hr
+      </p>
+    </div>
+  )
+}
+
 // ─── page ──────────────────────────────────────────────────
 export default function RoyaltyFundPool() {
   const { canClaim, claim, formatted } = useClaimCountdown()
 
   return (
-    <div className="space-y-8" data-testid="royalty-fund-pool">
+    <div className="relative space-y-8" data-testid="royalty-fund-pool">
       <header>
         <p className="text-3xl font-bold text-white">Royalty Fund Pool</p>
         <span className="text-lg text-white/50">
@@ -245,6 +268,9 @@ export default function RoyaltyFundPool() {
           {canClaim ? 'Claim Reward' : `Next claim in ${formatted}`}
         </button>
       </div>
+
+      {/* ── full-page blurred coming-soon overlay ── */}
+      <ClaimingSoonOverlay />
     </div>
   )
 }
