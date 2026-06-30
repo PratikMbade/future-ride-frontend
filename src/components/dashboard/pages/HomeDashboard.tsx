@@ -33,6 +33,7 @@ interface DashboardMe {
   lapsIncome: number
   lostIncome: number
   totalIncome: number
+  royaltyIncome:number
   // todaysIncome is an object with a `total` field, not a bare number —
   // the old `number` typing didn't match how it's actually used below.
   todaysIncome: {
@@ -117,6 +118,8 @@ export default function HomeDashboard() {
   const distributionCards = [
     { label: 'Direct Income',        value: me?.directIncome,        color: '#38BDF8', bg: 'from-[#0D2B6E] to-[#1B4FD8]', loading: false },
     { label: 'Generation Income',    value: me?.generationIncome,    color: '#22C55E', bg: 'from-[#14532D] to-[#16A34A]', loading: false },
+        { label: 'Royalty Income',    value: me?.royaltyIncome,    color: '#f2f0eb', bg: 'from-[#fcba03] to-[#16A34A]', loading: false },
+
     { label: 'Auto Upgrade Holding', value: upgradeHoldingIncome,    color: '#F5A623', bg: 'from-[#78340A] to-[#D97706]', loading: onChainLoading },
     { label: 'Laps Credit Income',   value: me?.lapsIncome,          color: '#A855F7', bg: 'from-[#3B0764] to-[#7E22CE]', loading: false },
     { label: 'Lost Income',          value: me?.lostIncome,          color: '#F43F5E', bg: 'from-[#4C0519] to-[#BE123C]', loading: false },
@@ -224,7 +227,7 @@ export default function HomeDashboard() {
 
         <motion.div
           initial="hidden" animate="visible" custom={2} variants={fadeUp}
-          className="lg:col-span-2 grid grid-cols-2 gap-3"
+          className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-3"
         >
           <GradientStatCard
             data-testid="stat-total-earnings"

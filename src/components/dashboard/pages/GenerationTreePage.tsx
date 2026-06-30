@@ -108,7 +108,7 @@ interface TreeNode {
   id:              string;
   address:         string;
   referralAddress: string;
-  contractRegId:   number | null;
+  futureRideId:   string | null;
   isRegistered:    boolean;
   highestPackage:  HighestPackage | null;
   absoluteLevel?:  number;
@@ -120,7 +120,7 @@ interface MemberNodeData extends Record<string, unknown> {
   nodeAddress:     string;
   address:         string;
   referralAddress: string;
-  contractRegId:   number | null;
+  futureRideId:   string | null;
   isRegistered:    boolean;
   displayLevel:    number;
   isEmpty:         boolean;
@@ -177,7 +177,7 @@ function buildGraph(root: TreeNode, device: Device): { nodes: Node[]; edges: Edg
           nodeAddress:     data.address,
           address:         data.address,
           referralAddress: data.referralAddress,
-          contractRegId:   data.contractRegId,
+          futureRideId:   data.futureRideId,
           isRegistered:    data.isRegistered,
           displayLevel:    data.absoluteLevel ?? 0,
           isEmpty: false,
@@ -186,7 +186,7 @@ function buildGraph(root: TreeNode, device: Device): { nodes: Node[]; edges: Edg
         }
       : {
           nodeAddress:'', address:'', referralAddress:'',
-          contractRegId:null, isRegistered:false,
+          futureRideId:null, isRegistered:false,
           displayLevel: (root.absoluteLevel ?? 0) + layoutLvl - 1,
           isEmpty:true, isRoot:false, device,
         },
@@ -246,7 +246,7 @@ const UserAvatarIcon = ({ size, color, glow }: { size:number; color:string; glow
 const HS = { opacity:0, width:1, height:1, minWidth:1, minHeight:1, background:'transparent', border:'none' };
 
 const MemberNode = ({ data }: NodeProps<Node<MemberNodeData>>) => {
-  const { address, contractRegId, isEmpty, isRoot, displayLevel, device } = data;
+  const { address, futureRideId, isEmpty, isRoot, displayLevel, device } = data;
   const cfg   = SIZES[device as Device];
   const style = nodeStyle();
   const NW    = cfg.nodeW;
@@ -324,13 +324,13 @@ const MemberNode = ({ data }: NodeProps<Node<MemberNodeData>>) => {
       </span>
 
       <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-        {contractRegId != null && (
+        {futureRideId != null && (
           <span style={{
             background:'rgba(56,189,248,0.10)', border:'1px solid rgba(56,189,248,0.28)',
             borderRadius:4, padding:'2px 6px',
             color:TEXT_DIM, fontSize:cfg.badgeFont, fontFamily:'Chivo Mono,monospace',
           }}>
-            #{contractRegId}
+            #{futureRideId}
           </span>
         )}
         <span style={{
@@ -409,7 +409,7 @@ const TapPanel = ({ node, onClose }: { node: TreeNode; onClose: () => void }) =>
       </div>
 
       {([
-        ['ID',       node.contractRegId != null ? `#${node.contractRegId}` : '—'],
+        ['ID',       node.futureRideId != null ? `#${node.futureRideId}` : '—'],
         ['Address',  node.address],
         ['Referral', node.referralAddress],
         ['Status',   node.isRegistered ? '● Active' : '○ Inactive'],
@@ -474,7 +474,7 @@ const CursorTooltip = ({ node, cursor, containerRef }: {
       </div>
 
       {([
-        ['ID',       node.contractRegId != null ? `#${node.contractRegId}` : '—'],
+        ['ID',       node.futureRideId != null ? `#${node.futureRideId}` : '—'],
         ['Address',  node.address],
         ['Referral', node.referralAddress],
         ['Status',   node.isRegistered ? '● Active' : '○ Inactive'],
