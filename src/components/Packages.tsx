@@ -105,7 +105,7 @@ function TotalHighlightCard() {
 export function Packages() {
   return (
     <section id="packages" data-testid="packages-section" className="relative py-28 md:py-36 overflow-hidden">
-      <span aria-hidden className="sec-num -top-4 -left-4">05</span>
+      <span aria-hidden className="sec-num -top-4 right-0">06</span>
 
       <div className="max-w-7xl mx-auto px-5 md:px-10 relative z-10">
         <motion.div
@@ -133,12 +133,12 @@ export function Packages() {
             <div className="w-3 h-3 rounded-full bg-red-500/60" />
             <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
             <div className="w-3 h-3 rounded-full bg-green-500/60" />
-            <span className="ml-3 font-mono-custom text-xs text-white/25 tracking-widest">futureride://packages</span>
+            <span className="ml-3 font-mono-custom text-xs text-white/25 tracking-widest">FutureRide/Packages</span>
           </div>
           {/* Col headers */}
           <div className="grid grid-cols-3 md:grid-cols-4 gap-4 px-6 py-3 border-b border-white/5">
             {['LEVEL', 'INVESTMENT', 'STRUCTURE', 'STATUS'].map((h) => (
-              <div key={h} className="font-mono-custom text-[10px] text-white/30 tracking-[0.2em]">{h}</div>
+              <div key={h} className="font-mono-custom text-[10px] text-white/90 tracking-[0.2em]">{h}</div>
             ))}
           </div>
           {/* Rows */}
@@ -155,22 +155,22 @@ export function Packages() {
                   #{String(pkg.l).padStart(2, '0')}
                 </span>
               </div>
-              <div>
-                <span className="font-mono-custom font-extrabold text-base sm:text-lg text-white group-hover:text-[#38BDF8] transition-colors">
+              <div className='translate-x-4'>
+                <span className="font-mono-custom  font-extrabold text-base sm:text-lg text-white group-hover:text-[#38BDF8] transition-colors">
                   {fmt(pkg.p)}
                 </span>
                 <span className="text-white/25 text-[10px] ml-1">USDT</span>
               </div>
-              <div className="font-mono-custom text-sm text-white/50">{pkg.m.toLocaleString()}</div>
+              <div className="font-mono-custom text-sm text-white/80 translate-x-4">{pkg.m.toLocaleString()}</div>
               <div className="hidden md:flex items-center">
                 {pkg.l === 1 && <span className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-md">ENTRY</span>}
                 {pkg.l === 12 && <span className="text-[10px] font-bold text-[#F5A623] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">MAX</span>}
-                {pkg.l === 6 && <span className="text-[10px] font-bold text-[#A855F7] bg-[#A855F7]/10 border border-[#A855F7]/20 px-2 py-0.5 rounded-md">MID</span>}
+                {pkg.l === 4 && <span className="text-[10px] font-bold text-[#A855F7] bg-[#A855F7]/10 border border-[#A855F7]/20 px-2 py-0.5 rounded-md">Auto Upgrade</span>}
               </div>
             </motion.div>
           ))}
         </div>
-        <p className="text-white/22 text-xs mt-5 text-center">Packages are permanent with no expiry. Earnings are illustrative only.</p>
+        <p className="text-white/80 text-md mt-5 text-center">Packages are permanent with no expiry. Earnings are illustrative only.</p>
       </div>
     </section>
   )

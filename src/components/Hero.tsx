@@ -74,8 +74,6 @@ export function Hero() {
           </span>
         </motion.div>
 
-        <LaunchCountdown />
-
 
         {/* Headline */}
         <motion.div

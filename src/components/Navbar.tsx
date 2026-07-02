@@ -4,7 +4,7 @@ import { LOGO_URL } from '../constants/assets'
 import { Link } from '@tanstack/react-router'
 
 const navLinks = [
-  { label: 'About', href: '#about' },
+  { label: 'Smart Contract', href: '#smart-contract' },
   { label: 'Features', href: '#features' },
   { label: 'How It Works', href: '#how-it-works' },
   { label: 'Packages', href: '#packages' },

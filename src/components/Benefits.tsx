@@ -15,7 +15,7 @@ const BENEFITS = [
 export function Benefits() {
   return (
     <section id="benefits" data-testid="benefits-section" className="relative py-28 md:py-36 overflow-hidden">
-      <span aria-hidden className="sec-num -top-4 -left-4">07</span>
+      <span aria-hidden className="sec-num -top-4 right-4">08</span>
 
       <div className="max-w-7xl mx-auto px-5 md:px-10 relative z-10">
         <motion.div

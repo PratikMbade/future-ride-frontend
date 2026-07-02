@@ -20,7 +20,7 @@ import '@xyflow/react/dist/style.css';
 // Adjust this to whatever your app already uses to reach the backend
 // (axios instance, env var, etc). Left as a plain constant + fetch so
 // this file has no extra dependency.
-const API_BASE = import.meta.env.VITE_API_URL
+const API_BASE = import.meta.env.VITE_API_URL ?? '/api';
 const FETCH_DEPTH = 3; // root + 3 generations = 1+2+4+8 = 15 nodes, matches the layout below
 
 async function fetchSubtree(address: string): Promise<TreeNode> {
@@ -108,7 +108,7 @@ interface TreeNode {
   id:              string;
   address:         string;
   referralAddress: string;
-  futureRideId:   string | null;
+  futureRideId:   number | null;
   isRegistered:    boolean;
   highestPackage:  HighestPackage | null;
   absoluteLevel?:  number;
@@ -120,7 +120,7 @@ interface MemberNodeData extends Record<string, unknown> {
   nodeAddress:     string;
   address:         string;
   referralAddress: string;
-  futureRideId:   string | null;
+  futureRideId:   number | null;
   isRegistered:    boolean;
   displayLevel:    number;
   isEmpty:         boolean;
@@ -231,6 +231,22 @@ function buildGraph(root: TreeNode, device: Device): { nodes: Node[]; edges: Edg
   return { nodes, edges };
 }
 
+// ─── copy / check icons ───────────────────────────────────
+const CopyIcon = ({ size, color }: { size:number; color:string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+    stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2"/>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+  </svg>
+);
+
+const CheckIcon = ({ size, color }: { size:number; color:string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+    stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+
 // ─── generic user-avatar icon ─────────────────────────────
 const UserAvatarIcon = ({ size, color, glow }: { size:number; color:string; glow:string }) => (
   <svg
@@ -251,6 +267,17 @@ const MemberNode = ({ data }: NodeProps<Node<MemberNodeData>>) => {
   const style = nodeStyle();
   const NW    = cfg.nodeW;
   const AVA   = isRoot ? cfg.avaRoot : cfg.ava;
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    void navigator.clipboard.writeText(address as string).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+
+  const iconSize = device === 'desktop' ? 13 : 11;
 
   if (isEmpty) {
     return (
@@ -277,7 +304,7 @@ const MemberNode = ({ data }: NodeProps<Node<MemberNodeData>>) => {
   }
 
   return (
-    <div style={{ width:NW, display:'flex', flexDirection:'column', alignItems:'center', gap:7, cursor:'pointer' }}>
+    <div style={{ width:NW, display:'flex', flexDirection:'column', alignItems:'center', gap:7, cursor:'pointer', position:'relative' }}>
       <Handle id="top" type="target" position={Position.Top} style={HS}/>
 
       <div style={{
@@ -312,16 +339,36 @@ const MemberNode = ({ data }: NodeProps<Node<MemberNodeData>>) => {
         </div>
       </div>
 
-      <span style={{
-        color: isRoot ? SKY : TEXT_BRIGHT,
-        fontSize: cfg.addrFont,
-        fontFamily:'Chivo Mono,monospace',
-        fontWeight: isRoot ? 700 : 500,
-        textAlign:'center', lineHeight:1.3,
-        maxWidth: NW, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
-      }}>
-        {address}
-      </span>
+      <div style={{ position:'relative', display:'flex', alignItems:'center' }}>
+        <span style={{
+          color: isRoot ? SKY : TEXT_BRIGHT,
+          fontSize: cfg.addrFont,
+          fontFamily:'Chivo Mono,monospace',
+          fontWeight: isRoot ? 700 : 500,
+          textAlign:'center', lineHeight:1.3,
+          maxWidth: NW, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
+        }}>
+          {address}
+        </span>
+        <button
+          onClick={handleCopy}
+          title="Copy address"
+          style={{
+            position:'absolute', left:'calc(100% + 6px)',
+            background: copied ? 'rgba(56,189,248,0.15)' : 'rgba(56,189,248,0.06)',
+            border:`1px solid ${copied ? SKY45 : 'rgba(56,189,248,0.22)'}`,
+            borderRadius:5, cursor:'pointer',
+            padding:4, display:'flex', alignItems:'center', justifyContent:'center',
+            transition:'background 0.2s, border-color 0.2s',
+            zIndex:10,
+          }}
+        >
+          {copied
+            ? <CheckIcon size={iconSize} color={SKY}/>
+            : <CopyIcon  size={iconSize} color="rgba(56,189,248,0.65)"/>
+          }
+        </button>
+      </div>
 
       <div style={{ display:'flex', alignItems:'center', gap:4 }}>
         {futureRideId != null && (
@@ -330,7 +377,7 @@ const MemberNode = ({ data }: NodeProps<Node<MemberNodeData>>) => {
             borderRadius:4, padding:'2px 6px',
             color:TEXT_DIM, fontSize:cfg.badgeFont, fontFamily:'Chivo Mono,monospace',
           }}>
-            #{futureRideId}
+            {futureRideId}
           </span>
         )}
         <span style={{
@@ -362,7 +409,7 @@ const PackageRow = ({ pkg }: { pkg: HighestPackage | null }) => (
 );
 
 // ─── touch tap panel (mobile + tablet) ────────────────────
-const TapPanel = ({ node, onClose }: { node: TreeNode; onClose: () => void }) => {
+const TapPanel = ({ node, onClose, onDrillDown }: { node: TreeNode; onClose: () => void; onDrillDown: () => void }) => {
   const style = nodeStyle();
   return (
     <div
@@ -384,7 +431,7 @@ const TapPanel = ({ node, onClose }: { node: TreeNode; onClose: () => void }) =>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14, paddingBottom:12, borderBottom:'1px solid rgba(56,189,248,0.15)' }}>
         <div style={{ display:'flex', alignItems:'center', gap:8 }}>
           <UserAvatarIcon size={18} color={SKY} glow="rgba(56,189,248,0.6)"/>
-          <span style={{ color:SKY, fontSize:11, fontFamily:'Chivo Mono,monospace', letterSpacing:'0.1em', fontWeight:700 }}>NODE INFO</span>
+          <span style={{ color:SKY, fontSize:11, fontFamily:'Chivo Mono,monospace', letterSpacing:'0.1em', fontWeight:700 }}>USER INFO</span>
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:8 }}>
           <span style={{
@@ -412,7 +459,6 @@ const TapPanel = ({ node, onClose }: { node: TreeNode; onClose: () => void }) =>
         ['ID',       node.futureRideId != null ? `#${node.futureRideId}` : '—'],
         ['Address',  node.address],
         ['Referral', node.referralAddress],
-        ['Status',   node.isRegistered ? '● Active' : '○ Inactive'],
       ] as [string,string][]).map(([label, value]) => (
         <div key={label} style={{ display:'flex', gap:12, marginBottom:9, alignItems:'flex-start' }}>
           <span style={{ color:'rgba(56,189,248,0.5)', fontSize:11, fontFamily:'Chivo Mono,monospace', minWidth:60, flexShrink:0, paddingTop:1, fontWeight:600 }}>
@@ -429,6 +475,22 @@ const TapPanel = ({ node, onClose }: { node: TreeNode; onClose: () => void }) =>
         </div>
       ))}
       <PackageRow pkg={node.highestPackage}/>
+
+      <button
+        onClick={onDrillDown}
+        style={{
+          marginTop:14, width:'100%',
+          background:'rgba(56,189,248,0.12)',
+          border:'1px solid rgba(56,189,248,0.40)',
+          borderRadius:10, padding:'10px 0',
+          color:SKY, fontSize:12, fontFamily:'Chivo Mono,monospace', fontWeight:700,
+          letterSpacing:'0.06em', cursor:'pointer',
+          display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+        }}
+      >
+        <span style={{ fontSize:15 }}>⤵</span>
+        Go into subtree
+      </button>
     </div>
   );
 };
@@ -462,7 +524,7 @@ const CursorTooltip = ({ node, cursor, containerRef }: {
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:11, paddingBottom:9, borderBottom:'1px solid rgba(56,189,248,0.15)' }}>
         <div style={{ display:'flex', alignItems:'center', gap:6 }}>
           <UserAvatarIcon size={15} color={SKY} glow="rgba(56,189,248,0.6)"/>
-          <span style={{ color:SKY, fontSize:10, fontFamily:'Chivo Mono,monospace', letterSpacing:'0.12em', fontWeight:700 }}>NODE INFO</span>
+          <span style={{ color:SKY, fontSize:10, fontFamily:'Chivo Mono,monospace', letterSpacing:'0.12em', fontWeight:700 }}>USER INFO</span>
         </div>
         <span style={{
           background:style.bg, border:`1px solid ${style.border}`,
@@ -477,7 +539,6 @@ const CursorTooltip = ({ node, cursor, containerRef }: {
         ['ID',       node.futureRideId != null ? `#${node.futureRideId}` : '—'],
         ['Address',  node.address],
         ['Referral', node.referralAddress],
-        ['Status',   node.isRegistered ? '● Active' : '○ Inactive'],
       ] as [string,string][]).map(([label, value]) => (
         <div key={label} style={{ display:'flex', gap:10, marginBottom:7, alignItems:'flex-start' }}>
           <span style={{ color:'rgba(56,189,248,0.45)', fontSize:10, fontFamily:'Chivo Mono,monospace', minWidth:56, flexShrink:0, paddingTop:1, fontWeight:600 }}>
@@ -843,7 +904,11 @@ export const GenerationTree = ({ rootAddress }: { rootAddress: string }) => {
           )}
 
           {isTouch && tappedNode && (
-            <TapPanel node={tappedNode} onClose={() => setTappedNode(null)} />
+            <TapPanel
+                node={tappedNode}
+                onClose={() => setTappedNode(null)}
+                onDrillDown={() => { void drillInto(tappedNode); setTappedNode(null); }}
+              />
           )}
         </div>
       ) : null}

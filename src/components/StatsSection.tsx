@@ -13,7 +13,7 @@ const STATS = [
 export function StatsSection() {
   return (
     <section id="stats" data-testid="stats-section" className="relative py-28 md:py-36 overflow-hidden">
-      <span aria-hidden className="sec-num -top-4 right-0">08</span>
+      <span aria-hidden className="sec-num -top-4 left-0">09</span>
 
       <div className="max-w-7xl mx-auto px-5 md:px-10 relative z-10">
         <motion.div

@@ -28,7 +28,7 @@ const TIERS = [
 export function RoyaltyCards() {
   return (
     <section id="royalty" data-testid="royalty-section" className="relative py-20 sm:py-28 md:py-36 overflow-hidden">
-      <span aria-hidden className="sec-num -top-4 right-0">06</span>
+      <span aria-hidden className="sec-num -top-4 left-0">07</span>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-5 md:px-10 relative z-10">
         <motion.div

@@ -15,6 +15,9 @@ import { CTASection } from './CTASection'
 import { Footer } from './Footer'
 import { SpaceBackground } from './SpaceBackground'
 import PackagesTemplate from './PackagesCard'
+import { ContractOwnershipBanner } from './Contractownershipbanner'
+import SmartContract from './SmartContract'
+import TreeStructure from './TreeStructure'
 
 export function HomePage() {
   return (
@@ -25,12 +28,15 @@ export function HomePage() {
         <main>
           <Hero />
           <StatsMarquee />
+             <ContractOwnershipBanner/>
           <About />
           <Features />
           <HowItWorks />
+          <SmartContract/>
           <IncomeDistribution />
           <PackagesTemplate/>
           <Packages />
+          <TreeStructure/>
           <RoyaltyCards />
           <Benefits />
           <StatsSection />

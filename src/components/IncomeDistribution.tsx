@@ -22,7 +22,7 @@ const STREAMS = [
 export function IncomeDistribution() {
   return (
     <section id="income" data-testid="income-section" className="relative py-28 md:py-36 overflow-hidden">
-      <span aria-hidden className="sec-num -top-4 right-0">04</span>
+      <span aria-hidden className="sec-num -top-4 left-0">05</span>
 
       <div className="max-w-7xl mx-auto px-5 md:px-10 relative z-10">
         <motion.div

@@ -18,7 +18,7 @@ export function FAQAccordion() {
 
   return (
     <section id="faq" data-testid="faq-section" className="relative py-28 md:py-36 overflow-hidden">
-      <span aria-hidden className="sec-num -top-4 -left-4">09</span>
+      <span aria-hidden className="sec-num -top-4 right-4">10</span>
 
       <div className="max-w-4xl mx-auto px-5 md:px-10 relative z-10">
         <motion.div
