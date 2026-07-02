@@ -165,7 +165,12 @@ export function Packages() {
               <div className="hidden md:flex items-center">
                 {pkg.l === 1 && <span className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-md">ENTRY</span>}
                 {pkg.l === 12 && <span className="text-[10px] font-bold text-[#F5A623] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">MAX</span>}
-                {pkg.l === 4 && <span className="text-[10px] font-bold text-[#A855F7] bg-[#A855F7]/10 border border-[#A855F7]/20 px-2 py-0.5 rounded-md">Auto Upgrade</span>}
+                {pkg.l === 3 && <span className="text-[10px] font-bold text-[#f2ece2] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">Silver Roaylty Unlock</span>}
+                                {pkg.l === 9 && <span className="text-[10px] font-bold text-[#A855F7] bg-[#A855F7]/10 border border-[#A855F7]/20 px-2 py-0.5 rounded-md">Diamond Roaylty Unlock</span>}
+                {pkg.l === 5 && <span className="text-[10px] font-bold text-[#F5A623] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">Gold Roaylty Unlock</span>}
+                                {pkg.l === 7 && <span className="text-[10px] font-bold text-[#f7f4ef] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">Platinum Roaylty Unlock</span>}
+
+                {pkg.l === 4 && <span className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-md">Auto Upgrade</span>}
               </div>
             </motion.div>
           ))}

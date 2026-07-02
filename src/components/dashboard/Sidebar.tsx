@@ -148,7 +148,7 @@ export function Sidebar({ open, onClose }: Props) {
                     data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                     onClick={() => toggle(item.label)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-lg font-medium transition-all duration-200 group
-                      ${childActive ? 'text-[#38BDF8] bg-[#38BDF8]/8' : 'text-white/90 hover:text-white/80 hover:bg-white/[0.04]'}`}
+                      ${childActive ? 'text-[#38BDF8] bg-[#38BDF8]/8' : 'text-white/50 hover:text-white/80 hover:bg-white/[0.04]'}`}
                   >
                     <span className={childActive ? 'text-[#38BDF8]' : 'text-white/40 group-hover:text-white/60'}>{item.icon}</span>
                     <span className="flex-1 text-left ">{item.label}</span>
@@ -196,7 +196,7 @@ export function Sidebar({ open, onClose }: Props) {
           {/* connected wallet card */}
           {account && (
             <div className="rounded-[10px] border border-white/[0.08] bg-white/[0.025] px-3 py-2.5">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-white/35 mb-1">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-[#38bdf8] mb-1">
                 Connected Wallet
               </p>
               <div className="flex items-center gap-1.5">

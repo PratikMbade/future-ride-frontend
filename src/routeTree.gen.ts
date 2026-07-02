@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MarketingRouteImport } from './routes/marketing'
 import { Route as RegistrationRouteRouteImport } from './routes/registration/route'
 import { Route as LoginRouteRouteImport } from './routes/login/route'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
@@ -27,6 +28,11 @@ import { Route as DashboardIncomeLapsIncomeRouteImport } from './routes/dashboar
 import { Route as DashboardIncomeGenerationIncomeRouteImport } from './routes/dashboard/income/generation-income'
 import { Route as DashboardIncomeDirectIncomeRouteImport } from './routes/dashboard/income/direct-income'
 
+const MarketingRoute = MarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegistrationRouteRoute = RegistrationRouteRouteImport.update({
   id: '/registration',
   path: '/registration',
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/login': typeof LoginRouteRouteWithChildren
   '/registration': typeof RegistrationRouteRoute
+  '/marketing': typeof MarketingRoute
   '/dashboard/direct-team': typeof DashboardDirectTeamRoute
   '/dashboard/future-ride-system': typeof DashboardFutureRideSystemRoute
   '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
@@ -141,6 +148,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/registration': typeof RegistrationRouteRoute
+  '/marketing': typeof MarketingRoute
   '/dashboard/direct-team': typeof DashboardDirectTeamRoute
   '/dashboard/future-ride-system': typeof DashboardFutureRideSystemRoute
   '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/login': typeof LoginRouteRouteWithChildren
   '/registration': typeof RegistrationRouteRoute
+  '/marketing': typeof MarketingRoute
   '/dashboard/direct-team': typeof DashboardDirectTeamRoute
   '/dashboard/future-ride-system': typeof DashboardFutureRideSystemRoute
   '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/registration'
+    | '/marketing'
     | '/dashboard/direct-team'
     | '/dashboard/future-ride-system'
     | '/dashboard/generation-tree'
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/registration'
+    | '/marketing'
     | '/dashboard/direct-team'
     | '/dashboard/future-ride-system'
     | '/dashboard/generation-tree'
@@ -218,6 +229,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/registration'
+    | '/marketing'
     | '/dashboard/direct-team'
     | '/dashboard/future-ride-system'
     | '/dashboard/generation-tree'
@@ -238,10 +250,18 @@ export interface RootRouteChildren {
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   LoginRouteRoute: typeof LoginRouteRouteWithChildren
   RegistrationRouteRoute: typeof RegistrationRouteRoute
+  MarketingRoute: typeof MarketingRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/marketing': {
+      id: '/marketing'
+      path: '/marketing'
+      fullPath: '/marketing'
+      preLoaderRoute: typeof MarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/registration': {
       id: '/registration'
       path: '/registration'
@@ -415,6 +435,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   LoginRouteRoute: LoginRouteRouteWithChildren,
   RegistrationRouteRoute: RegistrationRouteRoute,
+  MarketingRoute: MarketingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

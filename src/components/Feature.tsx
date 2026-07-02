@@ -44,7 +44,7 @@ export function Features() {
               data-testid={`feature-card-${i}`}
               initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }} transition={{ duration: 0.45, delay: Math.min(i * 0.05, 0.4) }}
-              className={`group card hover:-translate-y-1 transition-all duration-300 p-7 ${f.wide ? 'lg:col-span-2' : ''}`}
+              className={`group card hover:-translate-y-1 transition-all duration-300 p-7 ${f.wide ? '' : ''}`}
               style={{ borderColor: `${f.c}20` }}
             >
               <div className="flex items-start justify-between mb-5">
@@ -54,10 +54,10 @@ export function Features() {
                 >
                   <f.icon size={20} style={{ color: f.c }} />
                 </div>
-                <span className="font-mono-custom font-bold text-xs" style={{ color: `${f.c}55` }}>{f.n}</span>
+                <span className="font-mono-custom font-bold " style={{ color: `` }}>{f.n}</span>
               </div>
               <h3 className="font-bold text-white text-base mb-2">{f.title}</h3>
-              <p className="text-white/55 text-sm leading-relaxed">{f.desc}</p>
+              <p className="text-[#38bdf8] text-sm leading-relaxed">{f.desc}</p>
             </motion.div>
           ))}
         </div>

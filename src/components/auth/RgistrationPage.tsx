@@ -25,6 +25,7 @@ import { usdtContractInstance } from '@/contract/usdt/usdtContract';
 import { client } from '@/lib/client';
 import { authClient } from '@/lib/authClient';
 import { buildSiweMessage } from '@/utils/buildMessage';
+import FutureRideLogo from '../FutureRideLogo';
 
 const API = import.meta.env.VITE_API_URL;
 function shortAddr(a: string) { return `${a.slice(0,6)}…${a.slice(-4)}`; }
@@ -157,7 +158,7 @@ function AltitudeDial({ step, sponsorLabel, isSuccess }: {
               <span className="font-mono text-[26px] font-bold text-white leading-none">
                 {step}<span className="text-white/25 text-[15px]">/5</span>
               </span>
-              <span className="font-mono text-[9px] tracking-[0.18em] uppercase text-white/30">waypoint</span>
+              <span className="font-mono text-[9px] tracking-[0.18em] uppercase text-white">waypoint</span>
             </>
           )}
         </div>
@@ -223,7 +224,7 @@ function Panel({ index, title, children }: { index: number; title: string; child
           {String(index).padStart(2, '0')}
         </span>
         <span className="h-px flex-1 bg-white/[0.07]" />
-        <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-white/35">{title}</span>
+        <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-[#38bdf8]">{title}</span>
       </div>
       {children}
     </div>
@@ -267,9 +268,9 @@ function ReferralInput({ value, onChange, onValidated, disabled }: {
 
   return (
     <div className="flex flex-col gap-3">
-      <label className="font-mono text-[9.5px] tracking-[0.16em] uppercase text-white/35">Referral ID</label>
+      <label className="font-mono text-[9.5px] tracking-[0.16em] uppercase text-white/95">Referral ID</label>
       <div className={`relative flex items-center rounded-lg border bg-black/30 transition-all duration-300 ${ring}`}>
-        <Hash size={16} className="absolute left-3.5 text-white/30 pointer-events-none" />
+        <Hash size={16} className="absolute left-3.5 text-white/35 pointer-events-none" />
         <input
           data-testid="referral-id-input"
           value={value}
@@ -512,10 +513,10 @@ export default function RegisterPage() {
 
       {/* header */}
       <header className="relative z-10 flex items-center justify-between px-5 sm:px-8 h-[56px] border-b border-white/[0.06]">
-        <a href="/" className="flex items-center gap-2 font-mono text-[11px] text-white/40 hover:text-[#7dd3fc] transition-colors tracking-wide">
-          <span className="w-1.5 h-1.5 rotate-45 bg-[#38bdf8]" />
-          futureride.live
-        </a>
+       <a href="/" className="flex items-center gap-2.5">
+                <FutureRideLogo/>
+                <span className="font-heading text-[15px] font-bold text-white tracking-tight">Future Ride</span>
+              </a>
         <span className="flex items-center gap-1.5 font-mono text-[9.5px] text-white/35 tracking-[0.1em] uppercase">
           <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e]" style={{ boxShadow: '0 0 6px rgba(34,197,94,0.7)' }} />
           BNB Mainnet
@@ -539,7 +540,7 @@ export default function RegisterPage() {
           <h1 className="mt-5 mb-0 text-[20px] font-bold text-white tracking-[-0.01em] text-center">
             {isSuccess ? 'Position locked' : stageTitle}
           </h1>
-          <p className="mt-1 mb-0 text-[13px] text-white/40 text-center max-w-[300px]">
+          <p className="mt-1 mb-0 text-[13px] text-[#38bdf8] text-center max-w-[300px]">
             {isSuccess
               ? 'Your node is registered on-chain. Redirecting…'
               : 'Five checks to lock your position beneath your sponsor — fully on-chain.'}
@@ -552,7 +553,7 @@ export default function RegisterPage() {
           {/* step 1 — connect wallet */}
           {step === 1 && (
             <Panel index={1} title="Wallet">
-              <p className="mt-0 mb-4 text-[13px] text-white/45 leading-relaxed">
+              <p className="mt-0 mb-4 text-[13px] text-[#38bdf8] leading-relaxed">
                 MetaMask, Trust Wallet, or any WalletConnect-compatible wallet on BNB Chain.
               </p>
               <div className="[&>div]:!w-full [&>div>button]:!w-full">
@@ -580,7 +581,7 @@ export default function RegisterPage() {
           {/* step 2 — sign-in */}
           {step === 2 && (
             <Panel index={2} title="Sign-in">
-              <p className="mt-0 mb-4 text-[13px] text-white/45 leading-relaxed">
+              <p className="mt-0 mb-4 text-[13px] text-[#38bdf8] leading-relaxed">
                 Sign a free message to prove this wallet is yours. No gas, no transaction.
               </p>
               <div className="flex items-center justify-between px-3.5 py-3 rounded-lg border border-white/[0.08] bg-black/25 mb-3">
@@ -626,7 +627,7 @@ export default function RegisterPage() {
                   <h2 className="m-0 text-[18px] font-bold text-white leading-tight">
                     Do you have a referral ID?
                   </h2>
-                  <p className="mt-2 mb-0 text-[13px] text-white/50 leading-relaxed max-w-[300px] mx-auto">
+                  <p className="mt-2 mb-0 text-[13px] text-[#38bdf8] leading-relaxed max-w-[300px] mx-auto">
                     If someone invited you, enter their ID. If not, we'll place you under a default sponsor.
                   </p>
                 </div>
@@ -643,7 +644,7 @@ export default function RegisterPage() {
                     </div>
                     <div>
                       <p className="m-0 text-[15px] font-bold text-white leading-none">Yes</p>
-                      <p className="m-0 mt-1 text-[11px] font-mono text-white/50">I have a referral ID</p>
+                      <p className="m-0 mt-1 text-[11px] font-mono text-white">I have a referral ID</p>
                     </div>
                   </button>
 
@@ -658,7 +659,7 @@ export default function RegisterPage() {
                     </div>
                     <div>
                       <p className="m-0 text-[15px] font-bold text-white leading-none">No</p>
-                      <p className="m-0 mt-1 text-[11px] font-mono text-white/50">Use default sponsor</p>
+                      <p className="m-0 mt-1 text-[11px] font-mono text-white">Use default sponsor</p>
                     </div>
                   </button>
                 </div>
@@ -673,7 +674,7 @@ export default function RegisterPage() {
               the green "verified" row. "Yes" starts with an empty field. */}
           {step === 4 && referralChoice === 'yes' && (
             <Panel index={4} title="Sponsor">
-              <p className="mt-0 mb-4 text-[13px] text-white/45 leading-relaxed">
+              <p className="mt-0 mb-4 text-[13px] text-[#38bdf8] leading-relaxed">
                 {referralId === DEFAULT_REFERRAL_ID
                   ? 'You\'ll be placed under the default sponsor. You can change the ID below if you have one.'
                   : 'Enter the Future Ride ID of the person who invited you.'}
@@ -686,7 +687,7 @@ export default function RegisterPage() {
               />
               <button
                 onClick={() => { setReferralChoice(null); setReferralId(''); setReferrer(null); }}
-                className="mt-4 text-[12px] font-mono text-white/35 hover:text-white/65 transition-colors flex items-center gap-1.5"
+                className="mt-4 text-[12px] font-mono text-white/80 hover:text-white/65 transition-colors flex items-center gap-1.5"
               >
                 ← Back to referral question
               </button>
@@ -696,7 +697,7 @@ export default function RegisterPage() {
           {/* step 5 — confirm & register */}
           {step === 5 && !isSuccess && (
             <Panel index={5} title="Confirm">
-              <p className="mt-0 mb-4 text-[13px] text-white/45 leading-relaxed">
+              <p className="mt-0 mb-4 text-[13px] text-[#38bdf8] leading-relaxed">
                 Two wallet confirmations: approve {PACKAGE_1_PRICE_USDT} USDT, then register on-chain.
               </p>
 
@@ -713,7 +714,7 @@ export default function RegisterPage() {
                       key={label}
                       className={`flex items-center justify-between px-3.5 py-2.5 ${i < arr.length - 1 ? 'border-b border-white/[0.05]' : ''}`}
                     >
-                      <span className="text-[10.5px] font-mono tracking-[0.08em] uppercase text-white/35">{label}</span>
+                      <span className="text-[10.5px] font-mono tracking-[0.08em] uppercase text-white">{label}</span>
                       <span className={`text-[12.5px] font-medium font-mono truncate ml-3 ${label === 'Via' && referralId === DEFAULT_REFERRAL_ID ? 'text-[#7dd3fc]' : 'text-white'}`}>
                         {value}
                       </span>

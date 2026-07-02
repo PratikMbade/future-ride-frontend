@@ -354,18 +354,18 @@ function PremiumCard({
 
         {(status.state === 'claimable' || status.state === 'claimed-this-phase') && (
           <>
-            <div className="relative z-10 px-8 pb-5 grid grid-cols-2 gap-4">
+            <div className="relative z-10 px-8 pb-5 grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="rounded-2xl px-5 py-4" style={{ background: 'rgba(4,17,31,0.5)' }}>
                 <p className="text-xs font-bold tracking-wider uppercase mb-1.5 text-white">
                   Amount Claimed
                 </p>
-                <p className="text-3xl font-bold text-white">{usd(status.claimed)}</p>
+                <p className="text-xl font-bold text-white">{usd(status.claimed)}</p>
               </div>
               <div className="rounded-2xl px-5 py-4" style={{ background: 'rgba(4,17,31,0.5)' }}>
                 <p className="text-xs font-bold tracking-wider uppercase mb-1.5 text-white">
                   {status.isUncapped ? 'Cap' : 'Remaining'}
                 </p>
-                <p className="text-3xl font-bold text-white">
+                <p className="text-xl font-bold text-white">
                   {status.isUncapped ? 'Uncapped' : usd(status.remaining)}
                 </p>
               </div>

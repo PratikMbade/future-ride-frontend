@@ -403,7 +403,7 @@ const PackageRow = ({ pkg }: { pkg: HighestPackage | null }) => (
       Package
     </span>
     <span style={{ color: pkg ? TEXT_BRIGHT : 'rgba(224,242,254,0.4)', fontSize:11, fontFamily:'Chivo Mono,monospace', lineHeight:1.4 }}>
-      {pkg ? `${pkg.packageName} · #${pkg.packageNumber} · ${pkg.packageAmount}` : 'No package yet'}
+      {pkg ? `${pkg.packageName} · #${pkg.packageNumber} · $${pkg.packageAmount}` : 'No package yet'}
     </span>
   </div>
 );

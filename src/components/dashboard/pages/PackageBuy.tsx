@@ -104,7 +104,7 @@ function PkgCard({
           <div className="flex items-center gap-2">
             <span
               className="font-mono text-[10px] tracking-[0.18em] uppercase"
-              style={{ color: future ? "rgba(255,255,255,0.45)" : `${t.c}cc` }}
+              style={{ color: future ? "#38bdf8" : `${t.c}cc` }}
             >
               L{String(pkg.level).padStart(2, "0")}
             </span>
@@ -129,7 +129,7 @@ function PkgCard({
               <span className="font-mono text-[9px] uppercase tracking-[0.12em]" style={{ color: t.c }}>Active</span>
             </div>
           )}
-          {future && <Lock size={12} className="text-white/30 shrink-0 mt-0.5" />}
+          {future && <Lock size={12} className="text-[#38bdf8] shrink-0 mt-0.5" />}
         </div>
 
         {/* ── price ── */}
@@ -141,7 +141,7 @@ function PkgCard({
             {usd(pkg.price)}
             <span
               className="font-mono text-[11px] font-normal ml-1.5"
-              style={{ color: future ? "rgba(255,255,255,0.3)" : `${t.c}99` }}
+              style={{ color: future ? "#38bdf8" : `${t.c}99` }}
             >
               USDT
             </span>
@@ -173,7 +173,7 @@ function PkgCard({
         {/* ── future footer ── */}
         {future && (
           <div className="pt-3 border-t border-white/[0.06]">
-            <span className="font-mono text-[10px] text-white/35 tracking-[0.06em]">
+            <span className="font-mono text-[10px] text-[#38bdf8] tracking-[0.06em]">
               Requires PKG {String(pkg.level - 1).padStart(2, "0")}
             </span>
           </div>
@@ -423,7 +423,7 @@ export default function PackageBuyPage() {
           <h1 className="m-0 font-heading text-2xl sm:text-[28px] font-bold text-white tracking-[-0.025em]">
             Package Upgrade
           </h1>
-          <p className="mt-2 m-0 text-[13px] text-white/55 max-w-md leading-relaxed">
+          <p className="mt-2 m-0 text-[13px] text-[#38bdf8] max-w-md leading-relaxed">
             Each package unlocks the next generation of matrix earnings.
             Upgrade in sequence — packages cannot be skipped.
           </p>

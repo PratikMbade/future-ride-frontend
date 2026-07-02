@@ -112,13 +112,18 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="flex flex-col sm:flex-row gap-4 mb-10 w-full sm:w-auto justify-center"
         >
-          <button
+          <a
+            href="https://whatsapp.com/channel/0029VbD7Y0477qVZZaf29E1b"
+            target="_blank"
+            rel="noopener noreferrer"
             data-testid="hero-primary-cta"
-            onClick={() => go('packages')}
-            className="btn-gold px-8 py-4 text-[15px] rounded-xl"
+            className="inline-flex items-center justify-center gap-2 bg-green-500 px-8 py-4 text-[15px] font-bold rounded-xl"
           >
-            Join FutureRide
-          </button>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+              <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm0 18.15h-.01a8.23 8.23 0 0 1-4.2-1.15l-.3-.18-3.14.82.84-3.06-.2-.31a8.22 8.22 0 0 1-1.26-4.4c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.27-8.22 8.27zm4.52-6.16c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.17.24-.64.81-.78.97-.15.17-.29.19-.54.06-.25-.12-1.04-.38-1.99-1.23-.73-.66-1.23-1.46-1.37-1.71-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.15.16-.25.24-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.36-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.23.24-.85.83-.85 2.03s.87 2.36 1 2.52c.12.17 1.7 2.6 4.13 3.65.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.19.21-.58.21-1.08.15-1.19-.07-.11-.23-.18-.48-.3z" />
+            </svg>
+            Join Whatsapp Channel
+          </a>
           <button
             data-testid="hero-secondary-cta"
             onClick={() => go('about')}

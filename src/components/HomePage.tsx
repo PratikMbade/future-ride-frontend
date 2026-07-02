@@ -1,4 +1,4 @@
-import React from 'react'
+import  { useEffect } from 'react'
 import { Navbar } from './Navbar'
 import { Hero } from './Hero'
 import { StatsMarquee } from './StatsMarquee'
@@ -20,6 +20,18 @@ import SmartContract from './SmartContract'
 import TreeStructure from './TreeStructure'
 
 export function HomePage() {
+  useEffect(() => {
+  const hash = window.location.hash.slice(1)
+  if (!hash) return
+
+  // Wait for DOM to render, then scroll
+  const timer = setTimeout(() => {
+    document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' })
+  }, 100)
+
+  return () => clearTimeout(timer)
+}, [])
+
   return (
     <div className="relative min-h-screen   text-white">
       <SpaceBackground />

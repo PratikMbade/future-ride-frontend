@@ -143,8 +143,8 @@ function AccessDial({ stage, isChecking, isVerified }: {
         ) : (
           <>
             <Radar size={13} className="text-[#38bdf8]/50 mb-1" />
-            <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55">{labels[stage - 1]}</span>
-            <span className="font-mono text-[8.5px] tracking-[0.16em] uppercase text-white/25">{stage}/3</span>
+            <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-white">{labels[stage - 1]}</span>
+            <span className="font-mono text-[8.5px] tracking-[0.16em] uppercase text-white">{stage}/3</span>
           </>
         )}
       </div>
@@ -167,7 +167,7 @@ function Panel({ index, title, children }: { index: number; title: string; child
           {String(index).padStart(2, '0')}
         </span>
         <span className="h-px flex-1 bg-white/[0.07]" />
-        <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-white/35">{title}</span>
+        <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-[#38bdf8]">{title}</span>
       </div>
       {children}
     </div>
@@ -460,7 +460,8 @@ export default function LoginPage() {
             <button
               data-testid="header-disconnect-btn"
               onClick={handleDisconnect}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-[10.5px] text-white/40 border border-white/[0.07] hover:text-white/85 hover:border-white/[0.16] hover:bg-white/[0.04] transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-[10.5px] text-red-400 border border-red-500/40 hover:text-red-300 hover:border-red-400/70 hover:bg-red-500/8 transition-all"
+              style={{ boxShadow: '0 0 8px rgba(239,68,68,0.35), inset 0 0 8px rgba(239,68,68,0.08)' }}
             >
               <LogOut size={11} />
               <span className="hidden sm:inline">Disconnect</span>
@@ -486,7 +487,7 @@ export default function LoginPage() {
             <h1 className="m-0 font-heading text-[21px] font-bold text-white tracking-[-0.01em]">
               {isVerified ? 'Access granted' : 'Sign in to Future Ride'}
             </h1>
-            <p className="m-0 text-[12.5px] text-white/40 font-body leading-relaxed max-w-[280px]">
+            <p className="m-0 text-[13.5px] text-[#38bdf8] font-body leading-relaxed max-w-[280px]">
               {isVerified
                 ? 'Membership confirmed. Taking you to your dashboard…'
                 : 'Connect your wallet and sign a free message to access the matrix dashboard.'}
@@ -498,7 +499,7 @@ export default function LoginPage() {
             <Panel index={1} title="Wallet">
               <div className="rounded-lg border border-white/[0.08] overflow-hidden mb-3">
                 <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-white/[0.05]">
-                  <span className="flex items-center gap-2 text-[10.5px] font-mono tracking-[0.08em] uppercase text-white/35">
+                  <span className="flex items-center gap-2 text-[12.5px] font-mono tracking-[0.08em] uppercase text-[#38bdf8]">
                     <WalletIcon size={12} className="text-[#38bdf8]" />
                     Address
                   </span>
@@ -507,8 +508,8 @@ export default function LoginPage() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between px-3.5 py-2.5">
-                  <span className="text-[10.5px] font-mono tracking-[0.08em] uppercase text-white/35">Status</span>
-                  <span className="flex items-center gap-1.5 text-[12px] font-mono text-white/70">
+                  <span className="text-[10.5px] font-mono tracking-[0.08em] uppercase text-[#38bdf8]">Status</span>
+                  <span className="flex items-center gap-1.5 text-[12px] font-mono text-white">
                     {isLoading ? (
                       <>
                         <Loader2 size={12} className="text-[#38bdf8] animate-spin" />
@@ -517,12 +518,12 @@ export default function LoginPage() {
                     ) : isVerified ? (
                       <>
                         <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e]" />
-                        registered
+                        Registered
                       </>
                     ) : (
                       <>
-                        <span className="w-1.5 h-1.5 rounded-full bg-white/25" />
-                        connected
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                        Connected
                       </>
                     )}
                   </span>
@@ -556,7 +557,7 @@ export default function LoginPage() {
                 href={`https://bscscan.com/address/${account.address}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 py-2 font-mono text-[10.5px] text-white/30 hover:text-white/70 transition-colors mb-2"
+                className="flex items-center justify-center gap-1.5 py-2 font-mono text-[10.5px] text-yellow-400 hover:text-white/70 transition-colors mb-2"
               >
                 <ExternalLink size={10} />
                 View on BscScan
@@ -565,7 +566,8 @@ export default function LoginPage() {
               <button
                 data-testid="disconnect-wallet-btn"
                 onClick={handleDisconnect}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-lg border border-white/[0.08] font-mono text-[11.5px] text-white/40 hover:text-white/80 hover:border-white/[0.18] transition-all"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-lg border border-red-500/40 font-mono text-[11.5px] text-red-400 hover:text-red-300 hover:border-red-400/70 hover:bg-red-500/8 transition-all"
+                style={{ boxShadow: '0 0 8px rgba(239,68,68,0.35), inset 0 0 8px rgba(239,68,68,0.08)' }}
               >
                 <LogOut size={12} />
                 Disconnect wallet
@@ -573,7 +575,7 @@ export default function LoginPage() {
             </Panel>
           ) : (
             <Panel index={1} title="Connect">
-              <p className="mt-0 mb-4 text-[12.5px] text-white/45 font-body leading-relaxed">
+              <p className="mt-0 mb-4 text-[12.5px] text-[#38bdf8] font-body leading-relaxed">
                 MetaMask, Trust Wallet, or any WalletConnect-compatible wallet on BNB Chain.
               </p>
 
@@ -604,7 +606,7 @@ export default function LoginPage() {
 
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex-1 h-px bg-white/[0.06]" />
-                <span className="font-mono text-[9.5px] text-white/30 uppercase tracking-[0.14em]">New here?</span>
+                <span className="font-mono text-[9.5px] text-white uppercase tracking-[0.14em]">New here?</span>
                 <div className="flex-1 h-px bg-white/[0.06]" />
               </div>
 
@@ -621,24 +623,24 @@ export default function LoginPage() {
           )}
 
           {/* trust strip */}
-          <div className="flex items-center justify-center gap-4 font-mono text-[9.5px] text-white/30 tracking-wide">
+          <div className="flex items-center justify-center gap-4 font-mono text-[10.5px] text-[#38bdf8] tracking-wide">
             {['Non-custodial', 'Trustless', 'Instant access'].map((label, i, arr) => (
               <span key={label} className="flex items-center gap-4">
                 {label}
-                {i < arr.length - 1 && <span className="text-white/15">·</span>}
+                {i < arr.length - 1 && <span className="text-white">·</span>}
               </span>
             ))}
           </div>
 
           {/* footer */}
-          <p className="text-center text-[10.5px] font-mono text-white/25 tracking-wide -mt-1">
+          <p className="text-center text-[10.5px] font-mono text-[#38bdf8] tracking-wide -mt-1">
             Need help?{' '}
             <a
               data-testid="help-link"
               href="https://futureride.live"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#38bdf8]/60 hover:text-[#38bdf8] transition-colors"
+              className="text-[#38bdf8] hover:text-[#38bdf8] transition-colors"
             >
               Visit futureride.live →
             </a>
