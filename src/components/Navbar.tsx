@@ -36,85 +36,84 @@ export function Navbar() {
   }
 
   return (
-    <nav
-      data-testid="navbar"
-      className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-        scrolled
-          ? 'bg-[#020B20]/85 backdrop-blur-2xl border-b border-[#38BDF8]/10 shadow-lg shadow-black/30'
-          : 'bg-transparent'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-5 md:px-10 flex items-center justify-between h-[70px]">
-        {/* Logo */}
-        <button
-          data-testid="navbar-logo"
-          onClick={() => go('#home')}
-          className="flex items-center gap-2.5 flex-shrink-0 group"
-        >
-          <div className="relative w-20 h-20  overflow-hidden  flex-shrink-0">
-            <img
-              src={LOGO_URL}
-              alt="FutureRide"
-              className="w-full h-full object-contain"
-              // style={{ mixBlendMode: 'screen' }}
-            />
-          </div>
-          <span className="text-white font-extrabold text-[18px] tracking-tight leading-none hidden sm:block">
-            <span className="text-white">FUTURE</span>
-            <span className="text-yellow-400">RIDE</span>
-          </span>
-        </button>
-
-        {/* Desktop nav */}
-        <div className="hidden lg:flex items-center gap-1">
-          {navLinks.map((l) => {
-            const isActive = active === l.href.slice(1)
-            return (
-              <button
-                key={l.href}
-                data-testid={`nav-link-${l.label.toLowerCase().replace(/\s+/g, '-')}`}
-                onClick={() => go(l.href)}
-                className={`relative px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
-                  isActive ? 'text-[#38BDF8]' : 'text-white/95 hover:text-white'
-                }`}
-              >
-                {isActive && <span className="absolute inset-0 rounded-lg bg-[#38BDF8]/8 border border-[#38BDF8]/20" />}
-                <span className="relative">{l.label}</span>
-              </button>
-            )
-          })}
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Link
-            data-testid="navbar-cta-button"
-            to={'/registration'}
-            className="hidden lg:block px-6 py-2.5 text-sm font-bold text-black rounded-xl btn-gold"
-          >
-            Register
-          </Link>
-           <Link
-            data-testid="navbar-cta-button"
-            to={'/login'}
-            className="hidden lg:block px-6 py-2.5 text-sm font-bold text-black rounded-xl bg-white"
-          >
-            Login
-          </Link>
+    <>
+      <nav
+        data-testid="navbar"
+        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+          scrolled
+            ? 'bg-[#020B20]/85 backdrop-blur-2xl border-b border-[#38BDF8]/10 shadow-lg shadow-black/30'
+            : 'bg-transparent'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-5 md:px-10 flex items-center justify-between h-[70px]">
+          {/* Logo */}
           <button
-            data-testid="navbar-mobile-toggle"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl border border-white/12 bg-white/5 text-white"
+            data-testid="navbar-logo"
+            onClick={() => go('#home')}
+            className="flex items-center gap-2.5 flex-shrink-0 group"
           >
-            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+            <div className="relative w-20 h-20 overflow-hidden flex-shrink-0">
+              <img
+                src={LOGO_URL}
+                alt="FutureRide"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <span className="text-white font-extrabold text-[18px] tracking-tight leading-none hidden sm:block">
+              <span className="text-white">FUTURE</span>
+              <span className="text-yellow-400">RIDE</span>
+            </span>
           </button>
-        </div>
-      </div>
 
-      {/* Mobile menu */}
+          {/* Desktop nav */}
+          <div className="hidden lg:flex items-center gap-1">
+            {navLinks.map((l) => {
+              const isActive = active === l.href.slice(1)
+              return (
+                <button
+                  key={l.href}
+                  data-testid={`nav-link-${l.label.toLowerCase().replace(/\s+/g, '-')}`}
+                  onClick={() => go(l.href)}
+                  className={`relative px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                    isActive ? 'text-[#38BDF8]' : 'text-white/95 hover:text-white'
+                  }`}
+                >
+                  {isActive && <span className="absolute inset-0 rounded-lg bg-[#38BDF8]/8 border border-[#38BDF8]/20" />}
+                  <span className="relative">{l.label}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Link
+              to={'/registration'}
+              className="hidden lg:block px-6 py-2.5 text-sm font-bold text-black rounded-xl btn-gold"
+            >
+              Register
+            </Link>
+            <Link
+              to={'/login'}
+              className="hidden lg:block px-6 py-2.5 text-sm font-bold text-black rounded-xl bg-white"
+            >
+              Login
+            </Link>
+            <button
+              data-testid="navbar-mobile-toggle"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl border border-white/12 bg-white/5 text-white"
+            >
+              {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile menu — rendered OUTSIDE the nav to avoid backdrop-blur stacking context clipping */}
       {mobileOpen && (
         <div
           data-testid="navbar-mobile-menu"
-          className="lg:hidden bg-[#020B20]/95 backdrop-blur-2xl border-b border-[#38BDF8]/10"
+          className="fixed top-[70px] left-0 right-0 z-40 lg:hidden bg-[#020B20]/95 backdrop-blur-2xl border-b border-[#38BDF8]/10"
         >
           <div className="px-5 py-4 space-y-1">
             {navLinks.map((l) => (
@@ -122,34 +121,34 @@ export function Navbar() {
                 key={l.href}
                 onClick={() => go(l.href)}
                 className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
-                  active === l.href.slice(1) ? 'text-[#38BDF8] bg-[#38BDF8]/8' : 'text-white/60 hover:text-white hover:bg-white/5'
+                  active === l.href.slice(1)
+                    ? 'text-[#38BDF8] bg-[#38BDF8]/8'
+                    : 'text-white/60 hover:text-white hover:bg-white/5'
                 }`}
               >
                 {l.label}
               </button>
-
-              
             ))}
-            <div className='flex flex-col w-fit gap-4'>
-                         <Link
-            data-testid="navbar-cta-button"
-            to={'/registration'}
-            className=" lg:hidden px-6 py-2.5 text-sm font-bold text-black rounded-xl btn-gold"
-          >
-            Register
-          </Link>
-           <Link
-            data-testid="navbar-cta-button"
-            to={'/login'}
-            className=" lg:hidden px-6 py-2.5 text-sm font-bold text-black rounded-xl bg-white"
-          >
-            Login
-          </Link>
-            </div>
 
+            <div className="flex flex-col gap-3 pt-3 w-fit">
+              <Link
+                to={'/registration'}
+                onClick={() => setMobileOpen(false)}
+                className="px-6 py-2.5 text-sm font-bold text-black rounded-xl btn-gold"
+              >
+                Register
+              </Link>
+              <Link
+                to={'/login'}
+                onClick={() => setMobileOpen(false)}
+                className="px-6 py-2.5 text-sm font-bold text-black rounded-xl bg-white"
+              >
+                Login
+              </Link>
+            </div>
           </div>
         </div>
       )}
-    </nav>
+    </>
   )
 }

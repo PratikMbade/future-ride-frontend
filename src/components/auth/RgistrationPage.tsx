@@ -547,7 +547,7 @@ export default function RegisterPage() {
         </div>
 
         {/* ── stage panels ── */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 mt-24 lg:mt-0">
 
           {/* step 1 — connect wallet */}
           {step === 1 && (

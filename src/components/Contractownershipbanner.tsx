@@ -135,7 +135,6 @@ const css = `
   background: linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.08) 100%);
   border: 1px solid rgba(16,185,129,0.35);
   box-shadow: 0 0 8px rgba(16,185,129,0.12);
-  font-family: ui-monospace, monospace;
   font-size: 9px;
   letter-spacing: 0.15em;
   color: #4ade80;
@@ -306,47 +305,46 @@ function CornerAccent({ pos }: { pos: 'tl' | 'tr' | 'bl' | 'br' }) {
 function AddressRow({
   label, value, href,
 }: { label: string; value: string; href?: string }) {
-  const truncated = `${value.slice(0, 8)}…${value.slice(-6)}`
+
   return (
     <div className="glass-table-row">
       <span style={{
-        fontFamily: 'ui-monospace, monospace',
-        fontSize: 15,
+        fontSize: 11,
         letterSpacing: '0.18em',
-        color: 'rgba(56,189,248,1.45)',
+        color: 'rgba(56,189,248,1)',
         textTransform: 'uppercase',
         minWidth: 110,
         flexShrink: 0,
       }}>
         {label}
       </span>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, flex: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4, minWidth: 0, flex: 1 }}>
         <span style={{
-          fontFamily: 'ui-monospace, monospace',
           fontSize: 14,
           color: 'rgba(255,255,255,0.80)',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
+          wordBreak: 'break-all',   // ← breaks long hex strings/addresses
+          flex: 1,
+          minWidth: 0,
         }}>
-          <span className="hidden sm:inline">{value}</span>
-          <span className="sm:hidden">{truncated}</span>
+          {value}
         </span>
-        <CopyButton value={value} />
-        {href && (
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="View on BscScan"
-            style={{ color: 'rgba(56,189,248,0.45)', flexShrink: 0, display: 'flex' }}
-            className="hover:text-[#38bdf8] transition-colors"
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-          </a>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, paddingTop: 1 }}>
+          <CopyButton value={value} />
+          {href && (
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="View on BscScan"
+              style={{ color: 'rgba(56,189,248,0.45)', display: 'flex' }}
+              className="hover:text-[#38bdf8] transition-colors"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -356,18 +354,18 @@ function AddressRow({
 export function ContractOwnershipBanner() {
   return (
     <section
-
+    
       aria-label="Contract ownership verification"
-      style={{ width: '100%', padding: '40px 16px', display: 'flex', justifyContent: 'center' }}
+      className='max-w-7xl mx-auto'
+  style={{ padding: '40px 16px', display: 'flex', justifyContent: 'center', overflowX: 'hidden', width: '100%'}}
     >
       <style>{css}</style>
 
-      <div style={{ width: '100%', maxWidth: 960 }}>
+      <div style={{ width: '100%' }} className=''>
 
         {/* ── Eyebrow ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }} className=''>
           <span style={{
-            fontFamily: 'ui-monospace, monospace',
             fontSize: 20,
             letterSpacing: '0.22em',
             color: 'white',
@@ -385,7 +383,7 @@ export function ContractOwnershipBanner() {
           <div className="ambient-glow" />
 
           {/* Card */}
-          <div className="ownership-card">
+          <div className="ownership-card " >
             <div className="top-glow-border" />
             <div className="shimmer-sweep" />
 
@@ -420,7 +418,6 @@ export function ContractOwnershipBanner() {
                   {/* Contract 1: Future Ride Matrix */}
                   <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                     <h2 style={{
-                      fontFamily: 'ui-monospace, monospace',
                       fontSize: 15,
                       fontWeight: 600,
                       letterSpacing: '0.20em',
@@ -439,7 +436,6 @@ export function ContractOwnershipBanner() {
                   </div>
                
                   <p style={{
-                    fontFamily: 'ui-monospace, monospace',
                     fontSize: 13,
                     letterSpacing: '0.12em',
                     color: 'rgba(56,189,248,3.45)',
@@ -461,7 +457,6 @@ export function ContractOwnershipBanner() {
                   </svg>
                   <div>
                     <p style={{
-                      fontFamily: 'ui-monospace, monospace',
                       fontSize: 13,
                       color: '#6ee7b7',
                       letterSpacing: '0.08em',
