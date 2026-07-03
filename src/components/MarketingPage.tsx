@@ -295,7 +295,7 @@ export default function MarketingPage() {
         {/* ── Cards Grid ── */}
         <section
           aria-label="PDF Documents"
-          className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8"
+          className="grid grid-cols-1 sm:grid-cols-1 gap-6 sm:gap-8"
         >
           <PdfCard
             lang="English"
@@ -304,14 +304,14 @@ export default function MarketingPage() {
             pdfSrc={englishPdf}
             accent="sky"
           />
-          <PdfCard
+          {/* <PdfCard
             lang="Hindi"
             langNative="हिंदी"
 
             description="स्मार्ट कॉन्ट्रैक्ट की पूरी योजना हिंदी में — सभी मैट्रिक्स स्तरों और पुरस्कार संरचना के साथ।"
             pdfSrc={hindiPdf}
             accent="blue"
-          />
+          /> */}
         </section>
 
         <GlowDivider />
