@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 
 const PKGS = [
-  { l: 1, p: 5, m: 2 }, { l: 2, p: 10, m: 4 }, { l: 3, p: 20, m: 8 },
-  { l: 4, p: 40, m: 16 }, { l: 5, p: 80, m: 32 }, { l: 6, p: 160, m: 64 },
-  { l: 7, p: 320, m: 128 }, { l: 8, p: 640, m: 256 }, { l: 9, p: 1280, m: 512 },
-  { l: 10, p: 2560, m: 1024 }, { l: 11, p: 5120, m: 2048 }, { l: 12, p: 10240, m: 4096 },
+  { l: 1, p: 5, m: 2,i: 5}, { l: 2, p: 10, m: 4 ,i: 20}, { l: 3, p: 20, m: 8,i: 80 },
+  { l: 4, p: 40, m: 16,i: 320 }, { l: 5, p: 80, m: 32,i: 1280 }, { l: 6, p: 160, m: 64 ,i: 5120},
+  { l: 7, p: 320, m: 128 ,i: 20480}, { l: 8, p: 640, m: 256,i: 81920 }, { l: 9, p: 1280, m: 512,i: 327680 },
+  { l: 10, p: 2560, m: 1024,i: 1310720 }, { l: 11, p: 5120, m: 2048,i: 5242880 }, { l: 12, p: 10240, m: 4096,i: 20971520 },
 ]
 
 const fmt = (p: number) => p >= 1000 ? `$${(p / 1000).toFixed(p % 1000 === 0 ? 0 : 1)}K` : `$${p}`
@@ -58,7 +58,7 @@ function TotalHighlightCard() {
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
       data-testid="packages-total-card"
-      className="mb-8 flex flex-col gap-6 overflow-hidden rounded-2xl border border-[#F5A623]/20 p-6 md:flex-row md:items-center md:justify-between md:p-8"
+      className="mb-8 mt-3 flex flex-col gap-6 overflow-hidden rounded-2xl border border-[#F5A623]/20 p-6 md:flex-row md:items-center md:justify-between md:p-8"
       style={{ background: 'rgba(3,13,40,0.9)' }}
     >
       <div>
@@ -124,58 +124,63 @@ export function Packages() {
           </p>
         </motion.div>
 
-        <TotalHighlightCard/>
 
-        {/* Terminal window */}
-        <div className="rounded-2xl overflow-hidden border border-[#38BDF8]/18" style={{ background: 'rgba(3,13,40,0.9)' }}>
-          {/* Title bar */}
-          <div className="flex items-center gap-2.5 px-6 py-4 border-b border-white/6 bg-[#020B20]/60">
-            <div className="w-3 h-3 rounded-full bg-red-500/60" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-            <div className="w-3 h-3 rounded-full bg-green-500/60" />
-            <span className="ml-3 font-mono-custom text-xs text-white/25 tracking-widest">FutureRide/Packages</span>
-          </div>
-          {/* Col headers */}
-          <div className="grid grid-cols-3 md:grid-cols-4 gap-4 px-6 py-3 border-b border-white/5">
-            {['LEVEL', 'INVESTMENT', 'STRUCTURE', 'STATUS'].map((h) => (
-              <div key={h} className="font-mono-custom text-[10px] text-white/90 tracking-[0.2em]">{h}</div>
-            ))}
-          </div>
-          {/* Rows */}
-          {PKGS.map((pkg, i) => (
-            <motion.div
-              key={pkg.l}
-              data-testid={`package-card-${pkg.l}`}
-              initial={{ opacity: 0, x: -15 }} whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }} transition={{ duration: 0.3, delay: Math.min(i * 0.04, 0.4) }}
-              className={`grid grid-cols-3 md:grid-cols-4 gap-4 px-6 py-4 border-b border-white/4 group cursor-default transition-colors duration-150 hover:bg-[#38BDF8]/4 ${pkg.l === 12 ? 'bg-[#F5A623]/3' : ''}`}
-            >
-              <div className="flex items-center">
-                <span className="font-mono-custom font-bold text-xs" style={{ color: accent(pkg.l) }}>
-                  #{String(pkg.l).padStart(2, '0')}
-                </span>
-              </div>
-              <div className='translate-x-4'>
-                <span className="font-mono-custom  font-extrabold text-base sm:text-lg text-white group-hover:text-[#38BDF8] transition-colors">
-                  {fmt(pkg.p)}
-                </span>
-                <span className="text-white/25 text-[10px] ml-1">USDT</span>
-              </div>
-              <div className="font-mono-custom text-sm text-white/80 translate-x-4">{pkg.m.toLocaleString()}</div>
-              <div className="hidden md:flex items-center">
-                {pkg.l === 1 && <span className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-md">ENTRY</span>}
-                {pkg.l === 12 && <span className="text-[10px] font-bold text-[#F5A623] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">MAX</span>}
-                {pkg.l === 3 && <span className="text-[10px] font-bold text-[#f2ece2] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">Silver Roaylty Unlock</span>}
-                                {pkg.l === 9 && <span className="text-[10px] font-bold text-[#A855F7] bg-[#A855F7]/10 border border-[#A855F7]/20 px-2 py-0.5 rounded-md">Diamond Roaylty Unlock</span>}
-                {pkg.l === 5 && <span className="text-[10px] font-bold text-[#F5A623] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">Gold Roaylty Unlock</span>}
-                                {pkg.l === 7 && <span className="text-[10px] font-bold text-[#f7f4ef] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">Platinum Roaylty Unlock</span>}
+    {/* Terminal window */}
+<div className="overflow-x-auto rounded-2xl border border-[#38BDF8]/18" style={{ background: 'rgba(3,13,40,0.9)' }}>
+  <div className="min-w-[720px]">
+    {/* Title bar */}
+    <div className="flex items-center gap-2.5 px-6 py-4 border-b border-white/6 bg-[#020B20]/60">
+      <div className="w-3 h-3 rounded-full bg-red-500/60" />
+      <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+      <div className="w-3 h-3 rounded-full bg-green-500/60" />
+      <span className="ml-3 font-mono-custom text-xs text-white/25 tracking-widest">FutureRide/Packages</span>
+    </div>
 
-                {pkg.l === 4 && <span className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-md">Auto Upgrade</span>}
-              </div>
-            </motion.div>
-          ))}
+    {/* Col headers */}
+    <div className="grid grid-cols-5 gap-4 px-6 py-3 border-b border-white/5">
+      {['LEVEL', 'INVESTMENT', 'Matrix Members', 'STATUS', 'Level Income (USDT)'].map((h) => (
+        <div key={h} className="font-mono-custom text-[10px] text-white/90 tracking-[0.2em]">{h}</div>
+      ))}
+    </div>
+
+    {/* Rows */}
+    {PKGS.map((pkg, i) => (
+      <motion.div
+        key={pkg.l}
+        data-testid={`package-card-${pkg.l}`}
+        initial={{ opacity: 0, x: -15 }} whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }} transition={{ duration: 0.3, delay: Math.min(i * 0.04, 0.4) }}
+        className={`grid grid-cols-5 gap-4 px-6 py-4 border-b border-white/4 group cursor-default transition-colors duration-150 hover:bg-[#38BDF8]/4 ${pkg.l === 12 ? 'bg-[#F5A623]/3' : ''}`}
+      >
+        <div className="flex items-center">
+          <span className="font-mono-custom font-bold text-xs" style={{ color: accent(pkg.l) }}>
+            #{String(pkg.l).padStart(2, '0')}
+          </span>
         </div>
-        <p className="text-white/80 text-md mt-5 text-center">Packages are permanent with no expiry. Earnings are illustrative only.</p>
+        <div className="translate-x-4 whitespace-nowrap">
+          <span className="font-mono-custom font-extrabold text-base sm:text-lg text-white group-hover:text-[#38BDF8] transition-colors">
+            {fmt(pkg.p)}
+          </span>
+          <span className="text-white/25 text-[10px] ml-1">USDT</span>
+        </div>
+        <div className="font-mono-custom text-sm text-white/80 translate-x-4">{pkg.m.toLocaleString()}</div>
+        <div className="flex items-center">
+          {pkg.l === 1 && <span className="whitespace-nowrap text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-md">ENTRY</span>}
+          {pkg.l === 12 && <span className="whitespace-nowrap text-[10px] font-bold text-[#F5A623] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">MAX</span>}
+          {pkg.l === 3 && <span className="whitespace-nowrap text-[10px] font-bold text-[#f2ece2] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">Silver Royalty Unlock</span>}
+          {pkg.l === 9 && <span className="whitespace-nowrap text-[10px] font-bold text-[#A855F7] bg-[#A855F7]/10 border border-[#A855F7]/20 px-2 py-0.5 rounded-md">Diamond Royalty Unlock</span>}
+          {pkg.l === 5 && <span className="whitespace-nowrap text-[10px] font-bold text-[#F5A623] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">Gold Royalty Unlock</span>}
+          {pkg.l === 7 && <span className="whitespace-nowrap text-[10px] font-bold text-[#f7f4ef] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">Platinum Royalty Unlock</span>}
+          {pkg.l === 4 && <span className="whitespace-nowrap text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-md">Auto Upgrade</span>}
+        </div>
+        <div className="font-mono-custom text-sm text-white/80 translate-x-4">{pkg.i.toLocaleString()}</div>
+      </motion.div>
+    ))}
+  </div>
+</div>
+
+                <TotalHighlightCard/>
+
       </div>
     </section>
   )

@@ -6,6 +6,9 @@ import { authClient } from '@/lib/authClient'
 import { WalletAddress } from '../WalletAddress'
 import { StatCard, GradientStatCard } from '../StatCard'
 import PackageBuyPage from './PackageBuy'
+import { dashboardService } from '#/services/dashboard.service'
+import { RecentIncomePageTable, type IncomePageData, type IncomeRow } from '../RecentIncomePageTable'
+import { TableSkeleton } from '../LoadingSkeleton'
 
 const API = import.meta.env.VITE_API_URL
 
@@ -48,7 +51,15 @@ interface OnChainBalances {
   walletFundBalanceError?: boolean
   upgradeHoldingIncomeError?: boolean
 }
-
+function useBreakpoint() {
+  const [w, setW] = useState(typeof window !== "undefined" ? window.innerWidth : 1280);
+  useEffect(() => {
+    const fn = () => setW(window.innerWidth);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return { isMobile: w < 640, isTablet: w < 1024 };
+}
 export default function HomeDashboard() {
   // ── session ────────────────────────────────────────────
   // Same pattern as DashboardHomePage: scope every query on the SIWE
@@ -56,7 +67,8 @@ export default function HomeDashboard() {
   // refetch on mount as a second-layer defense against the better-auth
   // useSession() stale-atom issue (see DashboardHomePage for full context).
   const { data: session, isPending: sessionPending, refetch: refetchSession } = authClient.useSession()
-
+  const { isMobile, isTablet } = useBreakpoint();
+  const isSmall = isMobile || isTablet;
   useEffect(() => {
     refetchSession()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,6 +104,18 @@ export default function HomeDashboard() {
     retry: 1,
   })
 
+  const recentQ = useQuery({
+  queryKey: ["dashboard", "recent-income", address],
+  queryFn:  () => dashboardService.getRecentIncome(15),
+  enabled:   sessionReady,
+  staleTime: 2 * 60 * 1000,
+});
+
+  const [recentPage,      setRecentPage]      = useState(1);
+  const [recentPageSize,  setRecentPageSize]  = useState(8);
+  const [recentSearch,    setRecentSearch]    = useState("");
+  const [recentPkgFilter, setRecentPkgFilter] = useState(0);
+
   const me = meQ.data
   const isLoading = sessionPending || meQ.isLoading || !me
 
@@ -104,6 +128,42 @@ export default function HomeDashboard() {
   // "Total Earnings" lifetime stat (kept separate from the live
   // withdrawable walletFundBalance shown on the main balance card).
   const totalEarnedCombined = (me?.totalIncome ?? 0) + upgradeHoldingIncome
+
+  const [recentTypeFilter, setRecentTypeFilter] = useState<string>("all");
+
+const allRecentRows: IncomeRow[] = (recentQ.data ?? []).map(r => ({
+    id:                r.id,
+    fromUserAddress:   r.fromAddress,
+    fromContractRegId: r.fromContractRegId,   // ← NEW
+    incomeType:        r.incomeType,          // ← NEW
+    packageNumber:     r.packageNumber,
+    packageName:       r.packageName,
+    amount:            r.amount.toString(),
+    timestamp:         Math.floor(new Date(r.date).getTime() / 1000).toString(),
+    transactionHash:   r.transactionHash,
+    level:             r.level,
+    createdAt:         r.date,
+  }));
+  const recentTyped = recentTypeFilter !== "all"
+    ? allRecentRows.filter(r => r.incomeType === recentTypeFilter)
+    : allRecentRows;
+  const recentFiltered = recentPkgFilter > 0
+    ? recentTyped.filter(r => r.packageNumber === recentPkgFilter)
+    : recentTyped;
+
+  const recentSearched = recentSearch
+    ? recentFiltered.filter(r => r.fromUserAddress.toLowerCase().includes(recentSearch.toLowerCase()))
+    : recentFiltered;
+  const recentTotal      = recentSearched.length;
+  const recentTotalPages = Math.max(1, Math.ceil(recentTotal / recentPageSize));
+  const recentData: IncomePageData = {
+    success:    true,
+    total:      recentTotal,
+    page:       recentPage,
+    pageSize:   recentPageSize,
+    totalPages: recentTotalPages,
+    records:    recentSearched.slice((recentPage - 1) * recentPageSize, recentPage * recentPageSize),
+  };
 
   const [linkCopied, setLinkCopied] = useState(false)
 
@@ -280,6 +340,39 @@ export default function HomeDashboard() {
       </motion.div>
 
       <PackageBuyPage/>
+
+        <section className="flex flex-col gap-3.5">
+        <div>
+          <h2 className={`m-0 font-heading ${isSmall ? "text-[16px]" : "text-[18px]"} font-bold text-white tracking-[-0.02em]`}>
+            Recent Income
+          </h2>
+          <p className="mt-1 m-0 text-[13px] text-white/35 font-body">
+            Latest payouts received from your downline.
+          </p>
+        </div>
+        {recentQ.isLoading ? (
+          <TableSkeleton rows={6} />
+        ) : (
+          <RecentIncomePageTable
+            data={recentData}
+            isLoading={recentQ.isLoading}
+            isFetching={recentQ.isFetching}
+            page={recentPage}
+            pageSize={recentPageSize}
+            search={recentSearch}
+            pkgFilter={recentPkgFilter}
+            onPage={setRecentPage}
+            onPageSize={n => { setRecentPageSize(n); setRecentPage(1); }}
+            onSearch={s => { setRecentSearch(s); setRecentPage(1); }}
+            onPkgFilter={v => { setRecentPkgFilter(v); setRecentPage(1); }}
+            showLevel={true}
+            typeFilter={recentTypeFilter}
+            onTypeFilter={v => { setRecentTypeFilter(v); setRecentPage(1); }}
+          />
+        )}
+      </section>
+
+      
     </div>
   )
 }

@@ -36,6 +36,138 @@ function formatUsd(n: number): string {
   return n.toLocaleString("en-US");
 }
 
+import { CheckCircle2, Zap, Crown } from "lucide-react";
+
+interface Pkg {
+  level: number;
+  price: number;
+  tag?: string;
+  headline: string;
+  isRoyalty: boolean;
+  sub: string;
+}
+
+const THEME = {
+  owned:  { c: "#22C55E", soft: "rgba(34,197,94,0.10)",  border: "rgba(34,197,94,0.30)",  glow: "rgba(34,197,94,0.18)"  },
+  active: { c: "#22C55E", soft: "rgba(34,197,94,0.14)",  border: "rgba(34,197,94,0.45)",  glow: "rgba(34,197,94,0.28)"  },
+  next:   { c: "#A855F7", soft: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.45)", glow: "rgba(168,85,247,0.30)" },
+  future: { c: "#38BDF8", soft: "rgba(56,189,248,0.05)", border: "rgba(56,189,248,0.16)", glow: "rgba(56,189,248,0.08)" },
+} as const;
+
+const ROYALTY_TIER: Record<number, { name: string; c: string }> = {
+  3: { name: "Silver royalty unlocked",   c: "#C0C7D1" },
+  5: { name: "Gold royalty unlocked",     c: "#F5A623" },
+  7: { name: "Platinum royalty unlocked", c: "#7DD3FC" },
+  9: { name: "Diamond royalty unlocked",  c: "#E879F9" },
+};
+
+const PKGS: Pkg[] = [
+  { level: 1,  price: 5,     headline: "Entry",       sub: "Activates direct income & matrix position", isRoyalty: false },
+  { level: 2,  price: 10,    headline: "Foundation",  sub: "Opens generation 2 matrix earnings",        isRoyalty: false },
+  { level: 3,  price: 20,    headline: "Builder",     sub: "Silver Royalty unlocked",                   isRoyalty: true  },
+  { level: 4,  price: 40,    tag: "Auto", headline: "Leverage", sub: "Auto-upgrade engine activates from here", isRoyalty: false },
+  { level: 5,  price: 80,    headline: "Growth",      sub: "Gold Royalty unlocked",                     isRoyalty: true  },
+  { level: 6,  price: 160,   headline: "Momentum",    sub: "Deep matrix unlocked — gen 6 active",       isRoyalty: false },
+  { level: 7,  price: 320,   headline: "Accelerator", sub: "Platinum Royalty unlocked",                 isRoyalty: true  },
+  { level: 8,  price: 640,   headline: "Elite",       sub: "Elite compounding — gen 8 active",          isRoyalty: false },
+  { level: 9,  price: 1280,  headline: "Apex",        sub: "Diamond Royalty unlocked",                  isRoyalty: true  },
+  { level: 10, price: 2560,  headline: "Summit",      sub: "Generation 10 compounding — near the top",  isRoyalty: false },
+  { level: 11, price: 5120,  headline: "Vanguard",    sub: "Generation 11 unlocked — elite tier",       isRoyalty: false },
+  { level: 12, price: 10240, tag: "Max", headline: "Pinnacle", sub: "All 12 generations active. Full matrix.", isRoyalty: false },
+];
+
+const usd = (n: number) => `$${n.toLocaleString()}`;
+
+function PkgCard({ pkg }: { pkg: Pkg }) {
+  const t = THEME.future;
+  const royalty = pkg.isRoyalty ? ROYALTY_TIER[pkg.level] : undefined;
+
+  return (
+    <div
+      className="group relative flex flex-col rounded-2xl overflow-hidden backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5"
+      style={{
+        background: `linear-gradient(165deg, ${t.soft}, rgba(8,15,38,0.65))`,
+        border: `1px solid ${t.border}`,
+      }}
+    >
+      <div className="h-[2.5px] w-full shrink-0" style={{ background: t.c }} />
+
+      <div className="flex flex-col flex-1 p-5 gap-4">
+        {/* top meta row */}
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-mono text-[10px] tracking-[0.18em] uppercase" style={{ color: `${t.c}cc` }}>
+              L{String(pkg.level).padStart(2, "0")}
+            </span>
+
+            {pkg.tag && (
+              <span
+                className="font-mono text-[9px] font-bold uppercase tracking-[0.14em] px-1.5 py-[2px] rounded-[4px]"
+                style={{
+                  color: "#38BDF8",
+                  background: "rgba(56,189,248,0.12)",
+                  border: "1px solid rgba(56,189,248,0.3)",
+                }}
+              >
+                {pkg.tag}
+              </span>
+            )}
+
+            {royalty && (
+              <span
+                className="flex items-center gap-1 font-mono text-[10px] font-bold uppercase tracking-[0.12em] px-1.5 py-[2px] rounded-[4px]"
+                style={{
+                  color: royalty.c,
+                  background: `${royalty.c}1F`,
+                  border: `1px solid ${royalty.c}4D`,
+                }}
+              >
+                <Crown size={9} />
+                {royalty.name}
+              </span>
+            )}
+          </div>
+
+          <Lock size={12} className="text-[#38bdf8] shrink-0 mt-0.5" />
+        </div>
+
+        {/* price */}
+        <div>
+          <div
+            className="font-heading text-[28px] font-bold leading-none tracking-[-0.03em]"
+            style={{ color: "rgba(255,255,255,0.85)" }}
+          >
+            {usd(pkg.price)}
+            <span className="font-mono text-[11px] font-normal ml-1.5 text-[#38bdf8]">USDT</span>
+          </div>
+        </div>
+
+        {/* headline + sub */}
+        <div>
+          <p className="m-0 font-heading text-[14px] font-semibold text-white">{pkg.headline}</p>
+          <p className="mt-1 m-0 text-[11px] leading-relaxed text-white/40">{pkg.sub}</p>
+        </div>
+
+        <div className="flex-1" />
+
+        {/* footer */}
+        <div className="pt-3 border-t border-white/[0.06] flex items-center gap-1.5">
+          {pkg.level === 1 ? (
+            <>
+              <CheckCircle2 size={11} className="text-[#38bdf8]" />
+              <span className="font-mono text-[10px] text-[#38bdf8] tracking-[0.06em]">Starting package</span>
+            </>
+          ) : (
+            <span className="font-mono text-[10px] text-[#38bdf8] tracking-[0.06em]">
+              Requires PKG {String(pkg.level - 1).padStart(2, "0")}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PackagesTemplate() {
   return (
     <section id="packages" className="relative isolate py-24 md:py-32">
@@ -55,90 +187,31 @@ export default function PackagesTemplate() {
             <br />
             <span className="text-brand">Every level earns.</span>
           </h2>
+
         </motion.div>
 
-        <div className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-          {packages.map((p, i) => (
-            <div
-              key={p.level}
-              className={`glass-card group relative overflow-hidden p-5 fade-up transition-transform duration-300 hover:-translate-y-1 ${
-                p.recommended ? "border-gold/50 gold-glow" : ""
-              }`}
-              style={{
-                animationDelay: `${i * 50}ms`,
-                // Dark blue glass body (gold for the recommended card)
-                background: p.recommended
-                  ? "linear-gradient(160deg, rgba(245,166,35,0.16), rgba(255,255,255,0.02))"
-                  : "linear-gradient(160deg, rgba(56,120,210,0.22) 0%, rgba(18,32,64,0.45) 45%, rgba(8,14,30,0.5) 100%)",
-                border: p.recommended
-                  ? undefined
-                  : "1px solid rgba(120,180,255,0.18)",
-                backdropFilter: "blur(20px) saturate(140%)",
-                boxShadow: p.recommended
-                  ? "0 12px 40px rgba(245,166,35,0.28), inset 0 1px 0 rgba(255,255,255,0.12)"
-                  : "0 8px 28px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
-              }}
-            >
-              {/* Sky-blue shine — subtle diagonal sweep + top-right glow */}
-              {!p.recommended && (
-                <>
-                  <div
-                    className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-70"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, rgba(150,210,255,0.18) 0%, rgba(150,210,255,0.04) 22%, transparent 45%)",
-                    }}
-                  />
-                  <div
-                    className="pointer-events-none absolute right-0 top-0 h-[55%] w-[60%] rounded-[inherit]"
-                    style={{
-                      background:
-                        "radial-gradient(120% 120% at 100% 0%, rgba(110,180,255,0.16), transparent 60%)",
-                    }}
-                  />
-                </>
-              )}
 
-              {p.recommended && (
-                <div className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-black">
-                  <Sparkles className="h-3 w-3" /> Top
-                </div>
-              )}
-              {p.autoUpgrade && (
-                <div className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full border border-green-accent/50 bg-green-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-green-accent">
-                  <TrendingUp className="h-3 w-3" /> Auto
-                </div>
-              )}
+        
+  <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3">
+        {PKGS.map((pkg) => (
+          <PkgCard key={pkg.level} pkg={pkg} />
+        ))}
+      </div>
 
-              <div className="relative z-10">
-                <div className="text-[10px] uppercase tracking-[0.22em] text-white/40">
-                  Level
-                </div>
-                <div className="font-heading text-2xl font-bold text-white">
-                  {String(p.level).padStart(2, "0")}
-                </div>
-                <div className="mt-4 flex items-baseline gap-1">
-                  <span
-                    className={`font-mono text-2xl font-semibold ${
-                      p.recommended ? "text-gold" : "text-white"
-                    }`}
-                  >
-                    ${formatUsd(p.price)}
-                  </span>
-                  <span className="font-mono text-xs text-white/40">USDT</span>
-                </div>
-                <div className="mt-4 h-px bg-white/10" />
-                <div className="mt-3 text-xs text-white/55">
-                  {p.level === 1
-                    ? "Entry · activates direct income"
-                    : p.autoUpgrade
-                      ? "Auto-upgrade starts from here"
-                      : "Unlocks deeper level income"}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* legend */}
+      <div className="flex items-center gap-6 flex-wrap">
+        {[
+          { rail: "#C0C7D1", label: "Silver royalty" },
+          { rail: "#F5A623", label: "Gold royalty" },
+          { rail: "#7DD3FC", label: "Platinum royalty" },
+          { rail: "#E879F9", label: "Diamond royalty" },
+        ].map(({ rail, label }) => (
+          <div key={label} className="flex items-center gap-2">
+            <div className="w-4 h-[2.5px] rounded-full" style={{ background: rail }} />
+            <span className="text-[11px] font-mono text-white/35">{label}</span>
+          </div>
+        ))}
+      </div>
 
    
       </div>

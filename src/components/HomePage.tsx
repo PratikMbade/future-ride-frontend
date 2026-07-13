@@ -18,6 +18,7 @@ import PackagesTemplate from './PackagesCard'
 import { ContractOwnershipBanner } from './Contractownershipbanner'
 import SmartContract from './SmartContract'
 import TreeStructure from './TreeStructure'
+import PackageShowcase from './PackagesCard'
 
 export function HomePage() {
   useEffect(() => {
@@ -46,7 +47,7 @@ export function HomePage() {
           <HowItWorks />
           <SmartContract/>
           <IncomeDistribution />
-          <PackagesTemplate/>
+          <PackageShowcase/>
           <Packages />
           <TreeStructure/>
           <RoyaltyCards />

@@ -150,13 +150,15 @@ export function DataTable<T extends object>({
             )}
 
             {filters.map((f) => (
-              <div key={String(f.key)} className="relative w-full sm:w-auto">
-                <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+              <div key={String(f.key)} className="relative w-full sm:w-auto isolate">
+                <Filter size={13}
+      className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none z-0"
+                 />
                 <select
                   data-testid={testId ? `${testId}-filter-${String(f.key)}` : undefined}
                   value={filterValues[String(f.key)] ?? 'all'}
                   onChange={(e) => handleFilterChange(String(f.key), e.target.value)}
-                  className="w-full sm:w-auto appearance-none pl-8 pr-8 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:border-[#38BDF8]/50 transition-colors cursor-pointer"
+      className="relative z-10 w-full sm:w-auto appearance-none pl-8 pr-8 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:border-[#38BDF8]/50 cursor-pointer touch-manipulation [-webkit-appearance:none] [-webkit-tap-highlight-color:transparent]"
                 >
                   <option value="all" className="bg-[#080F26] text-white">
                     {f.allLabel ?? `All ${f.label}`}

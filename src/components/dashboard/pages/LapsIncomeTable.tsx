@@ -77,6 +77,7 @@ export default function LapsIncomeTable() {
     { key: 'contractRegId', header: 'User Id' },
     { key: 'fromUserAddress', header: 'Wallet Address' },
     { key: 'packageNumber', header: 'Package' },
+    { key: 'level', header: 'Level' },
     { key: 'amount', header: 'Amount' },
     { key: 'creditedAt', header: 'Credited Date' },
   ]
@@ -181,6 +182,10 @@ export default function LapsIncomeTable() {
                     <td className="px-5 py-4 whitespace-nowrap font-mono font-medium text-[#F5A623]">
                       PKG {String(r.packageNumber).padStart(2, '0')}
                     </td>
+                    <td className="px-5 py-4 whitespace-nowrap font-mono text-white/70">
+  {r.level > 0 ? `L${r.level}` : '—'}
+</td>
+
                     <td className="px-5 py-4 whitespace-nowrap font-mono font-medium text-[#22C55E]">
                       {usd(r.amount)}
                     </td>

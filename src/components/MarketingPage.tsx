@@ -3,7 +3,7 @@ import { useRef, useEffect } from "react";
 import { Navbar } from "./Navbar";
 import { SpaceBackground } from "./SpaceBackground";
 const englishPdf = "/future-ride-plan-english.pdf";
-const hindiPdf = "/future-ride-plan-hindi.pdf";
+const hindiPdf = "/future-ride-plan-mobile.pdf";
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface PdfCardProps {
   lang: "English" | "Hindi";
@@ -295,7 +295,7 @@ export default function MarketingPage() {
         {/* ── Cards Grid ── */}
         <section
           aria-label="PDF Documents"
-          className="grid grid-cols-1 sm:grid-cols-1 gap-6 sm:gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8"
         >
           <PdfCard
             lang="English"
@@ -304,14 +304,14 @@ export default function MarketingPage() {
             pdfSrc={englishPdf}
             accent="sky"
           />
-          {/* <PdfCard
-            lang="Hindi"
-            langNative="हिंदी"
+          <PdfCard
+            lang="English"
+            langNative="English"
 
-            description="स्मार्ट कॉन्ट्रैक्ट की पूरी योजना हिंदी में — सभी मैट्रिक्स स्तरों और पुरस्कार संरचना के साथ।"
+            description="Mobile Screen Friendly PDF — covering all matrix levels."
             pdfSrc={hindiPdf}
             accent="blue"
-          /> */}
+          />
         </section>
 
         <GlowDivider />

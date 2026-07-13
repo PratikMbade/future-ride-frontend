@@ -309,16 +309,16 @@ const MemberNode = ({ data }: NodeProps<Node<MemberNodeData>>) => {
 
       <div style={{
         position:'relative',
-        width:  AVA + (isRoot ? 10 : 0),
-        height: AVA + (isRoot ? 10 : 0),
+        width:  AVA + (isRoot ? 10 : 10),
+        height: AVA + (isRoot ? 10 : 10),
         borderRadius:'50%',
-        padding: isRoot ? 3 : 2,
+        padding: isRoot ? 3 : 3,
         background: isRoot
           ? `conic-gradient(${SKY}, ${DEEP}, ${SKY})`
-          : 'rgba(56,189,248,0.22)',
+          : `conic-gradient(${SKY}, ${DEEP}, ${SKY})`,
         boxShadow: isRoot
           ? `0 0 0 1px ${SKY45}, 0 0 30px ${SKY25}, 0 0 60px rgba(56,189,248,0.12)`
-          : '0 0 0 1px rgba(56,189,248,0.25)',
+          : `0 0 0 1px ${SKY45}, 0 0 30px ${SKY25}, 0 0 60px rgba(56,189,248,0.12)`,
         flexShrink:0,
       }}>
         <div style={{
@@ -329,7 +329,7 @@ const MemberNode = ({ data }: NodeProps<Node<MemberNodeData>>) => {
         }}>
           <div style={{
             position:'absolute', inset:0, borderRadius:'50%',
-            background: isRoot ? `radial-gradient(circle, ${SKY10} 0%, transparent 70%)` : 'none',
+            background: isRoot ? `radial-gradient(circle, ${SKY10} 0%, transparent 70%)` : 'radial-gradient(circle, ${SKY10} 0%, transparent 70%)',
           }}/>
           <UserAvatarIcon
             size={AVA * (isRoot ? 0.46 : 0.42)}
@@ -341,7 +341,7 @@ const MemberNode = ({ data }: NodeProps<Node<MemberNodeData>>) => {
 
       <div style={{ position:'relative', display:'flex', alignItems:'center' }}>
         <span style={{
-          color: isRoot ? SKY : TEXT_BRIGHT,
+          color: isRoot ? SKY : SKY,
           fontSize: cfg.addrFont,
           fontFamily:'Chivo Mono,monospace',
           fontWeight: isRoot ? 700 : 500,
@@ -634,7 +634,7 @@ const TreeFlow = ({
     <div ref={containerRef} style={{
       width:'100%', height:cfg.height, borderRadius:14, overflow:'hidden', position:'relative',
       background:'#020817',
-      border:'1px solid rgba(56,189,248,0.16)',
+      border:'2px solid rgba(56,189,248,0.16)',
       boxShadow:'0 0 0 1px rgba(56,189,248,0.05), inset 0 0 100px rgba(0,0,0,0.9)',
     }}>
       <ReactFlow

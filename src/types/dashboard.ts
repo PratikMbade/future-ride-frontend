@@ -205,6 +205,7 @@ export interface LapsIncomeRecord {
   fromUserAddress: string
   packageNumber: number
   packageName: string
+  level:number
   amount: number
   creditedAt: string
   transactionHash: string

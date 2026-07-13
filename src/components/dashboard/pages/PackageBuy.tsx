@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { useActiveAccount } from "thirdweb/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, Loader2, ShieldCheck, Zap, Lock } from "lucide-react";
+import { CheckCircle2, Loader2, ShieldCheck, Zap, Lock, Crown } from "lucide-react";
 import { usdtContractInstance } from "@/contract/usdt/usdtContract";
 import { ethers } from "ethers";
 import { contractInstance, FUTURE_RIDE_CONTRACT_ADDRESS } from "@/contract/contract";
@@ -20,6 +20,7 @@ interface Pkg {
   price: number;
   tag?: string;
   headline: string;
+  isRoyalty:boolean;
   sub: string;
 }
 
@@ -33,21 +34,26 @@ const THEME = {
   next:   { c: "#A855F7", soft: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.45)", glow: "rgba(168,85,247,0.30)" },
   future: { c: "#38BDF8", soft: "rgba(56,189,248,0.05)", border: "rgba(56,189,248,0.16)", glow: "rgba(56,189,248,0.08)" },
 } as const;
-
+const ROYALTY_TIER: Record<number, { name: string; c: string }> = {
+  3:  { name: "Silver royalty unlocked",   c: "#C0C7D1" },
+  5:  { name: "Gold royalty unlocked",     c: "#F5A623" },
+  7:  { name: "Platinum royalty unlocked", c: "#7DD3FC" },
+  9:  { name: "Diamond royalty unlocked",  c: "#E879F9" },
+};
 // ─── package definitions ──────────────────────────────────
 const PKGS: Pkg[] = [
-  { level: 1,  price: 5,     headline: "Entry",          sub: "Activates direct income & matrix position"   },
-  { level: 2,  price: 10,    headline: "Foundation",     sub: "Opens generation 2 matrix earnings"          },
-  { level: 3,  price: 20,    headline: "Builder",        sub: "Opens generation 3 matrix earnings"          },
-  { level: 4,  price: 40,    tag: "Auto",  headline: "Leverage",  sub: "Auto-upgrade engine activates from here"  },
-  { level: 5,  price: 80,    headline: "Growth",         sub: "Generation 5 compounding begins"             },
-  { level: 6,  price: 160,   headline: "Momentum",       sub: "Deep matrix unlocked — gen 6 active"        },
-  { level: 7,  price: 320,   headline: "Accelerator",    sub: "High-tier generation 7 earnings"             },
-  { level: 8,  price: 640,   headline: "Elite",          sub: "Elite compounding — gen 8 active"            },
-  { level: 9,  price: 1280,  headline: "Apex",           sub: "Maximum depth — generation 9 unlocked"      },
-  { level: 10, price: 2560,  headline: "Summit",         sub: "Generation 10 compounding — near the top"   },
-  { level: 11, price: 5120,  headline: "Vanguard",       sub: "Generation 11 unlocked — elite tier"         },
-  { level: 12, price: 10240, tag: "Max",   headline: "Pinnacle", sub: "All 12 generations active. Full matrix." },
+  { level: 1,  price: 5,     headline: "Entry",          sub: "Activates direct income & matrix position"  ,isRoyalty:false },
+  { level: 2,  price: 10,    headline: "Foundation",     sub: "Opens generation 2 matrix earnings"        ,isRoyalty:false   },
+  { level: 3,  price: 20,    headline: "Builder",        sub: "Silver Royalty unlocked"         ,isRoyalty:true  },
+  { level: 4,  price: 40,    tag: "Auto",  headline: "Leverage",  sub: "Auto-upgrade engine activates from here" ,isRoyalty:false  },
+  { level: 5,  price: 80,    headline: "Growth",        sub: "Gold Royalty unlocked"          ,isRoyalty:true    },
+  { level: 6,  price: 160,   headline: "Momentum",       sub: "Deep matrix unlocked — gen 6 active"       ,isRoyalty:false  },
+  { level: 7,  price: 320,   headline: "Accelerator",     sub: "Platinum Royalty unlocked"        ,isRoyalty:true    },
+  { level: 8,  price: 640,   headline: "Elite",          sub: "Elite compounding — gen 8 active"         ,isRoyalty:false    },
+  { level: 9,  price: 1280,  headline: "Apex",           sub: "Diamond Royalty unlocked"       ,isRoyalty:true    },
+  { level: 10, price: 2560,  headline: "Summit",         sub: "Generation 10 compounding — near the top"  ,isRoyalty:false  },
+  { level: 11, price: 5120,  headline: "Vanguard",       sub: "Generation 11 unlocked — elite tier"      ,isRoyalty:false    },
+  { level: 12, price: 10240, tag: "Max",   headline: "Pinnacle", sub: "All 12 generations active. Full matrix.",isRoyalty:false  },
 ];
 
 function usd(n: number) {
@@ -81,6 +87,7 @@ function PkgCard({
   const errored   = step === "error";
 
   const t = THEME[status];
+const royalty = pkg.isRoyalty ? ROYALTY_TIER[pkg.level] : undefined;
 
   return (
     <div
@@ -119,7 +126,24 @@ function PkgCard({
               >
                 {pkg.tag}
               </span>
+
+              
             )}
+
+            {royalty && (
+  <span
+    className="flex items-center gap-1 font-mono text-[12px] font-bold uppercase tracking-[0.12em] px-1.5 py-[2px] rounded-[4px]"
+    style={{
+      color: royalty.c,
+      background: `${royalty.c}1F`,
+      border: `2px solid ${royalty.c}4D`,
+      opacity: future ? 0.55 : 1,
+    }}
+  >
+    <Crown size={9} />
+    {royalty.name}
+  </span>
+)}
           </div>
 
           {owned && <CheckCircle2 size={13} style={{ color: t.c }} className="shrink-0 mt-0.5" />}
