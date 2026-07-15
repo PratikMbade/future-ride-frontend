@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
+import { Users } from 'lucide-react'
 import { authClient } from '@/lib/authClient'
 import { WalletAddress } from '../WalletAddress'
 import { DataTable } from '../DataTable'
@@ -61,8 +62,19 @@ export default function DirectTeam() {
     {
       key: 'highestPackage', header: 'Current Package', sortable: true,
       render: (r) => (
-        <span className="text-[#F5A623] font-mono  font-medium ">
+        <span className="text-[#F5A623] font-mono font-medium">
           PKG {String(r.highestPackage).padStart(2, '0')}
+        </span>
+      ),
+    },
+    {
+      // Count of THIS member's own direct referrals — surfaced by the backend
+      // via `subMap.get(m.userAddress)` in getDirectTeam.
+      key: 'directTeam', header: 'Direct Team', sortable: true,
+      render: (r) => (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-[#22D3EE]/10 text-[#22D3EE] font-mono">
+          <Users size={11} />
+          {r.directTeam ?? 0}
         </span>
       ),
     },
@@ -86,19 +98,21 @@ export default function DirectTeam() {
   const packageOptions = Array.from({ length: 12 }, (_, i) => i + 1).map((p) => ({
     label: `PKG ${String(p).padStart(2, '0')}`,
     value: String(p),
+    shortLabel: `P${p}`,
   }))
 
   const filters: FilterConfig<DirectTeamMember>[] = [
     {
       key: 'highestPackage',
-      label: 'Packages',
+      label: 'PKG',
+      allLabel: 'All Packages',
+      accent: '#F5A623',
       options: packageOptions,
     },
   ]
 
   return (
     <div className="space-y-5" data-testid="direct-team-page">
-
       <header>
         <p className="text-base font-bold text-white">Direct Team Table</p>
         <span className="text-sm text-white/50">
@@ -106,7 +120,11 @@ export default function DirectTeam() {
         </span>
       </header>
 
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }} className="rounded-2xl border border-white/[0.06] bg-[#080F26] p-5">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }}
+        className="rounded-2xl border border-white/[0.06] bg-[#080F26] p-5"
+      >
         <p className="text-base font-bold text-white mb-4">Direct Team Members</p>
         <DataTable<DirectTeamMember>
           data-testid="direct-team-table"

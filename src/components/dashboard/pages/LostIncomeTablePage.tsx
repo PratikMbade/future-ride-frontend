@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Search, Filter } from 'lucide-react'
@@ -10,6 +10,151 @@ const API = import.meta.env.VITE_API_URL
 
 function usd(n: number) {
   return `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
+// ─── package filter options ───────────────────────────────
+const PKG_OPTIONS = [
+  { value: 0, label: 'All Packages' },
+  ...Array.from({ length: 12 }, (_, i) => ({
+    value: i + 1,
+    label: `PKG ${String(i + 1).padStart(2, '0')}`,
+  })),
+]
+
+// ─── level filter options ─────────────────────────────────
+const LEVEL_OPTIONS = [
+  { value: 0, label: 'All Levels' },
+  ...Array.from({ length: 12 }, (_, i) => ({
+    value: i + 1,
+    label: `LVL ${String(i + 1).padStart(2, '0')}`,
+  })),
+]
+
+// ─── package filter dropdown (matches RecentIncomePageTable) ──
+function PackageFilter({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const [open, setOpen] = useState(false)
+  const [dropPos, setDropPos] = useState({ top: 0, right: 0 })
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const selected = PKG_OPTIONS.find((o) => o.value === value) ?? PKG_OPTIONS[0]
+
+  const handleOpen = () => {
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      setDropPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right })
+    }
+    setOpen((o) => !o)
+  }
+
+  return (
+    <div className="relative">
+      <button
+        ref={btnRef}
+        onClick={handleOpen}
+        className={[
+          'flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-[13px] font-mono font-semibold transition-all whitespace-nowrap',
+          value > 0
+            ? 'bg-[rgba(245,166,35,0.12)] border-[rgba(245,166,35,0.4)] text-[#F5A623]'
+            : 'bg-white/5 border-white/10 text-white hover:border-white/35',
+        ].join(' ')}
+      >
+        <Filter size={13} className={value > 0 ? 'text-[#F5A623]' : 'text-white'} />
+        <span className="hidden sm:inline">{selected.label}</span>
+        <span className="sm:hidden">{value > 0 ? `P${value}` : 'Filter'}</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" className={`transition-transform ${open ? 'rotate-180' : ''}`}>
+          <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </svg>
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div
+            className="fixed z-20 w-44 bg-[#080F26] border border-white/10 rounded-[10px] overflow-y-auto shadow-xl shadow-black/60 py-1 max-h-64"
+            style={{ top: dropPos.top, right: dropPos.right }}
+          >
+            {PKG_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => { onChange(opt.value); setOpen(false) }}
+                className={[
+                  'w-full text-left px-3.5 py-2.5 font-mono text-[13px] transition-colors',
+                  opt.value === value
+                    ? 'text-[#F5A623] bg-[rgba(245,166,35,0.1)] font-semibold'
+                    : 'text-white hover:bg-white/[0.06]',
+                ].join(' ')}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+// ─── level filter dropdown (matches RecentIncomePageTable) ────
+function LevelFilter({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const [open, setOpen] = useState(false)
+  const [dropPos, setDropPos] = useState({ top: 0, right: 0 })
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const isActive = value > 0
+  const selected = LEVEL_OPTIONS.find((o) => o.value === value) ?? LEVEL_OPTIONS[0]
+
+  const handleOpen = () => {
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      setDropPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right })
+    }
+    setOpen((o) => !o)
+  }
+
+  return (
+    <div className="relative">
+      <button
+        ref={btnRef}
+        onClick={handleOpen}
+        className={[
+          'flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-[13px] font-mono font-semibold transition-all whitespace-nowrap',
+          isActive
+            ? 'bg-[rgba(56,189,248,0.12)] border-[rgba(56,189,248,0.4)] text-[#38BDF8]'
+            : 'bg-white/5 border-white/10 text-white hover:border-white/35',
+        ].join(' ')}
+      >
+        <span className={`text-[12px] font-bold shrink-0 ${isActive ? 'text-[#38BDF8]' : 'text-white'}`}>LVL</span>
+        <span className="hidden sm:inline">{selected.label}</span>
+        <span className="sm:hidden">{isActive ? `L${value}` : 'All'}</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" className={`transition-transform ${open ? 'rotate-180' : ''}`}>
+          <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </svg>
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div
+            className="fixed z-20 w-36 bg-[#080F26] border border-white/10 rounded-[10px] overflow-y-auto shadow-xl shadow-black/60 py-1 max-h-64"
+            style={{ top: dropPos.top, right: dropPos.right }}
+          >
+            {LEVEL_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => { onChange(opt.value); setOpen(false) }}
+                className={[
+                  'w-full text-left px-3.5 py-2.5 font-mono text-[13px] transition-colors',
+                  opt.value === value
+                    ? 'text-[#38BDF8] bg-[rgba(56,189,248,0.1)] font-semibold'
+                    : 'text-white hover:bg-white/[0.06]',
+                ].join(' ')}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
 }
 
 export default function LostIncomeTable() {
@@ -27,7 +172,9 @@ export default function LostIncomeTable() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(15)
   const [search, setSearch] = useState('')
-  const [packageFilter, setPackageFilter] = useState('all')
+  // Numeric to match the filter components (0 = all).
+  const [packageFilter, setPackageFilter] = useState<number>(0)
+  const [levelFilter, setLevelFilter] = useState<number>(0)
 
   // Debounce search so we're not refetching on every keystroke.
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -40,11 +187,12 @@ export default function LostIncomeTable() {
   }, [search])
 
   const incomeQ = useQuery<LostIncomeResponse>({
-    queryKey: ['income', 'lost', address, page, pageSize, debouncedSearch, packageFilter],
+    queryKey: ['income', 'lost', address, page, pageSize, debouncedSearch, packageFilter, levelFilter],
     queryFn: async () => {
       const params = new URLSearchParams({ page: String(page), limit: String(pageSize) })
       if (debouncedSearch) params.set('search', debouncedSearch)
-      if (packageFilter !== 'all') params.set('package', packageFilter)
+      if (packageFilter > 0) params.set('package', String(packageFilter))
+      if (levelFilter > 0) params.set('level', String(levelFilter))
 
       const res = await fetch(`${API}/api/income/lost?${params.toString()}`, {
         credentials: 'include',
@@ -58,18 +206,23 @@ export default function LostIncomeTable() {
     staleTime: 60 * 1000,
   })
 
-  const records    = incomeQ.data?.records ?? []
-  const total       = incomeQ.data?.total ?? 0
-  const totalPages  = incomeQ.data?.totalPages ?? 1
-  const isLoading   = sessionPending || incomeQ.isLoading
+  const records = incomeQ.data?.records ?? []
+  const total = incomeQ.data?.total ?? 0
+  const totalPages = incomeQ.data?.totalPages ?? 1
+  const isLoading = sessionPending || incomeQ.isLoading
 
   const onPageSizeChange = (n: number) => {
     setPageSize(n)
     setPage(1)
   }
 
-  const onPackageFilterChange = (v: string) => {
+  const onPackageFilterChange = (v: number) => {
     setPackageFilter(v)
+    setPage(1)
+  }
+
+  const onLevelFilterChange = (v: number) => {
+    setLevelFilter(v)
     setPage(1)
   }
 
@@ -87,11 +240,8 @@ export default function LostIncomeTable() {
     return Math.max(1, Math.min(totalPages - 4, page - 2)) + i
   })
 
-  const packageOptions = Array.from({ length: 12 }, (_, i) => i + 1)
-
   return (
     <div className="space-y-5" data-testid="lost-income-page">
-
       <header>
         <p className="text-base font-bold text-white">Lost Income</p>
         <span className="text-sm text-white/50">
@@ -100,12 +250,14 @@ export default function LostIncomeTable() {
       </header>
 
       <motion.div
-        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }}
         className="rounded-2xl border border-white/[0.06] bg-[#080F26] p-5"
       >
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <p className="text-base font-bold text-white">
-            Income Records {!isLoading && <span className="text-white/40 font-normal text-sm">({total})</span>}
+            Income Records{' '}
+            {!isLoading && <span className="text-white/40 font-normal text-sm">({total})</span>}
           </p>
         </div>
 
@@ -123,21 +275,9 @@ export default function LostIncomeTable() {
               />
             </div>
 
-            <div className="relative w-full sm:w-auto">
-              <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
-              <select
-                data-testid="lost-income-filter-package"
-                value={packageFilter}
-                onChange={(e) => onPackageFilterChange(e.target.value)}
-                className="w-full sm:w-auto appearance-none pl-8 pr-8 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:border-[#38BDF8]/50 transition-colors cursor-pointer"
-              >
-                <option value="all" className="bg-[#080F26] text-white">All Packages</option>
-                {packageOptions.map((p) => (
-                  <option key={p} value={p} className="bg-[#080F26] text-white">
-                    PKG {String(p).padStart(2, '0')}
-                  </option>
-                ))}
-              </select>
+            <div className="flex items-center gap-2 flex-wrap">
+              <PackageFilter value={packageFilter} onChange={onPackageFilterChange} />
+              <LevelFilter value={levelFilter} onChange={onLevelFilterChange} />
             </div>
           </div>
 
@@ -171,31 +311,34 @@ export default function LostIncomeTable() {
                     </td>
                   </tr>
                 )}
-                {!isLoading && records.map((r) => (
-                  <tr key={r.id} className="border-b border-white/[0.06] hover:bg-white/[0.04] transition-colors">
-             
-                    <td className="px-5 py-4 whitespace-nowrap">
-                      <WalletAddress address={r.lapsedAddress} data-testid="lost-income-lapsed-wallet" />
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap">
-                      <WalletAddress address={r.redirectedToAddress} data-testid="lost-income-redirected-wallet" />
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap font-mono font-medium text-[#F5A623]">
-                      PKG {String(r.packageNumber).padStart(2, '0')}
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap">
-                      <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#A855F7]/10 text-[#A855F7] font-mono">
-                        L{r.level}
-                      </span>
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap font-mono font-medium text-[#F43F5E]">
-                      {usd(r.amount)}
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-white/70">
-                      {new Date(r.missedAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
+                {!isLoading &&
+                  records.map((r) => (
+                    <tr
+                      key={r.id}
+                      className="border-b border-white/[0.06] hover:bg-white/[0.04] transition-colors"
+                    >
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <WalletAddress address={r.lapsedAddress} data-testid="lost-income-lapsed-wallet" />
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <WalletAddress address={r.redirectedToAddress} data-testid="lost-income-redirected-wallet" />
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap font-mono font-medium text-[#F5A623]">
+                        PKG {String(r.packageNumber).padStart(2, '0')}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#A855F7]/10 text-[#A855F7] font-mono">
+                          L{r.level}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap font-mono font-medium text-[#F43F5E]">
+                        {usd(r.amount)}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-white/70">
+                        {new Date(r.missedAt).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
@@ -211,7 +354,9 @@ export default function LostIncomeTable() {
                   className="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#38BDF8]/50 cursor-pointer"
                 >
                   {[10, 15, 25, 50].map((opt) => (
-                    <option key={opt} value={opt} className="bg-[#080F26] text-white">{opt}</option>
+                    <option key={opt} value={opt} className="bg-[#080F26] text-white">
+                      {opt}
+                    </option>
                   ))}
                 </select>
                 <span className="text-white/50">

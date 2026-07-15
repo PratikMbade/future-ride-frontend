@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react'
-import { Search, ChevronLeft, ChevronRight, Download, ChevronUp, ChevronDown, Filter } from 'lucide-react'
+import React, { useState, useMemo, useRef } from 'react'
+import { Search, ChevronLeft, ChevronRight, Download, ChevronUp, ChevronDown } from 'lucide-react'
 
 export interface Column<T> {
   key: keyof T | string
@@ -12,14 +12,45 @@ export interface Column<T> {
 export interface FilterOption {
   label: string
   value: string
+  /** Short label shown on mobile, e.g. "P1", "L2". Falls back to `label`. */
+  shortLabel?: string
 }
 
+/**
+ * Client-side filter — DataTable applies it to `data` internally.
+ * State is owned by DataTable.
+ */
 export interface FilterConfig<T> {
   key: keyof T | string
+  /** Small label prefix shown inside the button (e.g. "PKG", "LVL", "TYPE"). */
   label: string
   options: FilterOption[]
-  /** Label shown for the "no filter applied" option. Defaults to "All". */
+  /** Label shown for the "no filter applied" option. Defaults to `All ${label}`. */
   allLabel?: string
+  /** Accent color used when a value is selected. Defaults to sky blue. */
+  accent?: string
+  /** Menu width in px. Defaults to 176. */
+  menuWidth?: number
+}
+
+/**
+ * Server-side filter — DataTable renders the dropdown UI, but state lives
+ * in the parent so it can drive a refetch (e.g. levels computed by a tree
+ * walk that can't be filtered client-side after the fact).
+ *
+ * The sentinel for "no filter applied" is `'all'`; the parent decides what
+ * that means for its query params.
+ */
+export interface ServerFilterConfig {
+  /** Unique key — used for React keys and test-ids. */
+  key: string
+  label: string
+  value: string
+  onChange: (v: string) => void
+  options: FilterOption[]
+  allLabel?: string
+  accent?: string
+  menuWidth?: number
 }
 
 interface DataTableProps<T> {
@@ -27,8 +58,10 @@ interface DataTableProps<T> {
   columns: Column<T>[]
   searchable?: boolean
   searchPlaceholder?: string
-  /** Dropdown filters rendered next to the search box, e.g. filter by package or generation */
+  /** Client-side dropdown filters. State owned by DataTable. */
   filters?: FilterConfig<T>[]
+  /** Server-side dropdown filters. State controlled by parent (for refetching queries). */
+  serverFilters?: ServerFilterConfig[]
   pageSize?: number
   /** Options shown in the "rows per page" selector */
   pageSizeOptions?: number[]
@@ -39,12 +72,119 @@ interface DataTableProps<T> {
   'data-testid'?: string
 }
 
+// ─── styled filter dropdown (matches RecentIncomePageTable) ─────
+interface FilterDropdownProps {
+  label: string
+  allLabel: string
+  value: string
+  options: FilterOption[]
+  onChange: (v: string) => void
+  accent: string
+  menuWidth: number
+  testId?: string
+}
+
+function FilterDropdown({
+  label, allLabel, value, options, onChange, accent, menuWidth, testId,
+}: FilterDropdownProps) {
+  const [open, setOpen] = useState(false)
+  const [dropPos, setDropPos] = useState({ top: 0, right: 0 })
+  const btnRef = useRef<HTMLButtonElement>(null)
+
+  const isActive = value !== 'all'
+  const selected = options.find((o) => o.value === value)
+  const displayLong = selected?.label ?? allLabel
+  const displayShort = selected?.shortLabel ?? selected?.label ?? 'All'
+
+  const handleOpen = () => {
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      setDropPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right })
+    }
+    setOpen((o) => !o)
+  }
+
+  // Build rgba tints from the accent hex for background/border when active.
+  const accentBg = `${accent}1F`   // ~12% alpha
+  const accentBorder = `${accent}66` // ~40% alpha
+  const accentMenuTint = `${accent}1A` // ~10% alpha
+
+  return (
+    <div className="relative">
+      <button
+        ref={btnRef}
+        data-testid={testId}
+        onClick={handleOpen}
+        className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-[13px] font-mono font-semibold transition-all whitespace-nowrap"
+        style={
+          isActive
+            ? { background: accentBg, borderColor: accentBorder, color: accent }
+            : { background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)', color: '#fff' }
+        }
+      >
+        <span
+          className="text-[12px] font-bold shrink-0"
+          style={{ color: isActive ? accent : '#fff' }}
+        >
+          {label}
+        </span>
+        <span className="hidden sm:inline">{displayLong}</span>
+        <span className="sm:hidden">{isActive ? displayShort : 'All'}</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" className={`transition-transform ${open ? 'rotate-180' : ''}`}>
+          <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </svg>
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div
+            className="fixed z-20 bg-[#080F26] border border-white/10 rounded-[10px] overflow-y-auto shadow-xl shadow-black/60 py-1 max-h-64"
+            style={{ top: dropPos.top, right: dropPos.right, width: menuWidth }}
+          >
+            <button
+              onClick={() => { onChange('all'); setOpen(false) }}
+              className="w-full text-left px-3.5 py-2.5 font-mono text-[13px] transition-colors"
+              style={
+                value === 'all'
+                  ? { color: accent, background: accentMenuTint, fontWeight: 600 }
+                  : { color: '#fff' }
+              }
+              onMouseEnter={(e) => { if (value !== 'all') e.currentTarget.style.background = 'rgba(255,255,255,0.06)' }}
+              onMouseLeave={(e) => { if (value !== 'all') e.currentTarget.style.background = 'transparent' }}
+            >
+              {allLabel}
+            </button>
+            {options.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => { onChange(opt.value); setOpen(false) }}
+                className="w-full text-left px-3.5 py-2.5 font-mono text-[13px] transition-colors"
+                style={
+                  opt.value === value
+                    ? { color: accent, background: accentMenuTint, fontWeight: 600 }
+                    : { color: '#fff' }
+                }
+                onMouseEnter={(e) => { if (opt.value !== value) e.currentTarget.style.background = 'rgba(255,255,255,0.06)' }}
+                onMouseLeave={(e) => { if (opt.value !== value) e.currentTarget.style.background = 'transparent' }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 export function DataTable<T extends object>({
   data,
   columns,
   searchable = true,
   searchPlaceholder = 'Search...',
   filters = [],
+  serverFilters = [],
   pageSize = 10,
   pageSizeOptions = [10, 25, 50],
   exportable = false,
@@ -130,10 +270,12 @@ export function DataTable<T extends object>({
   // scroll instead of squished columns.
   const minTableWidth = Math.max(columns.length * 160, 640)
 
+  const hasAnyToolbar = searchable || exportable || filters.length > 0 || serverFilters.length > 0
+
   return (
     <div data-testid={testId} className="flex flex-col gap-4">
       {/* Toolbar */}
-      {(searchable || exportable || filters.length > 0) && (
+      {hasAnyToolbar && (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:flex-wrap">
           <div className="flex flex-col sm:flex-row gap-2 sm:items-center flex-1">
             {searchable && (
@@ -149,28 +291,38 @@ export function DataTable<T extends object>({
               </div>
             )}
 
-            {filters.map((f) => (
-              <div key={String(f.key)} className="relative w-full sm:w-auto isolate">
-                <Filter size={13}
-      className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none z-0"
-                 />
-                <select
-                  data-testid={testId ? `${testId}-filter-${String(f.key)}` : undefined}
-                  value={filterValues[String(f.key)] ?? 'all'}
-                  onChange={(e) => handleFilterChange(String(f.key), e.target.value)}
-      className="relative z-10 w-full sm:w-auto appearance-none pl-8 pr-8 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:border-[#38BDF8]/50 cursor-pointer touch-manipulation [-webkit-appearance:none] [-webkit-tap-highlight-color:transparent]"
-                >
-                  <option value="all" className="bg-[#080F26] text-white">
-                    {f.allLabel ?? `All ${f.label}`}
-                  </option>
-                  {f.options.map((opt) => (
-                    <option key={opt.value} value={opt.value} className="bg-[#080F26] text-white">
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+            {(filters.length > 0 || serverFilters.length > 0) && (
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Client-side filters */}
+                {filters.map((f) => (
+                  <FilterDropdown
+                    key={`c-${String(f.key)}`}
+                    testId={testId ? `${testId}-filter-${String(f.key)}` : undefined}
+                    label={f.label}
+                    allLabel={f.allLabel ?? `All ${f.label}`}
+                    value={filterValues[String(f.key)] ?? 'all'}
+                    options={f.options}
+                    onChange={(v) => handleFilterChange(String(f.key), v)}
+                    accent={f.accent ?? '#38BDF8'}
+                    menuWidth={f.menuWidth ?? 176}
+                  />
+                ))}
+                {/* Server-side filters (controlled by parent) */}
+                {serverFilters.map((f) => (
+                  <FilterDropdown
+                    key={`s-${f.key}`}
+                    testId={testId ? `${testId}-filter-${f.key}` : undefined}
+                    label={f.label}
+                    allLabel={f.allLabel ?? `All ${f.label}`}
+                    value={f.value}
+                    options={f.options}
+                    onChange={f.onChange}
+                    accent={f.accent ?? '#38BDF8'}
+                    menuWidth={f.menuWidth ?? 176}
+                  />
+                ))}
               </div>
-            ))}
+            )}
           </div>
 
           {exportable && (
@@ -197,7 +349,7 @@ export function DataTable<T extends object>({
                   className={`px-5 py-4 text-left text-xs font-bold tracking-wider uppercase text-white whitespace-nowrap ${col.sortable ? 'cursor-pointer hover:text-[#38BDF8] select-none' : ''} ${col.className ?? ''}`}
                   onClick={() => col.sortable && handleSort(String(col.key))}
                 >
-                  <span className="inline-flex items-center  gap-1.5">
+                  <span className="inline-flex items-center gap-1.5">
                     {col.header}
                     {col.sortable && sortKey === String(col.key) && (
                       sortDir === 'asc' ? <ChevronUp size={13} /> : <ChevronDown size={13} />
@@ -217,7 +369,7 @@ export function DataTable<T extends object>({
             {!loading && paged.map((row, ri) => (
               <tr key={ri} className="border-b border-white/[0.06] hover:bg-white/[0.04] transition-colors">
                 {columns.map((col) => (
-                  <td key={String(col.key)} className={`px-5 py-4 text-white  whitespace-nowrap ${col.className ?? ''}`}>
+                  <td key={String(col.key)} className={`px-5 py-4 text-white whitespace-nowrap ${col.className ?? ''}`}>
                     {col.render ? col.render(row) : String(row[col.key as keyof T] ?? '-')}
                   </td>
                 ))}

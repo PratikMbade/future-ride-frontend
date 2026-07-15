@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { authClient } from '@/lib/authClient'
 import { WalletAddress } from '../WalletAddress'
 import { DataTable } from '../DataTable'
-import type { Column, FilterConfig } from '../DataTable'
+import type { Column, FilterConfig, ServerFilterConfig } from '../DataTable'
 import type { GenerationTeamMember, GenerationTeamResponse } from '../../../types/dashboard'
 
 const API = import.meta.env.VITE_API_URL
@@ -27,14 +27,14 @@ export default function GenerationTeamPage() {
 
   // Generation level is a structural filter the backend computes from the
   // tree walk — it can't be applied client-side after the fact, so it's
-  // a real query param that refetches, same as page/search/package.
-  const [levelFilter, setLevelFilter] = useState<string>('')
+  // a real query param that refetches. 'all' = no filter (DataTable convention).
+  const [levelFilter, setLevelFilter] = useState<string>('all')
 
   const teamQ = useQuery<GenerationTeamMember[]>({
     queryKey: ['dashboard', 'generation-team', address, levelFilter],
     queryFn: async () => {
       const params = new URLSearchParams({ limit: '500' })
-      if (levelFilter) params.set('level', levelFilter)
+      if (levelFilter !== 'all') params.set('level', levelFilter)
 
       const res = await fetch(`${API}/api/user/generation-team?${params.toString()}`, {
         credentials: 'include',
@@ -64,7 +64,7 @@ export default function GenerationTeamPage() {
       key: 'generationLevel', header: 'Generation Level', sortable: true,
       render: (r) => (
         <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#A855F7]/10 text-[#A855F7] font-mono">
-          Level{r.generationLevel}
+          Level {r.generationLevel}
         </span>
       ),
     },
@@ -99,22 +99,44 @@ export default function GenerationTeamPage() {
     },
   ]
 
+  // Client-side package filter (applied to whatever the server returned).
   const packageOptions = Array.from({ length: 12 }, (_, i) => i + 1).map((p) => ({
     label: `PKG ${String(p).padStart(2, '0')}`,
     value: String(p),
+    shortLabel: `P${p}`,
   }))
 
   const filters: FilterConfig<GenerationTeamMember>[] = [
     {
       key: 'highestPackage',
-      label: 'Packages',
+      label: 'PKG',
+      allLabel: 'All Packages',
+      accent: '#F5A623',
       options: packageOptions,
+    },
+  ]
+
+  // Server-side level filter — refetches on change.
+  const levelOptions = Array.from({ length: 12 }, (_, i) => i + 1).map((lvl) => ({
+    label: `LVL ${String(lvl).padStart(2, '0')}`,
+    value: String(lvl),
+    shortLabel: `L${lvl}`,
+  }))
+
+  const serverFilters: ServerFilterConfig[] = [
+    {
+      key: 'level',
+      label: 'LVL',
+      allLabel: 'All Levels',
+      accent: '#38BDF8',
+      value: levelFilter,
+      onChange: setLevelFilter,
+      options: levelOptions,
     },
   ]
 
   return (
     <div className="space-y-5" data-testid="generation-team-page">
-
       <header>
         <p className="text-base font-bold text-white">Generation Team Table</p>
         <span className="text-sm text-white/50">
@@ -122,25 +144,13 @@ export default function GenerationTeamPage() {
         </span>
       </header>
 
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }} className="rounded-2xl border border-white/[0.06] bg-[#080F26] p-5">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }}
+        className="rounded-2xl border border-white/[0.06] bg-[#080F26] p-5"
+      >
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <p className="text-base font-bold text-white">Generation Team Members</p>
-
-          {/* Level filter — server-side, since it's computed from the tree walk */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-white/50 font-mono uppercase tracking-wider">Level</span>
-            <select
-              value={levelFilter}
-              onChange={(e) => setLevelFilter(e.target.value)}
-              className="bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-1.5 text-sm text-white font-mono outline-none focus:border-[#A855F7]/40"
-              data-testid="generation-level-filter"
-            >
-              <option value="">All Levels</option>
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((lvl) => (
-                <option key={lvl} value={lvl}>L{lvl}</option>
-              ))}
-            </select>
-          </div>
         </div>
 
         <DataTable<GenerationTeamMember>
@@ -153,6 +163,7 @@ export default function GenerationTeamPage() {
           searchable
           searchPlaceholder="Search wallet or package…"
           filters={filters}
+          serverFilters={serverFilters}
         />
       </motion.div>
     </div>
