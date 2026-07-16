@@ -79,6 +79,15 @@ export default function DirectTeam() {
       ),
     },
     {
+       key: 'totalTeam', header: 'Total Team', sortable: true,
+  render: (r) => (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-[#A855F7]/10 text-[#A855F7] font-mono">
+      <Users size={11} />
+      {(r.totalTeam ?? 0).toLocaleString()}
+    </span>
+  ),
+    },
+    {
       key: 'joinedAt', header: 'Joining Date', sortable: true,
       render: (r) => <span className="text-white/70 text-sm">{new Date(r.joinedAt).toLocaleDateString()}</span>,
     },

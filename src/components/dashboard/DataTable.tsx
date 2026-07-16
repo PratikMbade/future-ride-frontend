@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { Search, ChevronLeft, ChevronRight, Download, ChevronUp, ChevronDown } from 'lucide-react'
 
 export interface Column<T> {
@@ -177,7 +177,113 @@ function FilterDropdown({
     </div>
   )
 }
+export interface ServerPaginationConfig {
+  page: number
+  pageSize: number
+  total: number
+  onPageChange: (page: number) => void
+  onPageSizeChange?: (size: number) => void
+}
 
+/**
+ * When present, the search box is controlled by the parent (so it can
+ * become a query param) instead of filtering `data` in-browser.
+ * DataTable debounces keystrokes internally before calling onChange.
+ */
+export interface ServerSearchConfig {
+  value: string
+  onChange: (v: string) => void
+  debounceMs?: number
+}
+
+interface DataTableProps<T> {
+  data: T[]
+  columns: Column<T>[]
+  searchable?: boolean
+  searchPlaceholder?: string
+  filters?: FilterConfig<T>[]
+  serverFilters?: ServerFilterConfig[]
+  /** NEW — opt in to server-driven pagination */
+  serverPagination?: ServerPaginationConfig
+  /** NEW — opt in to server-driven search */
+  serverSearch?: ServerSearchConfig
+  pageSize?: number
+  pageSizeOptions?: number[]
+  exportable?: boolean
+  exportFilename?: string
+  loading?: boolean
+  emptyMessage?: string
+  'data-testid'?: string
+}
+
+// ─── page-size dropdown (same visual language as FilterDropdown, but simpler) ───
+interface PageSizeDropdownProps {
+  value: number
+  options: number[]
+  onChange: (v: number) => void
+  testId?: string
+}
+
+function PageSizeDropdown({ value, options, onChange, testId }: PageSizeDropdownProps) {
+  const [open, setOpen] = useState(false)
+  const [dropPos, setDropPos] = useState({ top: 0, left: 0 })
+  const btnRef = useRef<HTMLButtonElement>(null)
+
+  const handleOpen = () => {
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      // Open UPWARD — this control sits at the bottom of the table, so a
+      // downward menu would spill off-screen on short viewports.
+      setDropPos({ top: rect.top - 6, left: rect.left })
+    }
+    setOpen((o) => !o)
+  }
+
+  return (
+    <div className="relative">
+      <button
+        ref={btnRef}
+        data-testid={testId}
+        onClick={handleOpen}
+        type="button"
+        className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm font-mono hover:bg-white/10 transition-colors"
+      >
+        <span>{value}</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" className={`transition-transform ${open ? 'rotate-180' : ''}`}>
+          <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </svg>
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div
+            className="fixed z-20 bg-[#080F26] border border-white/10 rounded-[10px] overflow-y-auto shadow-xl shadow-black/60 py-1"
+            style={{ left: dropPos.left, top: dropPos.top, transform: 'translateY(-100%)', minWidth: 72 }}
+          >
+            {options.map((opt) => (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => { onChange(opt); setOpen(false) }}
+                className="w-full text-left px-3.5 py-2 font-mono text-[13px] transition-colors"
+                style={
+                  opt === value
+                    ? { color: '#38BDF8', background: 'rgba(56,189,248,0.1)', fontWeight: 600 }
+                    : { color: '#fff' }
+                }
+                onMouseEnter={(e) => { if (opt !== value) e.currentTarget.style.background = 'rgba(255,255,255,0.06)' }}
+                onMouseLeave={(e) => { if (opt !== value) e.currentTarget.style.background = 'transparent' }}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
 export function DataTable<T extends object>({
   data,
   columns,
@@ -185,6 +291,8 @@ export function DataTable<T extends object>({
   searchPlaceholder = 'Search...',
   filters = [],
   serverFilters = [],
+  serverPagination,
+  serverSearch,
   pageSize = 10,
   pageSizeOptions = [10, 25, 50],
   exportable = false,
@@ -193,6 +301,8 @@ export function DataTable<T extends object>({
   emptyMessage = 'No data found',
   'data-testid': testId,
 }: DataTableProps<T>) {
+  const isServerDriven = !!serverPagination
+
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(pageSize)
@@ -202,8 +312,31 @@ export function DataTable<T extends object>({
     () => Object.fromEntries(filters.map((f) => [String(f.key), 'all']))
   )
 
+  // ── local mirror of serverSearch.value, debounced before bubbling up ──
+  const [localSearch, setLocalSearch] = useState(serverSearch?.value ?? '')
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
+
+  useEffect(() => {
+    // keep in sync if parent resets it externally (e.g. clears filters)
+    if (serverSearch) setLocalSearch(serverSearch.value)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serverSearch?.value])
+
+  const handleSearchInput = (v: string) => {
+    if (serverSearch) {
+      setLocalSearch(v)
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(() => {
+        serverSearch.onChange(v)
+      }, serverSearch.debounceMs ?? 400)
+    } else {
+      setSearch(v)
+      setPage(1)
+    }
+  }
+
   const filteredByFilters = useMemo(() => {
-    if (filters.length === 0) return data
+    if (isServerDriven || filters.length === 0) return data
     return data.filter((row) =>
       filters.every((f) => {
         const selected = filterValues[String(f.key)]
@@ -211,30 +344,36 @@ export function DataTable<T extends object>({
         return String(row[f.key as keyof T] ?? '') === selected
       })
     )
-  }, [data, filters, filterValues])
+  }, [data, filters, filterValues, isServerDriven])
 
   const filtered = useMemo(() => {
+    if (isServerDriven) return filteredByFilters
     if (!search.trim()) return filteredByFilters
     const q = search.toLowerCase()
     return filteredByFilters.filter((row) =>
       Object.values(row).some((v) => String(v).toLowerCase().includes(q))
     )
-  }, [filteredByFilters, search])
+  }, [filteredByFilters, search, isServerDriven])
 
   const sorted = useMemo(() => {
-    if (!sortKey) return filtered
+    if (isServerDriven || !sortKey) return filtered
     return [...filtered].sort((a, b) => {
       const av = String(a[sortKey as keyof T] ?? '')
       const bv = String(b[sortKey as keyof T] ?? '')
       return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av)
     })
-  }, [filtered, sortKey, sortDir])
+  }, [filtered, sortKey, sortDir, isServerDriven])
 
-  const totalPages = Math.max(1, Math.ceil(sorted.length / rowsPerPage))
-  const safePage = Math.min(page, totalPages)
-  const paged = sorted.slice((safePage - 1) * rowsPerPage, safePage * rowsPerPage)
+  // ── pagination: server-driven or client-driven ──
+  const effectivePage = isServerDriven ? serverPagination!.page : page
+  const effectiveRowsPerPage = isServerDriven ? serverPagination!.pageSize : rowsPerPage
+  const effectiveTotal = isServerDriven ? serverPagination!.total : sorted.length
+  const totalPages = Math.max(1, Math.ceil(effectiveTotal / effectiveRowsPerPage))
+  const safePage = isServerDriven ? effectivePage : Math.min(page, totalPages)
+  const paged = isServerDriven ? data : sorted.slice((safePage - 1) * rowsPerPage, safePage * rowsPerPage)
 
   const handleSort = (key: string) => {
+    if (isServerDriven) return // sorting server-paginated data needs a backend param — out of scope here
     if (sortKey === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
     else { setSortKey(key); setSortDir('asc') }
     setPage(1)
@@ -246,13 +385,26 @@ export function DataTable<T extends object>({
   }
 
   const handleRowsPerPageChange = (value: number) => {
-    setRowsPerPage(value)
-    setPage(1)
+    if (isServerDriven) {
+      serverPagination!.onPageSizeChange?.(value)
+      serverPagination!.onPageChange(1)
+    } else {
+      setRowsPerPage(value)
+      setPage(1)
+    }
+  }
+
+  const goToPage = (p: number) => {
+    if (isServerDriven) serverPagination!.onPageChange(p)
+    else setPage(p)
   }
 
   const handleExport = () => {
+    // NOTE: in server-driven mode this only exports the current page,
+    // since the full dataset never lives in the browser. That's intentional —
+    // a "export all" would need its own backend endpoint.
     const header = columns.map((c) => c.header).join(',')
-    const rows = sorted.map((row) =>
+    const rows = (isServerDriven ? data : sorted).map((row) =>
       columns.map((c) => {
         const v = row[c.key as keyof T]
         return typeof v === 'string' && v.includes(',') ? `"${v}"` : String(v ?? '')
@@ -266,15 +418,11 @@ export function DataTable<T extends object>({
     URL.revokeObjectURL(url)
   }
 
-  // Minimum table width scales with column count so mobile gets a real horizontal
-  // scroll instead of squished columns.
   const minTableWidth = Math.max(columns.length * 160, 640)
-
   const hasAnyToolbar = searchable || exportable || filters.length > 0 || serverFilters.length > 0
 
   return (
     <div data-testid={testId} className="flex flex-col gap-4">
-      {/* Toolbar */}
       {hasAnyToolbar && (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:flex-wrap">
           <div className="flex flex-col sm:flex-row gap-2 sm:items-center flex-1">
@@ -283,8 +431,8 @@ export function DataTable<T extends object>({
                 <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
                 <input
                   data-testid={testId ? `${testId}-search` : undefined}
-                  value={search}
-                  onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+                  value={serverSearch ? localSearch : search}
+                  onChange={(e) => handleSearchInput(e.target.value)}
                   placeholder={searchPlaceholder}
                   className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder-white/40 focus:outline-none focus:border-[#38BDF8]/50 transition-colors"
                 />
@@ -292,8 +440,7 @@ export function DataTable<T extends object>({
             )}
 
             {(filters.length > 0 || serverFilters.length > 0) && (
-              <div className="flex items-center gap-2 flex-wrap">
-                {/* Client-side filters */}
+              <div className="flex justify-end gap-2  flex-wrap">
                 {filters.map((f) => (
                   <FilterDropdown
                     key={`c-${String(f.key)}`}
@@ -307,7 +454,6 @@ export function DataTable<T extends object>({
                     menuWidth={f.menuWidth ?? 176}
                   />
                 ))}
-                {/* Server-side filters (controlled by parent) */}
                 {serverFilters.map((f) => (
                   <FilterDropdown
                     key={`s-${f.key}`}
@@ -337,8 +483,6 @@ export function DataTable<T extends object>({
         </div>
       )}
 
-      {/* Table — horizontally scrollable on every breakpoint so mobile keeps
-          columns in a row instead of stacking into vertical cards. */}
       <div className="rounded-xl border border-white/10 overflow-x-auto">
         <table className="text-base" style={{ minWidth: minTableWidth, width: '100%' }}>
           <thead>
@@ -346,12 +490,12 @@ export function DataTable<T extends object>({
               {columns.map((col) => (
                 <th
                   key={String(col.key)}
-                  className={`px-5 py-4 text-left text-xs font-bold tracking-wider uppercase text-white whitespace-nowrap ${col.sortable ? 'cursor-pointer hover:text-[#38BDF8] select-none' : ''} ${col.className ?? ''}`}
+                  className={`px-5 py-4 text-left text-xs font-bold tracking-wider uppercase text-white whitespace-nowrap ${col.sortable && !isServerDriven ? 'cursor-pointer hover:text-[#38BDF8] select-none' : ''} ${col.className ?? ''}`}
                   onClick={() => col.sortable && handleSort(String(col.key))}
                 >
                   <span className="inline-flex items-center gap-1.5">
                     {col.header}
-                    {col.sortable && sortKey === String(col.key) && (
+                    {col.sortable && !isServerDriven && sortKey === String(col.key) && (
                       sortDir === 'asc' ? <ChevronUp size={13} /> : <ChevronDown size={13} />
                     )}
                   </span>
@@ -379,23 +523,18 @@ export function DataTable<T extends object>({
         </table>
       </div>
 
-      {/* Footer: rows-per-page + pagination */}
-      {sorted.length > 0 && (
+      {effectiveTotal > 0 && (
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-sm text-white/70">
           <div className="flex items-center gap-2">
             <span>Rows per page</span>
-            <select
-              data-testid={testId ? `${testId}-page-size` : undefined}
-              value={rowsPerPage}
-              onChange={(e) => handleRowsPerPageChange(Number(e.target.value))}
-              className="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#38BDF8]/50 cursor-pointer"
-            >
-              {pageSizeOptions.map((opt) => (
-                <option key={opt} value={opt} className="bg-[#080F26] text-white">{opt}</option>
-              ))}
-            </select>
+            <PageSizeDropdown
+              testId={testId ? `${testId}-page-size` : undefined}
+  value={effectiveRowsPerPage}
+  options={pageSizeOptions}
+  onChange={handleRowsPerPageChange}
+            />
             <span className="text-white/50">
-              · {(safePage - 1) * rowsPerPage + 1}–{Math.min(safePage * rowsPerPage, sorted.length)} of {sorted.length}
+              · {(safePage - 1) * effectiveRowsPerPage + 1}–{Math.min(safePage * effectiveRowsPerPage, effectiveTotal)} of {effectiveTotal}
             </span>
           </div>
 
@@ -404,7 +543,7 @@ export function DataTable<T extends object>({
               <button
                 data-testid={testId ? `${testId}-prev` : undefined}
                 disabled={safePage === 1}
-                onClick={() => setPage((p) => p - 1)}
+                onClick={() => goToPage(safePage - 1)}
                 className="p-2 rounded-lg border border-white/10 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft size={15} />
@@ -414,7 +553,7 @@ export function DataTable<T extends object>({
                 return (
                   <button
                     key={pg}
-                    onClick={() => setPage(pg)}
+                    onClick={() => goToPage(pg)}
                     className={`w-8 h-8 rounded-lg text-sm font-semibold transition-colors ${pg === safePage ? 'bg-[#38BDF8]/25 border border-[#38BDF8]/40 text-[#38BDF8]' : 'border border-white/10 text-white hover:bg-white/10'}`}
                   >
                     {pg}
@@ -424,7 +563,7 @@ export function DataTable<T extends object>({
               <button
                 data-testid={testId ? `${testId}-next` : undefined}
                 disabled={safePage === totalPages}
-                onClick={() => setPage((p) => p + 1)}
+                onClick={() => goToPage(safePage + 1)}
                 className="p-2 rounded-lg border border-white/10 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight size={15} />

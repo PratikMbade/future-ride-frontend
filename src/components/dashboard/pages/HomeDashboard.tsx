@@ -20,7 +20,7 @@ function Skeleton({ className = '' }: { className?: string }) {
 
 // ─── types ──────────────────────────────────────────────
 // Mirrors getMe's response shape exactly — DB-only, fast.
-interface DashboardMe {
+export interface DashboardMe {
   highestPackage: number
   packagePurchaseDate: string
   referredBy: string | null
@@ -51,7 +51,7 @@ interface OnChainBalances {
   walletFundBalanceError?: boolean
   upgradeHoldingIncomeError?: boolean
 }
-function useBreakpoint() {
+export function useBreakpoint() {
   const [w, setW] = useState(typeof window !== "undefined" ? window.innerWidth : 1280);
   useEffect(() => {
     const fn = () => setW(window.innerWidth);
@@ -340,37 +340,6 @@ const allRecentRows: IncomeRow[] = (recentQ.data ?? []).map(r => ({
       </motion.div>
 
       <PackageBuyPage/>
-
-        <section className="flex flex-col gap-3.5">
-        <div>
-          <h2 className={`m-0 font-heading ${isSmall ? "text-[16px]" : "text-[18px]"} font-bold text-white tracking-[-0.02em]`}>
-            Recent Income
-          </h2>
-          <p className="mt-1 m-0 text-[13px] text-white/35 font-body">
-            Latest payouts received from your downline.
-          </p>
-        </div>
-        {recentQ.isLoading ? (
-          <TableSkeleton rows={6} />
-        ) : (
-          <RecentIncomePageTable
-            data={recentData}
-            isLoading={recentQ.isLoading}
-            isFetching={recentQ.isFetching}
-            page={recentPage}
-            pageSize={recentPageSize}
-            search={recentSearch}
-            pkgFilter={recentPkgFilter}
-            onPage={setRecentPage}
-            onPageSize={n => { setRecentPageSize(n); setRecentPage(1); }}
-            onSearch={s => { setRecentSearch(s); setRecentPage(1); }}
-            onPkgFilter={v => { setRecentPkgFilter(v); setRecentPage(1); }}
-            showLevel={true}
-            typeFilter={recentTypeFilter}
-            onTypeFilter={v => { setRecentTypeFilter(v); setRecentPage(1); }}
-          />
-        )}
-      </section>
 
       
     </div>

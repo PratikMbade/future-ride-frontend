@@ -83,8 +83,8 @@ interface IncomePageTableProps {
   onTypeFilter?: (v: string) => void;
   showLevel?: boolean;
   bscScanBase?: string;
-  showUserId?: boolean;   // NEW — hide the User ID column when false
-  showType?: boolean;     // NEW — hide the Type column when false
+  showUserId?: boolean;
+  showType?: boolean;
 }
 
 const DESKTOP_MINW = "min-w-[1100px]";
@@ -444,67 +444,9 @@ function Pagination({ page, totalPages, total, pageSize, onPage }: {
   );
 }
 
-// ─── mobile row (stacked card, no grid) ────────────────────
-function MobileRow({ r, showLevel, showUserId, showType, bscScanBase }: {
-  r: IncomeRow; showLevel: boolean; showUserId: boolean; showType: boolean; bscScanBase: string;
-}) {
-  return (
-    <div className="px-4 py-5 border-b border-white/[0.06] last:border-0 flex flex-col gap-3.5">
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[16px] text-white font-semibold truncate">
-          {shortAddr(r.fromUserAddress)}
-        </span>
-        <CopyBtn value={r.fromUserAddress} />
-      </div>
-
-      {showUserId && (
-        <div className="flex items-center justify-between">
-          <span className="font-mono text-[12px] text-white/90 uppercase tracking-[0.06em]">User ID</span>
-          <RegIdBadge id={r.fromContractRegId} />
-        </div>
-      )}
-
-      {showType && (
-        <div className="flex items-center justify-between">
-          <span className="font-mono text-[12px] text-white/90 uppercase tracking-[0.06em]">Type</span>
-          <IncomeTypeBadge type={r.incomeType} />
-        </div>
-      )}
-
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[12px] text-white/90 uppercase tracking-[0.06em]">Amount</span>
-        <span className="font-mono text-[18px] font-bold text-[#22C55E]">{usd(r.amount)}</span>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[12px] text-white/90 uppercase tracking-[0.06em]">Package</span>
-        <PkgBadge num={r.packageNumber} />
-      </div>
-
-      {showLevel && r.level !== undefined && (
-        <div className="flex items-center justify-between">
-          <span className="font-mono text-[12px] text-white/90 uppercase tracking-[0.06em]">Level</span>
-          <LevelBadge level={r.level} />
-        </div>
-      )}
-
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[12px] text-white/90 uppercase tracking-[0.06em]">Date</span>
-        <span className="font-mono text-[15px] text-[#38BDF8] font-semibold">{formatDateTime(r.timestamp)}</span>
-      </div>
-
-      <a
-        href={`${bscScanBase}${r.transactionHash}`}
-        target="_blank" rel="noopener noreferrer"
-        className="flex items-center justify-center gap-1.5 mt-1 py-2.5 rounded-lg bg-white/5 border border-white/10 font-mono text-[13px] text-white/70 active:bg-white/10 transition-colors"
-      >
-        {shortHash(r.transactionHash)} <ExternalLink size={12} />
-      </a>
-    </div>
-  );
-}
-
 // ─── tablet row (grid, gridStyle MUST match tablet header) ──────
+// Also serves as the mobile row now — mobile just uses the same
+// tablet grid inside a horizontal scroller, no stacked-card layout.
 function TabletRow({ r, showLevel, showUserId, showType, gridStyle }: {
   r: IncomeRow; showLevel: boolean; showUserId: boolean; showType: boolean; gridStyle: React.CSSProperties;
 }) {
@@ -573,8 +515,8 @@ export function RecentIncomePageTable({
   page, pageSize, search, pkgFilter = 0, levelFilter, typeFilter = "all",
   onPage, onSearch, onPkgFilter, onLevelFilter, onTypeFilter,
   showLevel = false,
-  showUserId = true,   // NEW
-  showType = true,     // NEW
+  showUserId = true,
+  showType = true,
   bscScanBase = "https://bscscan.com/tx/",
 }: IncomePageTableProps) {
   const [searchInput, setSearchInput] = useState(search);
@@ -599,10 +541,10 @@ export function RecentIncomePageTable({
     "120px", "130px", "180px", "120px",
   ].filter(Boolean).join(" ");
 
-  // Tablet: From | [UserID] | [Type] | [Level] | Package | Amount
+  // Tablet (also used on mobile): From | [UserID] | [Type] | [Level] | Package | Amount
   const tabletTemplate = [
-    "minmax(200px,1fr)",
-    showUserId ? "80px" : null,
+    "minmax(100px,1fr)",
+    showUserId ? "100px" : null,
     showType ? "100px" : null,
     showLevel ? "90px" : null,
     "100px", "110px",
@@ -658,7 +600,7 @@ export function RecentIncomePageTable({
           </form>
 
           {/* right controls */}
-          <div className="flex items-center gap-2 sm:ml-auto flex-wrap">
+          <div className="flex  gap-2 ml-auto flex-wrap">
             {onTypeFilter && (
               <IncomeTypeFilter value={typeFilter} onChange={v => { onTypeFilter(v); onPage(1); }} />
             )}
@@ -668,68 +610,21 @@ export function RecentIncomePageTable({
             {onLevelFilter && (
               <LevelFilter value={levelFilter} onChange={v => { onLevelFilter(v); onPage(1); }} />
             )}
-            {hasFilters && (
-              <button
-                onClick={() => {
-                  setSearchInput("");
-                  onSearch("");
-                  onPkgFilter?.(0);
-                  onLevelFilter?.(undefined);
-                  onTypeFilter?.("all");
-                  onPage(1);
-                }}
-                className="px-3 py-2.5 rounded-lg border border-white/10 text-white text-[12px] font-mono font-semibold hover:border-white/35 transition-colors whitespace-nowrap"
-              >
-                Clear
-              </button>
-            )}
+
             {isFetching && !isLoading && (
               <span className="font-mono text-[11px] text-white/50">Updating…</span>
             )}
           </div>
         </div>
 
-        {/* active filter pills */}
-        {(pkgFilter > 0 || levelFilter !== undefined || typeFilter !== "all") && (
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
-            <span className="font-mono text-[12px] text-white/50">Filtered by:</span>
-            {typeFilter !== "all" && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[rgba(56,189,248,0.12)] border border-[rgba(56,189,248,0.4)] font-mono text-[12px] text-[#38BDF8] font-semibold">
-                {INCOME_TYPE_OPTIONS.find(o => o.value === typeFilter)?.label ?? typeFilter}
-                <button onClick={() => { onTypeFilter?.("all"); onPage(1); }} className="hover:text-white transition-colors">×</button>
-              </span>
-            )}
-            {pkgFilter > 0 && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.4)] font-mono text-[12px] text-[#F5A623] font-semibold">
-                PKG {String(pkgFilter).padStart(2, "0")}
-                <button onClick={() => { onPkgFilter?.(0); onPage(1); }} className="hover:text-white transition-colors">×</button>
-              </span>
-            )}
-            {levelFilter !== undefined && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[rgba(56,189,248,0.12)] border border-[rgba(56,189,248,0.4)] font-mono text-[12px] text-[#38BDF8] font-semibold">
-                LVL {String(levelFilter).padStart(2, "0")}
-                <button onClick={() => { onLevelFilter?.(undefined); onPage(1); }} className="hover:text-white transition-colors">×</button>
-              </span>
-            )}
-          </div>
-        )}
+
       </div>
 
-      {/* ── MOBILE (stacked cards, no horizontal scroll needed) ── */}
-      <div className="sm:hidden">
-        {isLoading ? (
-          <Skeleton />
-        ) : records.length === 0 ? (
-          <Empty searched={!!search} filtered={pkgFilter > 0 || levelFilter !== undefined || typeFilter !== "all"} />
-        ) : (
-          records.map(r => (
-            <MobileRow key={r.id} r={r} showLevel={showLevel} showUserId={showUserId} showType={showType} bscScanBase={bscScanBase} />
-          ))
-        )}
-      </div>
-
-      {/* ── TABLET (grid + horizontal scroll) ── */}
-      <div className="hidden sm:block lg:hidden overflow-x-auto">
+      {/* ── MOBILE + TABLET (grid + horizontal scroll) ──
+          Formerly the tablet-only branch. Mobile no longer gets a
+          stacked-card layout — it uses the same compact grid and
+          scrolls sideways, matching what the user sees on tablet. */}
+      <div className="lg:hidden overflow-x-auto">
         <div className={TABLET_MINW}>
           <div className="grid gap-2 px-4 py-4 border-b border-white/10 bg-white/[0.04]" style={tabletGridStyle}>
             {tabletHeaders.map(h => (

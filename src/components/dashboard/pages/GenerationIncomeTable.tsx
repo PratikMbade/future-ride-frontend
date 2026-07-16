@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Search, Filter } from 'lucide-react'
 import { authClient } from '@/lib/authClient'
 import { WalletAddress } from '../WalletAddress'
 import type { GenerationIncomeResponse } from '../../../types/dashboard'
+import { PageSizeDropdown } from '../PageSizeDropdown'
 
 const API = import.meta.env.VITE_API_URL
 
@@ -285,7 +286,7 @@ export default function GenerationIncomeTable() {
               />
             </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex justify-end gap-2 flex-wrap">
               <PackageFilter value={packageFilter} onChange={onPackageFilterChange} />
               <LevelFilter value={levelFilter} onChange={onLevelFilterChange} />
             </div>
@@ -358,17 +359,12 @@ export default function GenerationIncomeTable() {
             <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-sm text-white/70">
               <div className="flex items-center gap-2">
                 <span>Rows per page</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => onPageSizeChange(Number(e.target.value))}
-                  className="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#38BDF8]/50 cursor-pointer"
-                >
-                  {[10, 15, 25, 50].map((opt) => (
-                    <option key={opt} value={opt} className="bg-[#080F26] text-white">
-                      {opt}
-                    </option>
-                  ))}
-                </select>
+           <PageSizeDropdown
+             value={pageSize}
+             options={[10, 15, 25, 50]}
+             onChange={onPageSizeChange}
+             testId="geneation-income-page-size" // ← change per table
+           />
                 <span className="text-white/50">
                   · {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)} of {total}
                 </span>

@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Search, Filter } from 'lucide-react'
 import { authClient } from '@/lib/authClient'
 import { WalletAddress } from '../WalletAddress'
 import type { DirectIncomeResponse } from '../../../types/dashboard'
+import { PageSizeDropdown } from '../PageSizeDropdown'
 
 const API = import.meta.env.VITE_API_URL
 
@@ -37,12 +38,12 @@ function PackageFilter({ value, onChange }: { value: number; onChange: (v: numbe
   }
 
   return (
-    <div className="relative">
+    <div className="relative flex justify-end">
       <button
         ref={btnRef}
         onClick={handleOpen}
         className={[
-          'flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-[13px] font-mono font-semibold transition-all whitespace-nowrap',
+          'flex  items-center gap-2 px-3.5 py-2.5 rounded-lg border text-[13px] font-mono font-semibold transition-all whitespace-nowrap',
           value > 0
             ? 'bg-[rgba(245,166,35,0.12)] border-[rgba(245,166,35,0.4)] text-[#F5A623]'
             : 'bg-white/5 border-white/10 text-white hover:border-white/35',
@@ -274,17 +275,12 @@ export default function DirectIncomeTable() {
             <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-sm text-white/70">
               <div className="flex items-center gap-2">
                 <span>Rows per page</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => onPageSizeChange(Number(e.target.value))}
-                  className="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#38BDF8]/50 cursor-pointer"
-                >
-                  {[10, 15, 25, 50].map((opt) => (
-                    <option key={opt} value={opt} className="bg-[#080F26] text-white">
-                      {opt}
-                    </option>
-                  ))}
-                </select>
+                <PageSizeDropdown
+  value={pageSize}
+  options={[10, 15, 25, 50]}
+  onChange={onPageSizeChange}
+  testId="direct-income-page-size" // ← change per table
+/>
                 <span className="text-white/50">
                   · {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)} of {total}
                 </span>

@@ -112,6 +112,7 @@ export interface DirectTeamMember {
   highestPackage: number
   packageName: string
   directTeam: number
+  totalTeam:number
 
   // income breakdown
   directIncome: number
