@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { GenerationTree } from '@/components/dashboard/pages/GenerationTreePage'
 import { authClient } from '@/lib/authClient'
 
-export const GenerationTreePage = () => {
+export  const GenerationTreePage = () => {
   const { data: session, isPending: sessionPending } = authClient.useSession()
 
   if (sessionPending) {
@@ -18,6 +18,6 @@ export const GenerationTreePage = () => {
   return <GenerationTree rootAddress={address.toLowerCase()} />
 }
 
-export const Route = createFileRoute('/dashboard/generation-tree')({
+export  const Route = createFileRoute('/dashboard/generation-tree')({
   component: GenerationTreePage,
 })

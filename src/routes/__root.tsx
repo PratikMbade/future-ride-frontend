@@ -8,7 +8,7 @@ import { queryClient } from '../lib/query-client'
 import { AutoConnect, ThirdwebProvider } from 'thirdweb/react'
 import { createWallet, inAppWallet } from 'thirdweb/wallets'
 import { client } from "@/lib/client";
-
+import { CrispChat } from "@/components/CrispChat";
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -47,6 +47,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         wallets={wallets}
         timeout={10000}
       />
+      <CrispChat/>
           <QueryClientProvider client={queryClient}>
           {children}
           <TanStackDevtools
