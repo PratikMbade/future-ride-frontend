@@ -21,27 +21,31 @@ export default function GenerationTeamPage() {
   const address = session?.user?.name
   const sessionReady = !sessionPending && !!address
 
-  // All filter/pagination state — every one of these is a query param now.
-  const [page, setPage]         = useState(1)
-  const [pageSize, setPageSize] = useState(10)
-  const [search, setSearch]     = useState('')
+  // All filter/pagination/sort state — every one of these is a query param.
+  const [page, setPage]                   = useState(1)
+  const [pageSize, setPageSize]           = useState(10)
+  const [search, setSearch]               = useState('')
   const [levelFilter, setLevelFilter]     = useState('all')
   const [packageFilter, setPackageFilter] = useState('all')
+  const [sortKey, setSortKey]             = useState<string>('generationLevel')
+  const [sortDir, setSortDir]             = useState<'asc' | 'desc'>('asc')
 
-  // Reset to page 1 whenever a filter/search/pageSize changes — otherwise
+  // Reset to page 1 whenever filter/search/pageSize/sort changes — otherwise
   // you can land on page 7 of a filtered set that only has 2 pages.
-  useEffect(() => { setPage(1) }, [search, levelFilter, packageFilter, pageSize])
+  useEffect(() => { setPage(1) }, [search, levelFilter, packageFilter, pageSize, sortKey, sortDir])
 
   const teamQ = useQuery<GenerationTeamResponse>({
-    queryKey: ['dashboard', 'generation-team', address, page, pageSize, search, levelFilter, packageFilter],
+    queryKey: ['dashboard', 'generation-team', address, page, pageSize, search, levelFilter, packageFilter, sortKey, sortDir],
     queryFn: async () => {
       const params = new URLSearchParams({
-        page:  String(page),
-        limit: String(pageSize),
+        page:    String(page),
+        limit:   String(pageSize),
+        sortKey,
+        sortDir,
       })
-      if (search.trim())             params.set('search', search.trim())
-      if (levelFilter   !== 'all')   params.set('level', levelFilter)
-      if (packageFilter !== 'all')   params.set('package', packageFilter)
+      if (search.trim())           params.set('search', search.trim())
+      if (levelFilter   !== 'all') params.set('level', levelFilter)
+      if (packageFilter !== 'all') params.set('package', packageFilter)
 
       const res = await fetch(`${API}/api/user/generation-team?${params.toString()}`, {
         credentials: 'include',
@@ -61,11 +65,11 @@ export default function GenerationTeamPage() {
   const isLoading = sessionPending || (teamQ.isLoading && !teamQ.data)
 
   const cols: Column<GenerationTeamMember>[] = [
-    { key: 'contractRegId', header: 'User ID', sortable: false,
+    { key: 'contractRegId', header: 'User ID', sortable: true,
       render: (r) => <span className="font-mono font-semibold text-[#38BDF8]">{r.contractRegId ?? '—'}</span> },
     { key: 'userAddress', header: 'Wallet Address', sortable: false,
       render: (r) => <WalletAddress address={r.userAddress} data-testid="gen-team-member-wallet" /> },
-    { key: 'generationLevel', header: 'Generation Level', sortable: false,
+    { key: 'generationLevel', header: 'Generation Level', sortable: true,
       render: (r) => (
         <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#A855F7]/10 text-[#A855F7] font-mono">
           Level {r.generationLevel}
@@ -75,15 +79,19 @@ export default function GenerationTeamPage() {
       render: (r) => r.referralAddress
         ? <WalletAddress address={r.referralAddress} data-testid="gen-team-referral-address" />
         : <span className="font-mono text-sm text-white/35">—</span> },
-    { key: 'highestPackage', header: 'Current Package', sortable: false,
+    { key: 'uplineAddress', header: 'Upline Address', sortable: false,
+      render: (r) => r.uplineAddress
+        ? <WalletAddress address={r.uplineAddress} data-testid="gen-team-upline-address" />
+        : <span className="font-mono text-sm text-white/35">—</span> },
+    { key: 'highestPackage', header: 'Current Package', sortable: true,
       render: (r) => (
         <span className="text-[#F5A623] font-mono font-medium">
           PKG {String(r.highestPackage).padStart(2, '0')}
         </span>
       ) },
-    { key: 'joinedAt', header: 'Joining Date', sortable: false,
+    { key: 'joinedAt', header: 'Joining Date', sortable: true,
       render: (r) => <span className="text-white/70 text-sm">{new Date(r.joinedAt).toLocaleDateString()}</span> },
-    { key: 'totalIncome', header: 'Total Income', sortable: false,
+    { key: 'totalIncome', header: 'Total Income', sortable: true,
       render: (r) => (
         <div className="flex flex-col gap-0.5">
           <span className="font-mono font-bold text-white">{usd(r.totalIncome)}</span>
@@ -148,6 +156,11 @@ export default function GenerationTeamPage() {
             total,
             onPageChange: setPage,
             onPageSizeChange: setPageSize,
+          }}
+          serverSort={{
+            sortKey,
+            sortDir,
+            onChange: (k, d) => { setSortKey(k); setSortDir(d) },
           }}
         />
       </motion.div>

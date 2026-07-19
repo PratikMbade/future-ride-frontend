@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardRoyaltyRouteImport } from './routes/dashboard/royalty'
+import { Route as DashboardPackageBuyHistoryRouteImport } from './routes/dashboard/package-buy-history'
 import { Route as DashboardOtherUserRouteImport } from './routes/dashboard/other-user'
 import { Route as DashboardGenerationTreeRouteImport } from './routes/dashboard/generation-tree'
 import { Route as DashboardFutureRideSystemRouteImport } from './routes/dashboard/future-ride-system'
@@ -68,6 +69,12 @@ const DashboardRoyaltyRoute = DashboardRoyaltyRouteImport.update({
   path: '/royalty',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardPackageBuyHistoryRoute =
+  DashboardPackageBuyHistoryRouteImport.update({
+    id: '/package-buy-history',
+    path: '/package-buy-history',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 const DashboardOtherUserRoute = DashboardOtherUserRouteImport.update({
   id: '/other-user',
   path: '/other-user',
@@ -135,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/future-ride-system': typeof DashboardFutureRideSystemRoute
   '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
   '/dashboard/other-user': typeof DashboardOtherUserRoute
+  '/dashboard/package-buy-history': typeof DashboardPackageBuyHistoryRoute
   '/dashboard/royalty': typeof DashboardRoyaltyRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
@@ -153,6 +161,7 @@ export interface FileRoutesByTo {
   '/dashboard/future-ride-system': typeof DashboardFutureRideSystemRoute
   '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
   '/dashboard/other-user': typeof DashboardOtherUserRoute
+  '/dashboard/package-buy-history': typeof DashboardPackageBuyHistoryRoute
   '/dashboard/royalty': typeof DashboardRoyaltyRoute
   '/dashboard': typeof DashboardIndexRoute
   '/login': typeof LoginIndexRoute
@@ -174,6 +183,7 @@ export interface FileRoutesById {
   '/dashboard/future-ride-system': typeof DashboardFutureRideSystemRoute
   '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
   '/dashboard/other-user': typeof DashboardOtherUserRoute
+  '/dashboard/package-buy-history': typeof DashboardPackageBuyHistoryRoute
   '/dashboard/royalty': typeof DashboardRoyaltyRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/dashboard/future-ride-system'
     | '/dashboard/generation-tree'
     | '/dashboard/other-user'
+    | '/dashboard/package-buy-history'
     | '/dashboard/royalty'
     | '/dashboard/'
     | '/login/'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/dashboard/future-ride-system'
     | '/dashboard/generation-tree'
     | '/dashboard/other-user'
+    | '/dashboard/package-buy-history'
     | '/dashboard/royalty'
     | '/dashboard'
     | '/login'
@@ -234,6 +246,7 @@ export interface FileRouteTypes {
     | '/dashboard/future-ride-system'
     | '/dashboard/generation-tree'
     | '/dashboard/other-user'
+    | '/dashboard/package-buy-history'
     | '/dashboard/royalty'
     | '/dashboard/'
     | '/login/'
@@ -309,6 +322,13 @@ declare module '@tanstack/react-router' {
       path: '/royalty'
       fullPath: '/dashboard/royalty'
       preLoaderRoute: typeof DashboardRoyaltyRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/package-buy-history': {
+      id: '/dashboard/package-buy-history'
+      path: '/package-buy-history'
+      fullPath: '/dashboard/package-buy-history'
+      preLoaderRoute: typeof DashboardPackageBuyHistoryRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/other-user': {
@@ -389,6 +409,7 @@ interface DashboardRouteRouteChildren {
   DashboardFutureRideSystemRoute: typeof DashboardFutureRideSystemRoute
   DashboardGenerationTreeRoute: typeof DashboardGenerationTreeRoute
   DashboardOtherUserRoute: typeof DashboardOtherUserRoute
+  DashboardPackageBuyHistoryRoute: typeof DashboardPackageBuyHistoryRoute
   DashboardRoyaltyRoute: typeof DashboardRoyaltyRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardIncomeDirectIncomeRoute: typeof DashboardIncomeDirectIncomeRoute
@@ -404,6 +425,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardFutureRideSystemRoute: DashboardFutureRideSystemRoute,
   DashboardGenerationTreeRoute: DashboardGenerationTreeRoute,
   DashboardOtherUserRoute: DashboardOtherUserRoute,
+  DashboardPackageBuyHistoryRoute: DashboardPackageBuyHistoryRoute,
   DashboardRoyaltyRoute: DashboardRoyaltyRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardIncomeDirectIncomeRoute: DashboardIncomeDirectIncomeRoute,

@@ -137,6 +137,7 @@ export interface GenerationTeamMember {
   userAddress: string
   contractRegId: number | null
   referralAddress: string | null
+  uplineAddress:string
   isRegistered: boolean
   joinedAt: string
   generationLevel: number

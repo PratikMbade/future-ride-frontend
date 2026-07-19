@@ -37,12 +37,8 @@ export interface FilterConfig<T> {
  * Server-side filter — DataTable renders the dropdown UI, but state lives
  * in the parent so it can drive a refetch (e.g. levels computed by a tree
  * walk that can't be filtered client-side after the fact).
- *
- * The sentinel for "no filter applied" is `'all'`; the parent decides what
- * that means for its query params.
  */
 export interface ServerFilterConfig {
-  /** Unique key — used for React keys and test-ids. */
   key: string
   label: string
   value: string
@@ -53,17 +49,47 @@ export interface ServerFilterConfig {
   menuWidth?: number
 }
 
+export interface ServerPaginationConfig {
+  page: number
+  pageSize: number
+  total: number
+  onPageChange: (page: number) => void
+  onPageSizeChange?: (size: number) => void
+}
+
+/**
+ * When present, the search box is controlled by the parent (so it can
+ * become a query param) instead of filtering `data` in-browser.
+ * DataTable debounces keystrokes internally before calling onChange.
+ */
+export interface ServerSearchConfig {
+  value: string
+  onChange: (v: string) => void
+  debounceMs?: number
+}
+
+/**
+ * When present, header clicks bubble up to the parent so sort can be
+ * applied server-side (needed whenever pagination is also server-driven,
+ * otherwise you'd only sort the current page).
+ */
+export interface ServerSortConfig {
+  sortKey: string | null
+  sortDir: 'asc' | 'desc'
+  onChange: (key: string, dir: 'asc' | 'desc') => void
+}
+
 interface DataTableProps<T> {
   data: T[]
   columns: Column<T>[]
   searchable?: boolean
   searchPlaceholder?: string
-  /** Client-side dropdown filters. State owned by DataTable. */
   filters?: FilterConfig<T>[]
-  /** Server-side dropdown filters. State controlled by parent (for refetching queries). */
   serverFilters?: ServerFilterConfig[]
+  serverPagination?: ServerPaginationConfig
+  serverSearch?: ServerSearchConfig
+  serverSort?: ServerSortConfig
   pageSize?: number
-  /** Options shown in the "rows per page" selector */
   pageSizeOptions?: number[]
   exportable?: boolean
   exportFilename?: string
@@ -104,10 +130,9 @@ function FilterDropdown({
     setOpen((o) => !o)
   }
 
-  // Build rgba tints from the accent hex for background/border when active.
-  const accentBg = `${accent}1F`   // ~12% alpha
-  const accentBorder = `${accent}66` // ~40% alpha
-  const accentMenuTint = `${accent}1A` // ~10% alpha
+  const accentBg = `${accent}1F`
+  const accentBorder = `${accent}66`
+  const accentMenuTint = `${accent}1A`
 
   return (
     <div className="relative">
@@ -122,10 +147,7 @@ function FilterDropdown({
             : { background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)', color: '#fff' }
         }
       >
-        <span
-          className="text-[12px] font-bold shrink-0"
-          style={{ color: isActive ? accent : '#fff' }}
-        >
+        <span className="text-[12px] font-bold shrink-0" style={{ color: isActive ? accent : '#fff' }}>
           {label}
         </span>
         <span className="hidden sm:inline">{displayLong}</span>
@@ -177,46 +199,8 @@ function FilterDropdown({
     </div>
   )
 }
-export interface ServerPaginationConfig {
-  page: number
-  pageSize: number
-  total: number
-  onPageChange: (page: number) => void
-  onPageSizeChange?: (size: number) => void
-}
 
-/**
- * When present, the search box is controlled by the parent (so it can
- * become a query param) instead of filtering `data` in-browser.
- * DataTable debounces keystrokes internally before calling onChange.
- */
-export interface ServerSearchConfig {
-  value: string
-  onChange: (v: string) => void
-  debounceMs?: number
-}
-
-interface DataTableProps<T> {
-  data: T[]
-  columns: Column<T>[]
-  searchable?: boolean
-  searchPlaceholder?: string
-  filters?: FilterConfig<T>[]
-  serverFilters?: ServerFilterConfig[]
-  /** NEW — opt in to server-driven pagination */
-  serverPagination?: ServerPaginationConfig
-  /** NEW — opt in to server-driven search */
-  serverSearch?: ServerSearchConfig
-  pageSize?: number
-  pageSizeOptions?: number[]
-  exportable?: boolean
-  exportFilename?: string
-  loading?: boolean
-  emptyMessage?: string
-  'data-testid'?: string
-}
-
-// ─── page-size dropdown (same visual language as FilterDropdown, but simpler) ───
+// ─── page-size dropdown ───
 interface PageSizeDropdownProps {
   value: number
   options: number[]
@@ -284,6 +268,7 @@ function PageSizeDropdown({ value, options, onChange, testId }: PageSizeDropdown
     </div>
   )
 }
+
 export function DataTable<T extends object>({
   data,
   columns,
@@ -293,6 +278,7 @@ export function DataTable<T extends object>({
   serverFilters = [],
   serverPagination,
   serverSearch,
+  serverSort,
   pageSize = 10,
   pageSizeOptions = [10, 25, 50],
   exportable = false,
@@ -317,7 +303,6 @@ export function DataTable<T extends object>({
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
 
   useEffect(() => {
-    // keep in sync if parent resets it externally (e.g. clears filters)
     if (serverSearch) setLocalSearch(serverSearch.value)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serverSearch?.value])
@@ -373,7 +358,13 @@ export function DataTable<T extends object>({
   const paged = isServerDriven ? data : sorted.slice((safePage - 1) * rowsPerPage, safePage * rowsPerPage)
 
   const handleSort = (key: string) => {
-    if (isServerDriven) return // sorting server-paginated data needs a backend param — out of scope here
+    if (isServerDriven) {
+      if (!serverSort) return
+      const nextDir: 'asc' | 'desc' =
+        serverSort.sortKey === key && serverSort.sortDir === 'asc' ? 'desc' : 'asc'
+      serverSort.onChange(key, nextDir)
+      return
+    }
     if (sortKey === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
     else { setSortKey(key); setSortDir('asc') }
     setPage(1)
@@ -401,8 +392,7 @@ export function DataTable<T extends object>({
 
   const handleExport = () => {
     // NOTE: in server-driven mode this only exports the current page,
-    // since the full dataset never lives in the browser. That's intentional —
-    // a "export all" would need its own backend endpoint.
+    // since the full dataset never lives in the browser.
     const header = columns.map((c) => c.header).join(',')
     const rows = (isServerDriven ? data : sorted).map((row) =>
       columns.map((c) => {
@@ -420,6 +410,14 @@ export function DataTable<T extends object>({
 
   const minTableWidth = Math.max(columns.length * 160, 640)
   const hasAnyToolbar = searchable || exportable || filters.length > 0 || serverFilters.length > 0
+
+  // Sort is "clickable" if the column is sortable AND either client-mode
+  // or server-mode with serverSort wired up.
+  const canSort = (col: Column<T>) => !!col.sortable && (!isServerDriven || !!serverSort)
+
+  // Which key is currently sorted (client or server)?
+  const activeSortKey = isServerDriven ? serverSort?.sortKey ?? null : sortKey
+  const activeSortDir = isServerDriven ? serverSort?.sortDir ?? 'asc' : sortDir
 
   return (
     <div data-testid={testId} className="flex flex-col gap-4">
@@ -440,7 +438,7 @@ export function DataTable<T extends object>({
             )}
 
             {(filters.length > 0 || serverFilters.length > 0) && (
-              <div className="flex justify-end gap-2  flex-wrap">
+              <div className="flex justify-end gap-2 flex-wrap">
                 {filters.map((f) => (
                   <FilterDropdown
                     key={`c-${String(f.key)}`}
@@ -487,20 +485,22 @@ export function DataTable<T extends object>({
         <table className="text-base" style={{ minWidth: minTableWidth, width: '100%' }}>
           <thead>
             <tr className="border-b border-white/10 bg-white/[0.04]">
-              {columns.map((col) => (
-                <th
-                  key={String(col.key)}
-                  className={`px-5 py-4 text-left text-xs font-bold tracking-wider uppercase text-white whitespace-nowrap ${col.sortable && !isServerDriven ? 'cursor-pointer hover:text-[#38BDF8] select-none' : ''} ${col.className ?? ''}`}
-                  onClick={() => col.sortable && handleSort(String(col.key))}
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    {col.header}
-                    {col.sortable && !isServerDriven && sortKey === String(col.key) && (
-                      sortDir === 'asc' ? <ChevronUp size={13} /> : <ChevronDown size={13} />
-                    )}
-                  </span>
-                </th>
-              ))}
+              {columns.map((col) => {
+                const clickable = canSort(col)
+                const isActive  = clickable && activeSortKey === String(col.key)
+                return (
+                  <th
+                    key={String(col.key)}
+                    className={`px-5 py-4 text-left text-xs font-bold tracking-wider uppercase text-white whitespace-nowrap ${clickable ? 'cursor-pointer hover:text-[#38BDF8] select-none' : ''} ${col.className ?? ''}`}
+                    onClick={() => clickable && handleSort(String(col.key))}
+                  >
+                    <span className="inline-flex items-center gap-1.5">
+                      {col.header}
+                      {isActive && (activeSortDir === 'asc' ? <ChevronUp size={13} /> : <ChevronDown size={13} />)}
+                    </span>
+                  </th>
+                )
+              })}
             </tr>
           </thead>
           <tbody>
@@ -529,9 +529,9 @@ export function DataTable<T extends object>({
             <span>Rows per page</span>
             <PageSizeDropdown
               testId={testId ? `${testId}-page-size` : undefined}
-  value={effectiveRowsPerPage}
-  options={pageSizeOptions}
-  onChange={handleRowsPerPageChange}
+              value={effectiveRowsPerPage}
+              options={pageSizeOptions}
+              onChange={handleRowsPerPageChange}
             />
             <span className="text-white/50">
               · {(safePage - 1) * effectiveRowsPerPage + 1}–{Math.min(safePage * effectiveRowsPerPage, effectiveTotal)} of {effectiveTotal}

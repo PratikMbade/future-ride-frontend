@@ -11,6 +11,7 @@ import {
   Layers,
   Copy,
   Check,
+  Clock,
 } from 'lucide-react'
 import { useActiveAccount, useActiveWallet, useDisconnect } from 'thirdweb/react'
 import { LOGO_URL } from '../../constants/assets'
@@ -47,6 +48,8 @@ const NAV: NavItem[] = [
 
     ],
   },
+    { label: 'Package Buy History',href: '/dashboard/package-buy-history',  icon: <Clock size={17} /> },
+
 
 ]
 
