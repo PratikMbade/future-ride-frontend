@@ -124,13 +124,18 @@ export function Hero() {
             </svg>
             Join Whatsapp Channel
           </a>
-          <button
-            data-testid="hero-secondary-cta"
-            onClick={() => go('about')}
-            className="btn-outline px-8 py-4 text-[15px] rounded-xl"
+         <a
+            href="https://t.me/FutureRideOfficial"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="hero-primary-cta"
+            className="inline-flex items-center justify-center gap-2 bg-sky-500 px-8 py-4 text-[15px] font-bold rounded-xl"
           >
-            Learn More
-          </button>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+              <path d="M21.05 3.16 2.6 10.36c-1.26.5-1.25 1.2-.23 1.51l4.72 1.47 1.82 5.6c.22.61.11.85.75.85.5 0 .72-.23.99-.5l2.38-2.32 4.95 3.66c.91.5 1.57.24 1.8-.85l3.25-15.34c.33-1.33-.5-1.93-1.98-1.28zM7.87 13.06l10.02-6.33c.48-.29.91-.13.56.19L9.9 14.7l-.35 3.72-1.68-5.36z" />
+            </svg>
+            Join Telegram Channel
+          </a>
         </motion.div>
 
         {/* Rocket — mobile only, inline in flow since side rockets are hidden below md */}
