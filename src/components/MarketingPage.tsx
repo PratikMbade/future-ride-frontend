@@ -3,10 +3,14 @@ import { useRef, useEffect } from "react";
 import { Navbar } from "./Navbar";
 import { SpaceBackground } from "./SpaceBackground";
 const englishPdf = "/future-ride-plan-english.pdf";
-const hindiPdf = "/future-ride-plan-mobile.pdf";
+const englishMobilePdf =  "/future-ride-plan-mobile.pdf";
+const hindiPdf = "/future-ride-plan-hindi.pdf";
+const frenchPdf = "/future-ride-plan-french.pdf";
+const filipinoPdf = "/future-ride-plan-filipino.pdf";
+const swahiliPdf = "/future-ride-plan-swahili.pdf";
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface PdfCardProps {
-  lang: "English" | "Hindi";
+  lang: "English" | "Hindi" | "French" | "Filipino" | "Swahili";
   langNative: string;
   description: string;
   pdfSrc: string;
@@ -309,7 +313,35 @@ export default function MarketingPage() {
             langNative="English"
 
             description="Mobile Screen Friendly PDF — covering all matrix levels."
+            pdfSrc={englishMobilePdf}
+            accent="blue"
+          />
+          <PdfCard
+            lang="Hindi"
+            langNative="Hindi"
+            description="Complete smart contract plan in Hindi — covering all matrix levels."
             pdfSrc={hindiPdf}
+            accent="blue"
+          />
+            <PdfCard
+            lang="French"
+            langNative="French"
+            description="Complete smart contract plan in French — covering all matrix levels."
+            pdfSrc={frenchPdf}
+            accent="blue"
+          />
+            <PdfCard
+            lang="Filipino"
+            langNative="Filipino"
+            description="Complete smart contract plan in Filipino — covering all matrix levels."
+            pdfSrc={filipinoPdf}
+            accent="blue"
+          />
+            <PdfCard
+            lang="Swahili"
+            langNative="Swahili"
+            description="Complete smart contract plan in Swahili — covering all matrix levels."
+            pdfSrc={swahiliPdf}
             accent="blue"
           />
         </section>

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Search, Filter } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search, Filter, Link, ExternalLink } from 'lucide-react'
 import { authClient } from '@/lib/authClient'
 import { WalletAddress } from '../WalletAddress'
 import type { DirectIncomeResponse } from '../../../types/dashboard'
@@ -168,6 +168,7 @@ export default function DirectIncomeTable() {
     { key: 'packageNumber', header: 'Package' },
     { key: 'amount', header: 'Amount' },
     { key: 'creditedAt', header: 'Credited Date' },
+     {key:'transactionHash',header:'Transaction Hash'}
   ]
 
   // matches DataTable's numbered-page-button window logic
@@ -263,6 +264,12 @@ export default function DirectIncomeTable() {
                       </td>
                       <td className="px-5 py-4 whitespace-nowrap text-white/70">
                         {new Date(r.creditedAt).toLocaleDateString()}
+                      </td>
+                       <td className="px-5 py-4 flex items-center gap-x-2 whitespace-nowrap text-white/70">
+                        <WalletAddress address={r.transactionHash} data-testid="direct-income-wallet" />
+                       <a href={`https://bscscan.com/tx/${r.transactionHash}`} target='_blank'>
+                       <ExternalLink size="15"/>
+                       </a>
                       </td>
                     </tr>
                   ))}

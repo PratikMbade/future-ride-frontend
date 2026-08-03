@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Search, Filter } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search, Filter, ExternalLink } from 'lucide-react'
 import { authClient } from '@/lib/authClient'
 import { WalletAddress } from '../WalletAddress'
 import type { GenerationIncomeResponse } from '../../../types/dashboard'
@@ -244,6 +244,7 @@ export default function GenerationIncomeTable() {
     { key: 'level', header: 'Generation Level' },
     { key: 'amount', header: 'Amount' },
     { key: 'creditedAt', header: 'Credited Date' },
+    {key:'transactionHash',header:'Transaction Hash'}
   ]
 
   // matches DataTable's numbered-page-button window logic
@@ -347,6 +348,12 @@ export default function GenerationIncomeTable() {
                       </td>
                       <td className="px-5 py-4 whitespace-nowrap text-white/70">
                         {new Date(r.creditedAt).toLocaleDateString()}
+                      </td>
+                        <td className="flex items-center  gap-x-2 px-5 py-4 whitespace-nowrap">
+                        <WalletAddress address={r.transactionHash} data-testid="generation-income-transactionHash" />
+                        <a href={`https://bscscan.com/tx/${r.transactionHash}`}>
+                        <ExternalLink size={15}/>
+                        </a>
                       </td>
                     </tr>
                   ))}
