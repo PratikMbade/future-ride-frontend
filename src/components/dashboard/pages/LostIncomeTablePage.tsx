@@ -228,7 +228,7 @@ export default function LostIncomeTable() {
   }
 
   const columns = [
-    { key: 'lapsedAddress', header: 'Lapsed Address' },
+    { key: 'fromAddress', header: 'From Address' },
     { key: 'redirectedToAddress', header: 'Redirected To' },
     { key: 'packageNumber', header: 'Package' },
     { key: 'level', header: 'Level' },
@@ -321,7 +321,7 @@ export default function LostIncomeTable() {
                       className="border-b border-white/[0.06] hover:bg-white/[0.04] transition-colors"
                     >
                       <td className="px-5 py-4 whitespace-nowrap">
-                        <WalletAddress address={r.lapsedAddress} data-testid="lost-income-lapsed-wallet" />
+                        <WalletAddress address={r.fromAddress} data-testid="lost-income-lapsed-wallet" />
                       </td>
                       <td className="px-5 py-4 whitespace-nowrap">
                         <WalletAddress address={r.redirectedToAddress} data-testid="lost-income-redirected-wallet" />

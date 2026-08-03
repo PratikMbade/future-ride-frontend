@@ -226,7 +226,7 @@ export interface LapsIncomeResponse {
 export interface LostIncomeRecord {
   id: string
   contractRegId: number | null
-  lapsedAddress: string
+  fromAddress: string
   redirectedToAddress: string
   packageNumber: number
   packageName: string
