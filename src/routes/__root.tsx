@@ -9,6 +9,7 @@ import { AutoConnect, ThirdwebProvider } from 'thirdweb/react'
 import { createWallet, inAppWallet } from 'thirdweb/wallets'
 import { client } from "@/lib/client";
 import { CrispChat } from "@/components/CrispChat";
+import TawkChat from '#/components/TawkChatBot'
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -47,7 +48,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         wallets={wallets}
         timeout={10000}
       />
-      <CrispChat/>
+      <TawkChat/>
           <QueryClientProvider client={queryClient}>
           {children}
           <TanStackDevtools
