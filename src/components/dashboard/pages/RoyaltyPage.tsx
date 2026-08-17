@@ -12,6 +12,7 @@ const API = import.meta.env.VITE_API_URL
 interface TierConfig {
   id: string
   poolNumber: number
+  roayltyNumber:number
   name: string
   base: string
   light: string
@@ -24,10 +25,10 @@ interface TierConfig {
 }
 
 const TIER_CONFIG: TierConfig[] = [
-  { id: 'silver',   poolNumber: 3, name: 'Silver',   base: '#A6ACB4', light: '#F4F6F8', dark: '#5B6168', sheen: 'rgba(255,255,255,0.85)', textColor: '#1B1F23', accentColor: '#272B30', badge: 'SLV', icon: Medal },
-  { id: 'gold',     poolNumber: 5, name: 'Gold',     base: '#C99A3B', light: '#FBE8AE', dark: '#6B4A12', sheen: 'rgba(255,244,210,0.9)',  textColor: '#241902', accentColor: '#3D2A08', badge: 'GLD', icon: Crown },
-  { id: 'platinum', poolNumber: 7, name: 'Platinum', base: '#9B9FA5', light: '#C8C9CA', dark: '#60656B', sheen: 'rgba(232,240,250,0.9)',  textColor: '#16191C', accentColor: '#272D33', badge: 'PLT', icon: ShieldCheck },
-  { id: 'diamond',  poolNumber: 9, name: 'Diamond',  base: '#D7EBF2', light: '#FFFFFF', dark: '#7FA9BC', sheen: 'rgba(255,255,255,0.95)', textColor: '#0F1E24', accentColor: '#1A3F4F', badge: 'DMD', icon: Gem },
+  { id: 'silver',   poolNumber: 3, roayltyNumber:1, name: 'Silver',   base: '#A6ACB4', light: '#F4F6F8', dark: '#5B6168', sheen: 'rgba(255,255,255,0.85)', textColor: '#1B1F23', accentColor: '#272B30', badge: 'SLV', icon: Medal },
+  { id: 'gold',     poolNumber: 5, roayltyNumber:2,name: 'Gold',     base: '#C99A3B', light: '#FBE8AE', dark: '#6B4A12', sheen: 'rgba(255,244,210,0.9)',  textColor: '#241902', accentColor: '#3D2A08', badge: 'GLD', icon: Crown },
+  { id: 'platinum', poolNumber: 7, roayltyNumber:3,name: 'Platinum', base: '#9B9FA5', light: '#C8C9CA', dark: '#60656B', sheen: 'rgba(232,240,250,0.9)',  textColor: '#16191C', accentColor: '#272D33', badge: 'PLT', icon: ShieldCheck },
+  { id: 'diamond',  poolNumber: 9, roayltyNumber:4,name: 'Diamond',  base: '#D7EBF2', light: '#FFFFFF', dark: '#7FA9BC', sheen: 'rgba(255,255,255,0.95)', textColor: '#0F1E24', accentColor: '#1A3F4F', badge: 'DMD', icon: Gem },
 ]
 
 function usd(n: number) {
@@ -306,11 +307,11 @@ function UnifiedTierCard({
 
   const statusPill = (() => {
     switch (status.state) {
-      case 'claimable':          return { label: 'Ready',      color: '#16a34a', bg: 'rgba(34,197,94,0.22)', border: 'rgba(34,197,94,0.55)' }
-      case 'claimed-this-phase': return { label: 'Claimed',    color: '#0f3d1f', bg: 'rgba(34,197,94,0.28)', border: 'rgba(34,197,94,0.7)' }
-      case 'locked':             return { label: 'Locked',     color: '#94a3b8', bg: 'rgba(148,163,184,0.18)', border: 'rgba(148,163,184,0.4)' }
-      case 'graduated':          return { label: 'Complete',   color: '#4ade80', bg: 'rgba(74,222,128,0.18)', border: 'rgba(74,222,128,0.4)' }
-      default:                   return { label: 'Loading',    color: '#7dd3fc', bg: 'rgba(125,211,252,0.15)', border: 'rgba(125,211,252,0.3)' }
+      case 'claimable':          return { label: 'Ready',      color: '#000000',bg: 'rgba(148,163,184,0.18)', border: 'rgba(148,163,184,0.4)' }
+      case 'claimed-this-phase': return { label: 'Current',    color: '#000000', bg: 'rgba(148,163,184,0.18)', border: 'rgba(148,163,184,0.4)' }
+      case 'locked':             return { label: 'Locked',     color: '#000000', bg: 'rgba(148,163,184,0.18)', border: 'rgba(148,163,184,0.4)' }
+      case 'graduated':          return { label: 'Complete',   color: '#000000',  bg: 'rgba(148,163,184,0.18)', border: 'rgba(148,163,184,0.4)' }
+      default:                   return { label: 'Loading',    color: '#000000', bg: 'rgba(148,163,184,0.18)', border: 'rgba(148,163,184,0.4)' }
     }
   })()
 const isDiamond = tier.id === 'diamond'
@@ -372,11 +373,12 @@ const isDiamond = tier.id === 'diamond'
               <Icon size={18} style={{ color: tier.accentColor }} strokeWidth={2.25} />
             </div>
             <div>
-              <p className="text-[10px] font-bold tracking-[0.14em] uppercase leading-none opacity-80" style={{ color: tier.textColor }}>
-                Pool {tier.poolNumber}
-              </p>
-              <p className="text-base font-bold tracking-[0.02em] leading-tight mt-0.5" style={{ color: tier.textColor }}>
+           
+              <p className="text-base font-bold tracking-[0.02em] leading-tight " style={{ color: tier.textColor }}>
                 {tier.name}
+              </p>
+                 <p className="text-[10px] font-bold tracking-[0.14em] uppercase leading-none opacity-80" style={{ color: tier.textColor }}>
+                Pool {tier.roayltyNumber}
               </p>
             </div>
           </div>
@@ -397,7 +399,7 @@ const isDiamond = tier.id === 'diamond'
         <div className="relative z-10 grid grid-cols-2 gap-2 mb-3">
           <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(4,17,31,0.55)' }}>
             <p className="text-[9px] font-bold tracking-wider uppercase text-white/70 mb-1 flex items-center gap-1">
-              <Users size={9} /> Royalty Holders
+              <Users size={9} /> Today's Royalty Holders
             </p>
             <p className="text-sm font-bold text-white font-mono leading-tight">
               {statsLoading ? '—' : stats.memberCount.toLocaleString('en-US')}
@@ -405,7 +407,7 @@ const isDiamond = tier.id === 'diamond'
           </div>
           <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(4,17,31,0.55)' }}>
             <p className="text-[9px] font-bold tracking-wider uppercase text-white/70 mb-1 flex items-center gap-1">
-              <TrendingUp size={9} /> Today's Distribute
+              <TrendingUp size={9} /> Today's Distribution
             </p>
             <p className="text-sm font-bold text-white font-mono leading-tight">
               {statsLoading ? '—' : usd(stats.distributedAmt)}
@@ -413,7 +415,7 @@ const isDiamond = tier.id === 'diamond'
           </div>
           <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(4,17,31,0.55)' }}>
             <p className="text-[9px] font-bold tracking-wider uppercase text-white/70 mb-1">
-              Per holder
+             Today's Per holder royalty
             </p>
             <p className="text-sm font-bold text-white font-mono leading-tight">
               {statsLoading ? '—' : usd(perUser)}
@@ -421,13 +423,22 @@ const isDiamond = tier.id === 'diamond'
           </div>
           <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(4,17,31,0.55)' }}>
             <p className="text-[9px] font-bold tracking-wider uppercase text-white/70 mb-1">
-              Your claimed
+              Total claimed
             </p>
             <p className="text-sm font-bold text-white font-mono leading-tight">
               {status.state === 'loading' ? '—' : usd(status.claimed)}
             </p>
           </div>
+          
         </div>
+        <div className="rounded-lg px-3 my-4 py-2" style={{ background: 'rgba(4,17,31,0.55)' }}>
+            <p className="text-[9px] font-bold tracking-wider uppercase text-white/70 mb-1">
+              Remaining cap
+            </p>
+            <p className="text-sm font-bold text-white font-mono leading-tight">
+              {status.state === 'loading' ? '—' : usd(status.remaining)}
+            </p>
+          </div>
 
         <div className="relative z-10">
           {status.state === 'loading' && (
@@ -677,9 +688,9 @@ export default function RoyaltyFundPool() {
 
   return (
     <div className="relative space-y-4" data-testid="royalty-fund-pool">
-      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:m-10">
         <div className="min-w-0">
-          <p className="text-2xl sm:text-3xl font-bold text-white leading-tight">Royalty Fund Pool</p>
+          <p className="text-2xl sm:text-3xl font-bold text-white leading-tight ">Royalty Fund Pool</p>
           <span className="text-xs sm:text-sm font-medium text-white/70">
             Tier-based rewards. Higher packages unlock higher caps.
           </span>
@@ -710,7 +721,7 @@ export default function RoyaltyFundPool() {
             />
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-12 sm:m-10">
             {TIER_CONFIG.map((tier, i) => (
               <UnifiedTierCard
                 key={tier.id}
