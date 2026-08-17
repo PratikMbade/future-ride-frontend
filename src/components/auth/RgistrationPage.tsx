@@ -326,7 +326,9 @@ export default function RegisterPage() {
   //   'yes' = proceed to the sponsor input at step 4
   //           set by "Yes" button OR by "No" button (which also pre-fills
   //           DEFAULT_REFERRAL_ID so the ReferralInput auto-validates it)
-  const [referralChoice,   setReferralChoice]    = useState<null | 'yes'>(null);
+  const [referralChoice, setReferralChoice] = useState<null | 'yes'>(
+  search.ref && FUTURE_RIDE_ID_RE.test(search.ref) ? 'yes' : null
+);
 
   const { data: session, isPending: sessionPending, refetch: refetchSession } = authClient.useSession();
   const [signingIn, setSigningIn] = useState(false);
@@ -336,14 +338,19 @@ export default function RegisterPage() {
   const { disconnect } = useDisconnect();
 
   // ── Resolve ?referralAddress= query param to a futureRideId
-  useEffect(() => {
-    if (search.referralAddress && !search.ref) {
-      fetch(`${API}/api/user/by-address/${search.referralAddress}`, { credentials: 'include' })
-        .then(r => r.json())
-        .then(d => { if (d?.futureRideId) setReferralId(String(d.futureRideId)); })
-        .catch(() => {});
-    }
-  }, [search.referralAddress, search.ref]);
+useEffect(() => {
+  if (search.referralAddress && !search.ref) {
+    fetch(`${API}/api/user/by-address/${search.referralAddress}`, { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => {
+        if (d?.futureRideId) {
+          setReferralId(String(d.futureRideId));
+          setReferralChoice('yes'); // ← add this line
+        }
+      })
+      .catch(() => {});
+  }
+}, [search.referralAddress, search.ref]);
 
   const { data: regInfo, isLoading: checkingReg } = useQuery({
     queryKey: ['register-info', account?.address, hasSession],
