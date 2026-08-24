@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Copy, Check, Users, DollarSign, Package, Activity, Globe } from 'lucide-react'
+import { Copy, Check, Users, DollarSign, Package, Activity, Globe, CardSimIcon } from 'lucide-react'
 import { authClient } from '@/lib/authClient'
 import { WalletAddress } from '../WalletAddress'
 import { StatCard, GradientStatCard } from '../StatCard'
@@ -28,6 +28,7 @@ export interface DashboardMe {
   referralLink: string
   directTeamCount: number
   totalCommunityTeam: number
+  totalGenerationTeam:number
   userAddress: string
   contractRegId: number
   isRegistered: boolean
@@ -48,8 +49,18 @@ interface OnChainBalances {
   success: boolean
   walletFundBalance: number
   upgradeHoldingIncome: number
+  activeRoyaltyPool: number
   walletFundBalanceError?: boolean
   upgradeHoldingIncomeError?: boolean
+  activeRoyaltyPoolError?: boolean
+}
+
+// Royalty pool numbers → tier names, mirrors TIER_CONFIG in RoyaltyPage.tsx
+const ROYALTY_POOL_TIERS: Record<number, string> = {
+  3: 'Silver',
+  5: 'Gold',
+  7: 'Platinum',
+  9: 'Diamond',
 }
 export function useBreakpoint() {
   const [w, setW] = useState(typeof window !== "undefined" ? window.innerWidth : 1280);
@@ -121,6 +132,8 @@ export default function HomeDashboard() {
 
   const upgradeHoldingIncome = onChainQ.data?.upgradeHoldingIncome ?? 0
   const walletFundBalance = onChainQ.data?.walletFundBalance ?? 0
+  const activeRoyaltyPool = onChainQ.data?.activeRoyaltyPool ?? 0
+  const activeRoyaltyPoolLabel = ROYALTY_POOL_TIERS[activeRoyaltyPool] ?? 'None'
   const onChainLoading = onChainQ.isLoading
 
   // totalIncome from getMe is DB-only (direct + generation + laps);
@@ -299,27 +312,43 @@ const allRecentRows: IncomeRow[] = (recentQ.data ?? []).map(r => ({
           />
           <GradientStatCard
             data-testid="stat-direct-team"
-            title="Direct Team"
+            title="My Direct Team"
             value={isLoading ? '—' : String(me?.directTeamCount ?? 0)}
-            subtitle="Members"
+            subtitle=""
             gradient="bg-gradient-to-br from-[#3B1D8F] via-[#5B21B6] to-[#7C3AED]"
             icon={<Users size={16} />}
           />
-          <GradientStatCard
-            data-testid="stat-active-package"
-            title="Active Package"
-            value={isLoading ? '—' : String(me?.highestPackage ?? 0)}
-            subtitle={isLoading ? '' : new Date(me!.packagePurchaseDate).toLocaleDateString()}
-            gradient="bg-gradient-to-br from-[#065F5F] via-[#0891B2] to-[#06B6D4]"
-            icon={<Package size={16} />}
+      
+           <GradientStatCard
+            data-testid="stat-my-generation"
+            title="My Generation Team"
+            value={isLoading ? '—' : String(me?.totalGenerationTeam ?? 0)}
+            subtitle=""
+            gradient="bg-gradient-to-br from-[#78340A] via-[#B45309] to-[#F59E0B]"
+            icon={<Activity size={16} />}
           />
           <GradientStatCard
             data-testid="stat-community"
-            title="Community"
+            title="My Total Team"
             value={isLoading ? '—' : String(me?.totalCommunityTeam ?? 0)}
-            subtitle="Total Members"
             gradient="bg-gradient-to-br from-[#78340A] via-[#B45309] to-[#F59E0B]"
             icon={<Activity size={16} />}
+          />
+              <GradientStatCard
+            data-testid="stat-active-package"
+            title="Active Package"
+            value={isLoading ? '—' : String(me?.highestPackage ?? 0)}
+            // subtitle={isLoading ? '' : new Date(me!.packagePurchaseDate).toLocaleDateString()}
+            gradient="bg-gradient-to-br from-[#065F5F] via-[#0891B2] to-[#06B6D4]"
+            icon={<Package size={16} />}
+          />
+
+             <GradientStatCard
+            data-testid="stat-active-royalty"
+            title="Active Royalty Pool"
+            value={isLoading || onChainLoading ? '—' : activeRoyaltyPoolLabel}
+            gradient="bg-gradient-to-br from-[#065F5F] via-[#0891B2] to-[#06B6D4]"
+            icon={<CardSimIcon size={16} />}
           />
         </motion.div>
       </div>
