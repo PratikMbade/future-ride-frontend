@@ -895,7 +895,7 @@ export const GenerationTree = ({ rootAddress }: { rootAddress: string }) => {
         <div style={{ display:'flex', alignItems:'center', gap:9, flexWrap:'wrap' }}>
           <UserAvatarIcon size={20} color={SKY} glow="rgba(56,189,248,0.7)"/>
           <span style={{ color:SKY, fontSize:13, fontFamily:'Chivo Mono,monospace', letterSpacing:'0.1em', textTransform:'uppercase', fontWeight:700 }}>
-            Generation Tree
+            Matrix Tree
           </span>
           {currentRoot && (
             <span style={{

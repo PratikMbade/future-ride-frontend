@@ -22,6 +22,7 @@ import { Route as DashboardOtherUserRouteImport } from './routes/dashboard/other
 import { Route as DashboardGenerationTreeRouteImport } from './routes/dashboard/generation-tree'
 import { Route as DashboardFutureRideSystemRouteImport } from './routes/dashboard/future-ride-system'
 import { Route as DashboardDirectTeamRouteImport } from './routes/dashboard/direct-team'
+import { Route as DashboardTeamTotalTeamRouteImport } from './routes/dashboard/team/total-team'
 import { Route as DashboardTeamGenerationTeamRouteImport } from './routes/dashboard/team/generation-team'
 import { Route as DashboardTeamDirectTeamRouteImport } from './routes/dashboard/team/direct-team'
 import { Route as DashboardIncomeLostIncomeRouteImport } from './routes/dashboard/income/lost-income'
@@ -96,6 +97,11 @@ const DashboardDirectTeamRoute = DashboardDirectTeamRouteImport.update({
   path: '/direct-team',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardTeamTotalTeamRoute = DashboardTeamTotalTeamRouteImport.update({
+  id: '/team/total-team',
+  path: '/team/total-team',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const DashboardTeamGenerationTeamRoute =
   DashboardTeamGenerationTeamRouteImport.update({
     id: '/team/generation-team',
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/income/lost-income': typeof DashboardIncomeLostIncomeRoute
   '/dashboard/team/direct-team': typeof DashboardTeamDirectTeamRoute
   '/dashboard/team/generation-team': typeof DashboardTeamGenerationTeamRoute
+  '/dashboard/team/total-team': typeof DashboardTeamTotalTeamRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/dashboard/income/lost-income': typeof DashboardIncomeLostIncomeRoute
   '/dashboard/team/direct-team': typeof DashboardTeamDirectTeamRoute
   '/dashboard/team/generation-team': typeof DashboardTeamGenerationTeamRoute
+  '/dashboard/team/total-team': typeof DashboardTeamTotalTeamRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/dashboard/income/lost-income': typeof DashboardIncomeLostIncomeRoute
   '/dashboard/team/direct-team': typeof DashboardTeamDirectTeamRoute
   '/dashboard/team/generation-team': typeof DashboardTeamGenerationTeamRoute
+  '/dashboard/team/total-team': typeof DashboardTeamTotalTeamRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/dashboard/income/lost-income'
     | '/dashboard/team/direct-team'
     | '/dashboard/team/generation-team'
+    | '/dashboard/team/total-team'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -235,6 +245,7 @@ export interface FileRouteTypes {
     | '/dashboard/income/lost-income'
     | '/dashboard/team/direct-team'
     | '/dashboard/team/generation-team'
+    | '/dashboard/team/total-team'
   id:
     | '__root__'
     | '/'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/dashboard/income/lost-income'
     | '/dashboard/team/direct-team'
     | '/dashboard/team/generation-team'
+    | '/dashboard/team/total-team'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -359,6 +371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDirectTeamRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/team/total-team': {
+      id: '/dashboard/team/total-team'
+      path: '/team/total-team'
+      fullPath: '/dashboard/team/total-team'
+      preLoaderRoute: typeof DashboardTeamTotalTeamRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/team/generation-team': {
       id: '/dashboard/team/generation-team'
       path: '/team/generation-team'
@@ -418,6 +437,7 @@ interface DashboardRouteRouteChildren {
   DashboardIncomeLostIncomeRoute: typeof DashboardIncomeLostIncomeRoute
   DashboardTeamDirectTeamRoute: typeof DashboardTeamDirectTeamRoute
   DashboardTeamGenerationTeamRoute: typeof DashboardTeamGenerationTeamRoute
+  DashboardTeamTotalTeamRoute: typeof DashboardTeamTotalTeamRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
@@ -434,6 +454,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardIncomeLostIncomeRoute: DashboardIncomeLostIncomeRoute,
   DashboardTeamDirectTeamRoute: DashboardTeamDirectTeamRoute,
   DashboardTeamGenerationTeamRoute: DashboardTeamGenerationTeamRoute,
+  DashboardTeamTotalTeamRoute: DashboardTeamTotalTeamRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(

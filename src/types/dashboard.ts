@@ -160,6 +160,34 @@ export interface GenerationTeamResponse {
   members: GenerationTeamMember[]
 }
 
+export interface TotalTeamMember {
+  id: string
+  rank: number
+  userAddress: string
+  contractRegId: number | null
+  referralAddress: string | null
+  isRegistered: boolean
+  joinedAt: string
+  level: number
+  highestPackage: number
+  packageName: string
+
+  directIncome: number
+  generationIncome: number
+  lapsIncome: number
+  royaltyIncome: number
+  totalIncome: number
+}
+
+export interface TotalTeamResponse {
+  success: boolean
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  members: TotalTeamMember[]
+}
+
 export interface DirectIncomeRecord {
   id: string
   contractRegId: number | null

@@ -4,8 +4,8 @@ import { motion } from 'framer-motion'
 import { authClient } from '@/lib/authClient'
 import { WalletAddress } from '../WalletAddress'
 import { DataTable } from '../DataTable'
-import type { Column, ServerFilterConfig } from '../DataTable'
-import type { GenerationTeamMember, GenerationTeamResponse } from '../../../types/dashboard'
+import type { Column } from '../DataTable'
+import type { TotalTeamMember, TotalTeamResponse } from '../../../types/dashboard'
 
 const API = import.meta.env.VITE_API_URL
 
@@ -13,7 +13,54 @@ function usd(n: number) {
   return `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-export default function GenerationTeamPage() {
+// ─── level filter — a free-form 1..1000 input, not a dropdown, since the
+// referral chain can run far deeper than the 12-level generation matrix ──
+function LevelInputFilter({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const isActive = value !== ''
+
+  const handleChange = (raw: string) => {
+    if (raw === '') { onChange(''); return }
+    const n = Math.max(1, Math.min(1000, parseInt(raw, 10) || 1))
+    onChange(String(n))
+  }
+
+  return (
+    <div
+      className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-[13px] font-mono font-semibold transition-all"
+      style={
+        isActive
+          ? { background: '#38BDF81F', borderColor: '#38BDF866', color: '#38BDF8' }
+          : { background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)', color: '#fff' }
+      }
+    >
+      <span className="text-[12px] font-bold shrink-0" style={{ color: isActive ? '#38BDF8' : '#fff' }}>LVL</span>
+      <input
+        type="number"
+        inputMode="numeric"
+        min={1}
+        max={1000}
+        value={value}
+        onChange={(e) => handleChange(e.target.value)}
+        placeholder="All (1-1000)"
+        data-testid="total-team-filter-level"
+        className="w-24 bg-transparent outline-none placeholder-white/40"
+        style={{ color: isActive ? '#38BDF8' : '#fff' }}
+      />
+      {isActive && (
+        <button
+          type="button"
+          onClick={() => onChange('')}
+          aria-label="Clear level filter"
+          className="text-white/40 hover:text-white/70 leading-none"
+        >
+          ×
+        </button>
+      )}
+    </div>
+  )
+}
+
+export default function TotalTeamPage() {
   const { data: session, isPending: sessionPending, refetch: refetchSession } = authClient.useSession()
 
   useEffect(() => { refetchSession() /* eslint-disable-next-line */ }, [])
@@ -25,17 +72,16 @@ export default function GenerationTeamPage() {
   const [page, setPage]                   = useState(1)
   const [pageSize, setPageSize]           = useState(10)
   const [search, setSearch]               = useState('')
-  const [levelFilter, setLevelFilter]     = useState('all')
-  const [packageFilter, setPackageFilter] = useState('all')
-  const [sortKey, setSortKey]             = useState<string>('generationLevel')
+  const [levelFilter, setLevelFilter]     = useState('')
+  const [sortKey, setSortKey]             = useState<string>('level')
   const [sortDir, setSortDir]             = useState<'asc' | 'desc'>('asc')
 
   // Reset to page 1 whenever filter/search/pageSize/sort changes — otherwise
   // you can land on page 7 of a filtered set that only has 2 pages.
-  useEffect(() => { setPage(1) }, [search, levelFilter, packageFilter, pageSize, sortKey, sortDir])
+  useEffect(() => { setPage(1) }, [search, levelFilter, pageSize, sortKey, sortDir])
 
-  const teamQ = useQuery<GenerationTeamResponse>({
-    queryKey: ['dashboard', 'generation-team', address, page, pageSize, search, levelFilter, packageFilter, sortKey, sortDir],
+  const teamQ = useQuery<TotalTeamResponse>({
+    queryKey: ['dashboard', 'total-team', address, page, pageSize, search, levelFilter, sortKey, sortDir],
     queryFn: async () => {
       const params = new URLSearchParams({
         page:    String(page),
@@ -44,15 +90,14 @@ export default function GenerationTeamPage() {
         sortDir,
       })
       if (search.trim())           params.set('search', search.trim())
-      if (levelFilter   !== 'all') params.set('level', levelFilter)
-      if (packageFilter !== 'all') params.set('package', packageFilter)
+      if (levelFilter.trim())      params.set('level', levelFilter.trim())
 
-      const res = await fetch(`${API}/api/user/generation-team?${params.toString()}`, {
+      const res = await fetch(`${API}/api/user/total-team?${params.toString()}`, {
         credentials: 'include',
       })
-      if (!res.ok) throw new Error('Failed to load generation team')
-      const json: GenerationTeamResponse = await res.json()
-      if (!json.success) throw new Error('Failed to load generation team')
+      if (!res.ok) throw new Error('Failed to load total team')
+      const json: TotalTeamResponse = await res.json()
+      if (!json.success) throw new Error('Failed to load total team')
       return json
     },
     enabled: sessionReady,
@@ -64,24 +109,20 @@ export default function GenerationTeamPage() {
   const total   = teamQ.data?.total   ?? 0
   const isLoading = sessionPending || (teamQ.isLoading && !teamQ.data)
 
-  const cols: Column<GenerationTeamMember>[] = [
+  const cols: Column<TotalTeamMember>[] = [
     { key: 'contractRegId', header: 'User ID', sortable: true,
       render: (r) => <span className="font-mono font-semibold text-[#38BDF8]">{r.contractRegId ?? '—'}</span> },
     { key: 'userAddress', header: 'Wallet Address', sortable: false,
-      render: (r) => <WalletAddress address={r.userAddress} data-testid="gen-team-member-wallet" /> },
-    { key: 'generationLevel', header: 'Generation Level', sortable: true,
+      render: (r) => <WalletAddress address={r.userAddress} data-testid="total-team-member-wallet" /> },
+    { key: 'level', header: 'Generation Level', sortable: true,
       render: (r) => (
         <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#A855F7]/10 text-[#A855F7] font-mono">
-          Level {r.generationLevel}
+          Level {r.level}
         </span>
       ) },
     { key: 'referralAddress', header: 'Referral Address', sortable: false,
       render: (r) => r.referralAddress
-        ? <WalletAddress address={r.referralAddress} data-testid="gen-team-referral-address" />
-        : <span className="font-mono text-sm text-white/35">—</span> },
-    { key: 'uplineAddress', header: 'Upline Address', sortable: false,
-      render: (r) => r.uplineAddress
-        ? <WalletAddress address={r.uplineAddress} data-testid="gen-team-upline-address" />
+        ? <WalletAddress address={r.referralAddress} data-testid="total-team-referral-address" />
         : <span className="font-mono text-sm text-white/35">—</span> },
     { key: 'highestPackage', header: 'Current Package', sortable: true,
       render: (r) => (
@@ -102,26 +143,12 @@ export default function GenerationTeamPage() {
       ) },
   ]
 
-  const levelOptions = Array.from({ length: 12 }, (_, i) => i + 1).map((lvl) => ({
-    label: `LVL ${String(lvl).padStart(2, '0')}`, value: String(lvl), shortLabel: `L${lvl}`,
-  }))
-  const packageOptions = Array.from({ length: 12 }, (_, i) => i + 1).map((p) => ({
-    label: `PKG ${String(p).padStart(2, '0')}`, value: String(p), shortLabel: `P${p}`,
-  }))
-
-  const serverFilters: ServerFilterConfig[] = [
-    { key: 'level',   label: 'LVL', allLabel: 'All Levels',   accent: '#38BDF8',
-      value: levelFilter,   onChange: setLevelFilter,   options: levelOptions },
-    { key: 'package', label: 'PKG', allLabel: 'All Packages', accent: '#F5A623',
-      value: packageFilter, onChange: setPackageFilter, options: packageOptions },
-  ]
-
   return (
-    <div className="space-y-5" data-testid="generation-team-page">
+    <div className="space-y-5" data-testid="total-team-page">
       <header>
-        <p className="text-base font-bold text-white">2x2 Matrix Team Table</p>
+        <p className="text-base font-bold text-white">Generation Team Table</p>
         <span className="text-sm text-white/50">
-          All downline members across every 2x2 Matrix level in your matrix.
+          Every member in your referral chain, at every depth, however far it runs.
         </span>
       </header>
 
@@ -131,7 +158,7 @@ export default function GenerationTeamPage() {
         className="rounded-2xl border border-white/[0.06] bg-[#080F26] p-5"
       >
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-          <p className="text-base font-bold text-white">2x2 Matrix Team Members</p>
+          <p className="text-base font-bold text-white">Total Generation Team Members</p>
           {/* Total count — surfaced up top so the user sees the size even before scrolling to the pager. */}
           <span className="text-sm font-mono text-white/60">
             {teamQ.isFetching && !teamQ.data ? 'Loading…' : (
@@ -140,15 +167,15 @@ export default function GenerationTeamPage() {
           </span>
         </div>
 
-        <DataTable<GenerationTeamMember>
-          data-testid="generation-team-table"
+        <DataTable<TotalTeamMember>
+          data-testid="total-team-table"
           data={members}
           columns={cols}
           loading={isLoading}
           pageSizeOptions={[10, 25, 50]}
           searchable
-          searchPlaceholder="Search wallet…"
-          serverFilters={serverFilters}
+          searchPlaceholder="Search wallet address…"
+          filtersExtra={<LevelInputFilter value={levelFilter} onChange={setLevelFilter} />}
           serverSearch={{ value: search, onChange: setSearch, debounceMs: 400 }}
           serverPagination={{
             page,

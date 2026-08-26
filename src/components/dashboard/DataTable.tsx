@@ -86,6 +86,8 @@ interface DataTableProps<T> {
   searchPlaceholder?: string
   filters?: FilterConfig<T>[]
   serverFilters?: ServerFilterConfig[]
+  /** Arbitrary extra control(s) rendered in the same toolbar row as filters (e.g. a numeric range input). */
+  filtersExtra?: React.ReactNode
   serverPagination?: ServerPaginationConfig
   serverSearch?: ServerSearchConfig
   serverSort?: ServerSortConfig
@@ -276,6 +278,7 @@ export function DataTable<T extends object>({
   searchPlaceholder = 'Search...',
   filters = [],
   serverFilters = [],
+  filtersExtra,
   serverPagination,
   serverSearch,
   serverSort,
@@ -409,7 +412,7 @@ export function DataTable<T extends object>({
   }
 
   const minTableWidth = Math.max(columns.length * 160, 640)
-  const hasAnyToolbar = searchable || exportable || filters.length > 0 || serverFilters.length > 0
+  const hasAnyToolbar = searchable || exportable || filters.length > 0 || serverFilters.length > 0 || !!filtersExtra
 
   // Sort is "clickable" if the column is sortable AND either client-mode
   // or server-mode with serverSort wired up.
@@ -437,8 +440,9 @@ export function DataTable<T extends object>({
               </div>
             )}
 
-            {(filters.length > 0 || serverFilters.length > 0) && (
+            {(filters.length > 0 || serverFilters.length > 0 || !!filtersExtra) && (
               <div className="flex justify-end gap-2 flex-wrap">
+                {filtersExtra}
                 {filters.map((f) => (
                   <FilterDropdown
                     key={`c-${String(f.key)}`}

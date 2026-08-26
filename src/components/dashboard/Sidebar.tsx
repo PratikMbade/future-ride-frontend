@@ -12,6 +12,8 @@ import {
   Copy,
   Check,
   Clock,
+  Network,
+  TreePalm,
 } from 'lucide-react'
 import { useActiveAccount, useActiveWallet, useDisconnect } from 'thirdweb/react'
 import { LOGO_URL } from '../../constants/assets'
@@ -32,11 +34,13 @@ const NAV: NavItem[] = [
    {
     label: 'Team', href: '/dashboard/team/', icon: <Users size={17} />,
     children: [
-      { label: 'Direct Team',     href: '/dashboard/team/direct-team',       icon: <Link2 size={14} /> },
-      { label: 'Generation Team', href: '/dashboard/team/generation-team',    icon: <Merge size={14} /> },
+      { label: 'My Direct Team',     href: '/dashboard/team/direct-team',       icon: <Link2 size={14} /> },
+      { label: 'My Matrix Team', href: '/dashboard/team/generation-team',    icon: <TreePalm size={14} /> },
+     { label: 'My Generation Team', href: '/dashboard/team/total-team',    icon: <Merge size={14} /> },
+
     ],
   },
-  { label: 'Generation Tree',   href: '/dashboard/generation-tree',     icon: <GitBranch size={17} /> },
+  { label: 'Matrix Tree',   href: '/dashboard/generation-tree',     icon: <GitBranch size={17} /> },
   {
     label: 'Income', href: '/dashboard/income/direct', icon: <TrendingUp size={17} />,
     children: [
