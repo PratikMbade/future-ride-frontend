@@ -251,6 +251,27 @@ export interface LapsIncomeResponse {
 }
 
 
+export interface UpgradeHoldingRecord {
+  id: string
+  contractRegId: number | null
+  userAddress: string
+  fromUserAddress: string
+  packageNumber: number
+  amount: number
+  level: number
+  time: string
+  transactionHash: string
+}
+
+export interface UpgradeHoldingResponse {
+  success: boolean
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  records: UpgradeHoldingRecord[]
+}
+
 export interface LostIncomeRecord {
   id: string
   contractRegId: number | null

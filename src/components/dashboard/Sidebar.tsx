@@ -49,6 +49,7 @@ const NAV: NavItem[] = [
             { label: 'Laps Income', href: '/dashboard/income/laps-income',    icon: <DollarSign size={14} /> },
                   // { label: 'Royalty Income', href: '/dashboard/income/royalty-income',    icon: <LucideCardSim size={14} /> },
                   { label: 'Lost Income', href: '/dashboard/income/lost-income',    icon: <DollarSign size={14} /> },
+                  { label: 'Upgrade Holding', href: '/dashboard/upgrade-holding-history',    icon: <DollarSign size={14} /> },
 
     ],
   },

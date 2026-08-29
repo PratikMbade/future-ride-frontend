@@ -16,6 +16,7 @@ import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardUpgradeHoldingHistoryRouteImport } from './routes/dashboard/upgrade-holding-history'
 import { Route as DashboardRoyaltyRouteImport } from './routes/dashboard/royalty'
 import { Route as DashboardPackageBuyHistoryRouteImport } from './routes/dashboard/package-buy-history'
 import { Route as DashboardOtherUserRouteImport } from './routes/dashboard/other-user'
@@ -65,6 +66,12 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardUpgradeHoldingHistoryRoute =
+  DashboardUpgradeHoldingHistoryRouteImport.update({
+    id: '/upgrade-holding-history',
+    path: '/upgrade-holding-history',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 const DashboardRoyaltyRoute = DashboardRoyaltyRouteImport.update({
   id: '/royalty',
   path: '/royalty',
@@ -150,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/other-user': typeof DashboardOtherUserRoute
   '/dashboard/package-buy-history': typeof DashboardPackageBuyHistoryRoute
   '/dashboard/royalty': typeof DashboardRoyaltyRoute
+  '/dashboard/upgrade-holding-history': typeof DashboardUpgradeHoldingHistoryRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
   '/dashboard/income/direct-income': typeof DashboardIncomeDirectIncomeRoute
@@ -170,6 +178,7 @@ export interface FileRoutesByTo {
   '/dashboard/other-user': typeof DashboardOtherUserRoute
   '/dashboard/package-buy-history': typeof DashboardPackageBuyHistoryRoute
   '/dashboard/royalty': typeof DashboardRoyaltyRoute
+  '/dashboard/upgrade-holding-history': typeof DashboardUpgradeHoldingHistoryRoute
   '/dashboard': typeof DashboardIndexRoute
   '/login': typeof LoginIndexRoute
   '/dashboard/income/direct-income': typeof DashboardIncomeDirectIncomeRoute
@@ -193,6 +202,7 @@ export interface FileRoutesById {
   '/dashboard/other-user': typeof DashboardOtherUserRoute
   '/dashboard/package-buy-history': typeof DashboardPackageBuyHistoryRoute
   '/dashboard/royalty': typeof DashboardRoyaltyRoute
+  '/dashboard/upgrade-holding-history': typeof DashboardUpgradeHoldingHistoryRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
   '/dashboard/income/direct-income': typeof DashboardIncomeDirectIncomeRoute
@@ -217,6 +227,7 @@ export interface FileRouteTypes {
     | '/dashboard/other-user'
     | '/dashboard/package-buy-history'
     | '/dashboard/royalty'
+    | '/dashboard/upgrade-holding-history'
     | '/dashboard/'
     | '/login/'
     | '/dashboard/income/direct-income'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/dashboard/other-user'
     | '/dashboard/package-buy-history'
     | '/dashboard/royalty'
+    | '/dashboard/upgrade-holding-history'
     | '/dashboard'
     | '/login'
     | '/dashboard/income/direct-income'
@@ -259,6 +271,7 @@ export interface FileRouteTypes {
     | '/dashboard/other-user'
     | '/dashboard/package-buy-history'
     | '/dashboard/royalty'
+    | '/dashboard/upgrade-holding-history'
     | '/dashboard/'
     | '/login/'
     | '/dashboard/income/direct-income'
@@ -327,6 +340,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/upgrade-holding-history': {
+      id: '/dashboard/upgrade-holding-history'
+      path: '/upgrade-holding-history'
+      fullPath: '/dashboard/upgrade-holding-history'
+      preLoaderRoute: typeof DashboardUpgradeHoldingHistoryRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/royalty': {
@@ -430,6 +450,7 @@ interface DashboardRouteRouteChildren {
   DashboardOtherUserRoute: typeof DashboardOtherUserRoute
   DashboardPackageBuyHistoryRoute: typeof DashboardPackageBuyHistoryRoute
   DashboardRoyaltyRoute: typeof DashboardRoyaltyRoute
+  DashboardUpgradeHoldingHistoryRoute: typeof DashboardUpgradeHoldingHistoryRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardIncomeDirectIncomeRoute: typeof DashboardIncomeDirectIncomeRoute
   DashboardIncomeGenerationIncomeRoute: typeof DashboardIncomeGenerationIncomeRoute
@@ -447,6 +468,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardOtherUserRoute: DashboardOtherUserRoute,
   DashboardPackageBuyHistoryRoute: DashboardPackageBuyHistoryRoute,
   DashboardRoyaltyRoute: DashboardRoyaltyRoute,
+  DashboardUpgradeHoldingHistoryRoute: DashboardUpgradeHoldingHistoryRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardIncomeDirectIncomeRoute: DashboardIncomeDirectIncomeRoute,
   DashboardIncomeGenerationIncomeRoute: DashboardIncomeGenerationIncomeRoute,
