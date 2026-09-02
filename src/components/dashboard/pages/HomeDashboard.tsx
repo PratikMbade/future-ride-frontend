@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { Copy, Check, Users, DollarSign, Package, Activity, Globe, CardSimIcon } from 'lucide-react'
+import { Copy, Check, Users, DollarSign, Package, Activity, Globe, CardSimIcon, Plane } from 'lucide-react'
 import { authClient } from '@/lib/authClient'
 import { WalletAddress } from '../WalletAddress'
 import { StatCard, GradientStatCard } from '../StatCard'
@@ -78,6 +79,7 @@ export default function HomeDashboard() {
   // refetch on mount as a second-layer defense against the better-auth
   // useSession() stale-atom issue (see DashboardHomePage for full context).
   const { data: session, isPending: sessionPending, refetch: refetchSession } = authClient.useSession()
+  const navigate = useNavigate()
   const { isMobile, isTablet } = useBreakpoint();
   const isSmall = isMobile || isTablet;
   useEffect(() => {
@@ -236,6 +238,28 @@ const allRecentRows: IncomeRow[] = (recentQ.data ?? []).map(r => ({
             </button>
           </div>
         </div>
+      </motion.div>
+
+      {/* ── Dubai Tour CTA ── */}
+      <motion.div initial="hidden" animate="visible" custom={0.5} variants={fadeUp}>
+        <motion.button
+          type="button"
+          data-testid="dubai-tour-cta"
+          onClick={() => navigate({ to: '/dashboard/dubai-tour' })}
+          className="w-full flex items-center justify-center gap-2 rounded-2xl border border-amber-400/40 bg-linear-to-r from-amber-500/20 via-yellow-400/20 to-amber-500/20 px-5 py-3.5 text-sm font-bold tracking-wide text-amber-300"
+          animate={{
+            opacity: [1, 0.45, 1],
+            boxShadow: [
+              '0 0 0px rgba(251,191,36,0)',
+              '0 0 22px rgba(251,191,36,0.55)',
+              '0 0 0px rgba(251,191,36,0)',
+            ],
+          }}
+          transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <Plane size={16} className="text-amber-300" />
+          Go Diamond 💎 Global Dubai Tour
+        </motion.button>
       </motion.div>
 
       {/* ── Earnings + Stats Grid ── */}

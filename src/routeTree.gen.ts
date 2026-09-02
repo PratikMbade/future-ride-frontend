@@ -22,6 +22,7 @@ import { Route as DashboardPackageBuyHistoryRouteImport } from './routes/dashboa
 import { Route as DashboardOtherUserRouteImport } from './routes/dashboard/other-user'
 import { Route as DashboardGenerationTreeRouteImport } from './routes/dashboard/generation-tree'
 import { Route as DashboardFutureRideSystemRouteImport } from './routes/dashboard/future-ride-system'
+import { Route as DashboardDubaiTourRouteImport } from './routes/dashboard/dubai-tour'
 import { Route as DashboardDirectTeamRouteImport } from './routes/dashboard/direct-team'
 import { Route as DashboardTeamTotalTeamRouteImport } from './routes/dashboard/team/total-team'
 import { Route as DashboardTeamGenerationTeamRouteImport } from './routes/dashboard/team/generation-team'
@@ -99,6 +100,11 @@ const DashboardFutureRideSystemRoute =
     path: '/future-ride-system',
     getParentRoute: () => DashboardRouteRoute,
   } as any)
+const DashboardDubaiTourRoute = DashboardDubaiTourRouteImport.update({
+  id: '/dubai-tour',
+  path: '/dubai-tour',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const DashboardDirectTeamRoute = DashboardDirectTeamRouteImport.update({
   id: '/direct-team',
   path: '/direct-team',
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/registration': typeof RegistrationRouteRoute
   '/marketing': typeof MarketingRoute
   '/dashboard/direct-team': typeof DashboardDirectTeamRoute
+  '/dashboard/dubai-tour': typeof DashboardDubaiTourRoute
   '/dashboard/future-ride-system': typeof DashboardFutureRideSystemRoute
   '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
   '/dashboard/other-user': typeof DashboardOtherUserRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByTo {
   '/registration': typeof RegistrationRouteRoute
   '/marketing': typeof MarketingRoute
   '/dashboard/direct-team': typeof DashboardDirectTeamRoute
+  '/dashboard/dubai-tour': typeof DashboardDubaiTourRoute
   '/dashboard/future-ride-system': typeof DashboardFutureRideSystemRoute
   '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
   '/dashboard/other-user': typeof DashboardOtherUserRoute
@@ -197,6 +205,7 @@ export interface FileRoutesById {
   '/registration': typeof RegistrationRouteRoute
   '/marketing': typeof MarketingRoute
   '/dashboard/direct-team': typeof DashboardDirectTeamRoute
+  '/dashboard/dubai-tour': typeof DashboardDubaiTourRoute
   '/dashboard/future-ride-system': typeof DashboardFutureRideSystemRoute
   '/dashboard/generation-tree': typeof DashboardGenerationTreeRoute
   '/dashboard/other-user': typeof DashboardOtherUserRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/registration'
     | '/marketing'
     | '/dashboard/direct-team'
+    | '/dashboard/dubai-tour'
     | '/dashboard/future-ride-system'
     | '/dashboard/generation-tree'
     | '/dashboard/other-user'
@@ -243,6 +253,7 @@ export interface FileRouteTypes {
     | '/registration'
     | '/marketing'
     | '/dashboard/direct-team'
+    | '/dashboard/dubai-tour'
     | '/dashboard/future-ride-system'
     | '/dashboard/generation-tree'
     | '/dashboard/other-user'
@@ -266,6 +277,7 @@ export interface FileRouteTypes {
     | '/registration'
     | '/marketing'
     | '/dashboard/direct-team'
+    | '/dashboard/dubai-tour'
     | '/dashboard/future-ride-system'
     | '/dashboard/generation-tree'
     | '/dashboard/other-user'
@@ -384,6 +396,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardFutureRideSystemRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/dubai-tour': {
+      id: '/dashboard/dubai-tour'
+      path: '/dubai-tour'
+      fullPath: '/dashboard/dubai-tour'
+      preLoaderRoute: typeof DashboardDubaiTourRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/direct-team': {
       id: '/dashboard/direct-team'
       path: '/direct-team'
@@ -445,6 +464,7 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteRouteChildren {
   DashboardDirectTeamRoute: typeof DashboardDirectTeamRoute
+  DashboardDubaiTourRoute: typeof DashboardDubaiTourRoute
   DashboardFutureRideSystemRoute: typeof DashboardFutureRideSystemRoute
   DashboardGenerationTreeRoute: typeof DashboardGenerationTreeRoute
   DashboardOtherUserRoute: typeof DashboardOtherUserRoute
@@ -463,6 +483,7 @@ interface DashboardRouteRouteChildren {
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardDirectTeamRoute: DashboardDirectTeamRoute,
+  DashboardDubaiTourRoute: DashboardDubaiTourRoute,
   DashboardFutureRideSystemRoute: DashboardFutureRideSystemRoute,
   DashboardGenerationTreeRoute: DashboardGenerationTreeRoute,
   DashboardOtherUserRoute: DashboardOtherUserRoute,

@@ -293,3 +293,44 @@ export interface LostIncomeResponse {
   totalPages: number
   records: LostIncomeRecord[]
 }
+
+export interface DubaiTourRequirementStat {
+  required: number
+  current: number
+  met: boolean
+}
+
+export interface DubaiTourDirectTeamRequirement {
+  met: boolean
+  qualifyingDirectReferrals: {
+    required: number
+    packagesRequiredPerReferral: number
+    current: number
+    met: boolean
+  }
+  totalDirectPackageValue: {
+    required: number
+    current: number
+    met: boolean
+  }
+}
+
+export interface DubaiTourEligibilityResponse {
+  success: boolean
+  eligible: boolean
+  requirements: {
+    ownPackages: DubaiTourRequirementStat
+    directTeam: DubaiTourDirectTeamRequirement
+  }
+  directTeamCount: number
+}
+
+export interface DubaiTourGenerationBusinessResponse {
+  success: boolean
+  totalGenerationBusiness: number
+  downlineCount: number
+  promoWindow: {
+    start: string
+    end: string
+  }
+}
