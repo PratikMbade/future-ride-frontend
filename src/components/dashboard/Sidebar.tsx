@@ -33,12 +33,13 @@ const NAV: NavItem[] = [
     { label: 'Dubai Tour',href: '/dashboard/dubai-tour',  icon: <Plane size={17} /> },
     { label: 'User Register & Package Buy',href: '/dashboard/other-user',  icon: <Users size={17} /> },
 
+    
    {
-    label: 'Team', href: '/dashboard/team/', icon: <Users size={17} />,
+    label: 'My Team', href: '/dashboard/team/', icon: <Users size={17} />,
     children: [
-      { label: 'My Direct Team',     href: '/dashboard/team/direct-team',       icon: <Link2 size={14} /> },
-      { label: 'My Matrix Team', href: '/dashboard/team/generation-team',    icon: <TreePalm size={14} /> },
-     { label: 'My Generation Team', href: '/dashboard/team/total-team',    icon: <Merge size={14} /> },
+      { label: 'Direct Team',     href: '/dashboard/team/direct-team',       icon: <Link2 size={14} /> },
+      { label: 'Matrix Team', href: '/dashboard/team/generation-team',    icon: <TreePalm size={14} /> },
+     { label: 'Generation Team', href: '/dashboard/team/total-team',    icon: <Merge size={14} /> },
 
     ],
   },

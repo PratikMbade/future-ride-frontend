@@ -28,6 +28,7 @@ export interface DashboardMe {
   referredByContractRegId: number | null
   referralLink: string
   directTeamCount: number
+  totalTeamCount: number
   totalCommunityTeam: number
   totalGenerationTeam:number
   userAddress: string
@@ -345,7 +346,7 @@ const allRecentRows: IncomeRow[] = (recentQ.data ?? []).map(r => ({
       
            <GradientStatCard
             data-testid="stat-my-generation"
-            title="My Generation Team"
+            title="My Matrix Team"
             value={isLoading ? '—' : String(me?.totalGenerationTeam ?? 0)}
             subtitle=""
             gradient="bg-gradient-to-br from-[#78340A] via-[#B45309] to-[#F59E0B]"
@@ -353,8 +354,8 @@ const allRecentRows: IncomeRow[] = (recentQ.data ?? []).map(r => ({
           />
           <GradientStatCard
             data-testid="stat-community"
-            title="My Total Team"
-            value={isLoading ? '—' : String(me?.totalCommunityTeam ?? 0)}
+            title="My Generation Team"
+            value={isLoading ? '—' : String(me?.totalTeamCount ?? 0)}
             gradient="bg-gradient-to-br from-[#78340A] via-[#B45309] to-[#F59E0B]"
             icon={<Activity size={16} />}
           />

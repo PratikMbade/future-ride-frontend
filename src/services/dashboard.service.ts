@@ -20,6 +20,7 @@ export interface UserData {
   referredBy:          string | null;
   referralLink:        string;
   directTeamCount:     number;
+  totalTeamCount:      number;
   totalCommunityTeam:  number;
   userAddress:         string;
   contractRegId:       number | null;
