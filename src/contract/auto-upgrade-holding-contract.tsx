@@ -2,9 +2,9 @@ import { type Account } from 'thirdweb/wallets'
 import { ethers5Adapter } from 'thirdweb/adapters/ethers5';
 import { client, MainnetChain } from '@/lib/client';
 import { ethers } from 'ethers';
-import FUTUR_RIDE_CONTRACT_ABI from './futurerideContract.abi.json'
+import AUTO_UPGRADE_CONTRACT_ABI from './auto-upgrading-holding-contract-abi.json'
 
-export const  FUTURE_RIDE_CONTRACT_ADDRESS = "0x68a018465b2cCdB23b8d1a5Bb1888c2837F7864f"
+export const  AUTO_UPGRADE_CONTRACT_ADDRESS = "0x4b723b4E500d99493ed4003705Bd7840927AEa62"
 
 export async function contractInstance (activeAccount: Account){
     try {
@@ -15,8 +15,8 @@ export async function contractInstance (activeAccount: Account){
         });
 
         const constractInst = new ethers.Contract(
-            FUTURE_RIDE_CONTRACT_ADDRESS,
-            FUTUR_RIDE_CONTRACT_ABI,
+            AUTO_UPGRADE_CONTRACT_ADDRESS,
+            AUTO_UPGRADE_CONTRACT_ABI,
             signerEthers
         );
 

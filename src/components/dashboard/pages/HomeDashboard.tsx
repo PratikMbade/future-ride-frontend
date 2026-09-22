@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { Copy, Check, Users, DollarSign, Package, Activity, Globe, CardSimIcon, Plane } from 'lucide-react'
+import { Copy, Check, Users, Package, Activity, Globe, GitBranch, Lock, Layers, Clock, AlertTriangle, Sparkles, Wallet, Network, ShieldAlert } from 'lucide-react'
 import { authClient } from '@/lib/authClient'
 import { WalletAddress } from '../WalletAddress'
-import { StatCard, GradientStatCard } from '../StatCard'
+import { StatCard } from '../StatCard'
 import PackageBuyPage from './PackageBuy'
 import { dashboardService } from '#/services/dashboard.service'
 import { RecentIncomePageTable, type IncomePageData, type IncomeRow } from '../RecentIncomePageTable'
 import { TableSkeleton } from '../LoadingSkeleton'
+import { useOnChainRegisterInfo } from '@/hooks/useOnChainRegisterInfo'
+import { ClaimAutoUpgradeHoldingCard } from '../ClaimAutoUpgradeHoldingCard'
 
 const API = import.meta.env.VITE_API_URL
 
@@ -38,6 +39,10 @@ export interface DashboardMe {
   generationIncome: number
   lapsIncome: number
   lostIncome: number
+  levelIncome: number
+  levelLapseIncome: number
+  levelLostIncome: number
+  lostPay: number
   totalIncome: number
   royaltyIncome:number
   // todaysIncome is an object with a `total` field, not a bare number —
@@ -57,13 +62,6 @@ interface OnChainBalances {
   activeRoyaltyPoolError?: boolean
 }
 
-// Royalty pool numbers → tier names, mirrors TIER_CONFIG in RoyaltyPage.tsx
-const ROYALTY_POOL_TIERS: Record<number, string> = {
-  3: 'Silver',
-  5: 'Gold',
-  7: 'Platinum',
-  9: 'Diamond',
-}
 export function useBreakpoint() {
   const [w, setW] = useState(typeof window !== "undefined" ? window.innerWidth : 1280);
   useEffect(() => {
@@ -80,7 +78,6 @@ export default function HomeDashboard() {
   // refetch on mount as a second-layer defense against the better-auth
   // useSession() stale-atom issue (see DashboardHomePage for full context).
   const { data: session, isPending: sessionPending, refetch: refetchSession } = authClient.useSession()
-  const navigate = useNavigate()
   const { isMobile, isTablet } = useBreakpoint();
   const isSmall = isMobile || isTablet;
   useEffect(() => {
@@ -125,6 +122,10 @@ export default function HomeDashboard() {
   staleTime: 2 * 60 * 1000,
 });
 
+  // ── direct/generation/level income — read live from the contract's
+  // register() struct, not the backend DB ──
+  const onChainRegister = useOnChainRegisterInfo(address)
+
   const [recentPage,      setRecentPage]      = useState(1);
   const [recentPageSize,  setRecentPageSize]  = useState(8);
   const [recentSearch,    setRecentSearch]    = useState("");
@@ -135,15 +136,18 @@ export default function HomeDashboard() {
 
   const upgradeHoldingIncome = onChainQ.data?.upgradeHoldingIncome ?? 0
   const walletFundBalance = onChainQ.data?.walletFundBalance ?? 0
-  const activeRoyaltyPool = onChainQ.data?.activeRoyaltyPool ?? 0
-  const activeRoyaltyPoolLabel = ROYALTY_POOL_TIERS[activeRoyaltyPool] ?? 'None'
   const onChainLoading = onChainQ.isLoading
 
-  // totalIncome from getMe is DB-only (direct + generation + laps);
-  // add the on-chain upgrade holding figure client-side for the
-  // "Total Earnings" lifetime stat (kept separate from the live
-  // withdrawable walletFundBalance shown on the main balance card).
-  const totalEarnedCombined = (me?.totalIncome ?? 0) + upgradeHoldingIncome
+  // "Total Earnings" = direct + generation + level + level lapsed +
+  // generation lapsed, straight from the on-chain register() struct.
+  // Every lost-income category (level lost, generation lost, lost pay) is
+  // deliberately excluded — that value was never actually received.
+  const totalEarnedCombined =
+    onChainRegister.data.directIncome +
+    onChainRegister.data.generationIncome +
+    onChainRegister.data.levelIncome +
+    onChainRegister.data.levelLapsedIncome +
+    onChainRegister.data.generationLapsedIncome
 
   const [recentTypeFilter, setRecentTypeFilter] = useState<string>("all");
 
@@ -191,211 +195,295 @@ const allRecentRows: IncomeRow[] = (recentQ.data ?? []).map(r => ({
   }
 
   // ── overall (all-time) income per type — NOT daily ──────
-  const distributionCards = [
-    { label: 'Direct Income',        value: me?.directIncome,        color: '#38BDF8', bg: 'from-[#0D2B6E] to-[#1B4FD8]', loading: false },
-    { label: 'Generation Income',    value: me?.generationIncome,    color: '#22C55E', bg: 'from-[#14532D] to-[#16A34A]', loading: false },
-        { label: 'Royalty Income',    value: me?.royaltyIncome,    color: '#f2f0eb', bg: 'from-[#fcba03] to-[#16A34A]', loading: false },
+  // Direct/Generation/Level income figures come straight from the
+  // contract's register() struct (see useOnChainRegisterInfo) instead of
+  // the backend DB. Grouped into three tiers for the dashboard layout:
+  // core (earned), lapsed (delayed), and lost (never received — flagged).
+  const onChainLoadingIncome = onChainRegister.isLoading
+  const coreIncomeCards = [
+    { label: 'Direct Income',        value: onChainRegister.data.directIncome,     color: '#38BDF8', icon: Users,     loading: onChainLoadingIncome },
+    { label: 'Generation Income',    value: onChainRegister.data.generationIncome, color: '#22C55E', icon: GitBranch, loading: onChainLoadingIncome },
+    { label: 'Level Income',         value: onChainRegister.data.levelIncome,      color: '#2DD4BF', icon: Layers,    loading: onChainLoadingIncome },
+    { label: 'Auto Upgrade Holding', value: upgradeHoldingIncome,                  color: '#F5A623', icon: Lock,      loading: onChainLoading },
+  ]
+  const lapsedIncomeCards = [
+    { label: 'Level Lapsed Income',      value: onChainRegister.data.levelLapsedIncome,      color: '#FB923C', icon: Clock, loading: onChainLoadingIncome },
+    { label: 'Generation Lapsed Income', value: onChainRegister.data.generationLapsedIncome, color: '#FDE047', icon: Clock, loading: onChainLoadingIncome },
+  ]
+  const lostIncomeCards = [
+    { label: 'Level Lost Income',      value: onChainRegister.data.levelLostIncome },
+    { label: 'Generation Lost Income', value: onChainRegister.data.generationLostIncome },
+  ]
+  const totalLostIncome = onChainRegister.data.levelLostIncome + onChainRegister.data.generationLostIncome
 
-    { label: 'Auto Upgrade Holding', value: upgradeHoldingIncome,    color: '#F5A623', bg: 'from-[#78340A] to-[#D97706]', loading: onChainLoading },
-    { label: 'Laps Credit Income',   value: me?.lapsIncome,          color: '#A855F7', bg: 'from-[#3B0764] to-[#7E22CE]', loading: false },
-    { label: 'Lost Income',          value: me?.lostIncome,          color: '#F43F5E', bg: 'from-[#4C0519] to-[#BE123C]', loading: false },
+  const quickStats = [
+    { testId: 'stat-direct-team', label: 'Direct Team',     value: isLoading ? '—' : String(me?.directTeamCount ?? 0),     icon: Users,       color: '#8B5CF6' },
+    { testId: 'stat-my-generation', label: 'Matrix Team',   value: isLoading ? '—' : String(me?.totalGenerationTeam ?? 0), icon: Network,     color: '#F59E0B' },
+    { testId: 'stat-community', label: 'Generation Team',   value: isLoading ? '—' : String(me?.totalTeamCount ?? 0),      icon: Activity,    color: '#F59E0B' },
+    { testId: 'stat-active-package', label: 'Active Package', value: isLoading ? '—' : String(me?.highestPackage ?? 0),   icon: Package,     color: '#06B6D4' },
   ]
 
   return (
-    <div className="space-y-5" data-testid="home-dashboard">
-      {/* ── Referral Portal Card ── */}
+    <div className="space-y-6" data-testid="home-dashboard">
+      {/* ── Identity Strip ── */}
       <motion.div
         initial="hidden" animate="visible" custom={0} variants={fadeUp}
-        className="relative rounded-2xl border border-[#38BDF8]/15 bg-[#080F26] overflow-hidden"
-        data-testid="referral-portal-card"
+        className="relative rounded-2xl border border-white/10 bg-[#080F26] overflow-hidden"
+        data-testid="identity-strip"
       >
-        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: 'linear-gradient(rgba(56,189,248,0.8) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,0.8) 1px,transparent 1px)', backgroundSize: '32px 32px' }} />
-        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 sm:p-5">
-          <div className="shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-[#1B4FD8]/60 to-[#38BDF8]/20 border border-[#38BDF8]/25 flex items-center justify-center">
-            <Globe size={26} className="text-[#38BDF8]" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-bold text-lg text-white">Referral Portal</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase bg-green-400/10 text-green-400 border border-green-400/20">
-                {isLoading ? '—' : me?.isRegistered ? 'Active' : 'Inactive'}
-              </span>
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#38BDF8]/60 to-transparent" />
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-3 px-4 sm:px-5 py-3.5">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[#1B4FD8]/70 to-[#38BDF8]/25 border border-[#38BDF8]/30 flex items-center justify-center">
+              <Globe size={18} className="text-[#38BDF8]" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-white truncate">
+                  {isLoading ? 'Loading…' : `User #${me?.contractRegId ?? '—'}`}
+                </span>
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-widest uppercase bg-green-400/10 text-green-400 border border-green-400/20 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_6px_rgba(74,222,128,0.8)]" />
+                  {isLoading ? '—' : me?.isRegistered ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+              {isLoading ? <Skeleton className="h-3 w-32 mt-1" /> : <WalletAddress address={me?.userAddress ?? ''} className="font-mono text-xs text-white/40" />}
             </div>
           </div>
-          <div className="flex flex-col gap-2 min-w-0 w-full sm:w-auto sm:max-w-xs">
-            {isLoading ? <Skeleton className="h-8 w-full" /> : (
-              <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] min-w-0">
-                <Globe size={12} className="text-[#38BDF8] shrink-0" />
-                <span className="text-xs text-white/40 truncate font-mono">{me?.referralLink}</span>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            {isLoading ? <Skeleton className="h-8 flex-1 sm:w-44" /> : (
+              <div className="flex-1 sm:w-44 flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] min-w-0">
+                <Globe size={11} className="text-[#38BDF8] shrink-0" />
+                <span className="text-[11px] text-white/40 truncate font-mono">{me?.referralLink}</span>
               </div>
             )}
             <button
               data-testid="copy-referral-link"
               onClick={copyLink}
               disabled={isLoading}
-              className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#1B4FD8] to-[#38BDF8] text-white text-xs font-bold tracking-wider hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
+              className="shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-gradient-to-r from-[#1B4FD8] to-[#38BDF8] text-white text-xs font-bold tracking-wider hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
             >
-              {linkCopied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy Link</>}
+              {linkCopied ? <Check size={13} /> : <Copy size={13} />}
+              <span className="hidden sm:inline">{linkCopied ? 'Copied!' : 'Copy Link'}</span>
             </button>
           </div>
         </div>
       </motion.div>
 
-      {/* ── Dubai Tour CTA ── */}
-      <motion.div initial="hidden" animate="visible" custom={0.5} variants={fadeUp}>
-        <motion.button
-          type="button"
-          data-testid="dubai-tour-cta"
-          onClick={() => navigate({ to: '/dashboard/dubai-tour' })}
-          className="w-full flex items-center justify-center gap-2 rounded-2xl border border-amber-400/40 bg-linear-to-r from-amber-500/20 via-yellow-400/20 to-amber-500/20 px-5 py-3.5 text-sm font-bold tracking-wide text-amber-300"
-          animate={{
-            opacity: [1, 0.45, 1],
-            boxShadow: [
-              '0 0 0px rgba(251,191,36,0)',
-              '0 0 22px rgba(251,191,36,0.55)',
-              '0 0 0px rgba(251,191,36,0)',
-            ],
-          }}
-          transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <Plane size={16} className="text-amber-300" />
-          Go Diamond 💎 Global Dubai Tour
-        </motion.button>
-      </motion.div>
+      {/* ── Claim Auto Upgrade Holding ── */}
+      <ClaimAutoUpgradeHoldingCard index={0.5} />
 
-      {/* ── Earnings + Stats Grid ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      {/* ── Balance Hero + Account Details ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <motion.div
           initial="hidden" animate="visible" custom={1} variants={fadeUp}
-          className="lg:col-span-3 rounded-2xl border border-[#38BDF8]/12 bg-[#080F26] p-5 overflow-hidden relative"
+          className="rounded-[24px] border border-[#38BDF8]/15 bg-gradient-to-br from-[#0A1230] via-[#080F26] to-[#060A1C] p-5 sm:p-6 overflow-hidden relative shadow-[0_10px_40px_-14px_rgba(0,0,0,0.5)]"
           data-testid="total-earnings-card"
         >
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(56,189,248,0.8) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,0.8) 1px,transparent 1px)', backgroundSize: '32px 32px' }} />
+          <div className="absolute -top-24 -right-24 w-56 h-56 rounded-full bg-[#38BDF8]/10 blur-3xl pointer-events-none" />
           <div className="relative z-10">
-            <p className="text-[13px] font-semibold tracking-widest uppercase text-white/90 mb-1">Current USDT Balance</p>
+            <div className="flex items-center gap-1.5 mb-2">
+              <Wallet size={13} className="text-[#38BDF8]" />
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-white/60">Wallet Balance</p>
+            </div>
             {isLoading || onChainLoading
-              ? <Skeleton className="h-12 w-40 mb-4" />
-              : <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-5xl font-black text-white" style={{ fontFamily: 'Outfit' }}>
-                    ${walletFundBalance.toFixed(2)}
-                  </span>
-                  <span className="text-lg font-bold text-[#F5A623]">USDT - BEP-20</span>
+              ? <Skeleton className="h-11 w-40 mb-1" />
+              : <div className="flex items-baseline gap-2">
+                  <span className="text-4xl sm:text-5xl font-black text-white" style={{ fontFamily: 'Outfit' }}>${walletFundBalance.toFixed(2)}</span>
+                  <span className="text-sm font-bold text-[#F5A623]">USDT</span>
                 </div>
             }
             {onChainQ.data?.walletFundBalanceError && (
-              <p className="text-xs text-amber-400/70 mb-3">Balance temporarily unavailable — showing fallback value</p>
+              <p className="text-xs text-amber-400/70 mt-1">Balance temporarily unavailable — showing fallback value</p>
             )}
-            <div className="flex items-center gap-2 mb-5 px-3 py-2 rounded-lg bg-green-400/[0.06] border border-green-400/10 w-fit">
-              <Activity size={12} className="text-green-400" />
-              <span className="text-xs text-white/50">Today:</span>
-              <span className="text-sm font-bold text-green-400">{isLoading ? '—' : `${(me?.todaysIncome?.total ?? 0).toFixed(4)} USDT`}</span>
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/2 transition-colors">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-[#38BDF815]">
-                  <Users size={14} className="text-[#38BDF8]" />
+
+            <div className="h-px bg-white/8 my-4" />
+
+            <div className="flex flex-wrap items-center gap-x-10 gap-y-4">
+              <div>
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <Sparkles size={13} className="text-[#38BDF8]" />
+                  <p className="text-xs font-semibold tracking-widest uppercase text-white/50">Total Earnings</p>
                 </div>
-                <span className="text-lg text-white flex-1">User ID</span>
-                {isLoading ? <Skeleton className="h-4 w-24" /> : <span className="font-mono font-semibold text-lg text-[#38BDF8]">{me?.contractRegId}</span>}
+                <p className="text-3xl sm:text-4xl font-black text-white" style={{ fontFamily: 'Outfit' }} data-testid="stat-total-earnings">
+                  {isLoading || onChainRegister.isLoading ? '—' : totalEarnedCombined.toFixed(2)}
+                  <span className="text-sm font-normal text-white/40 ml-1.5">USDT</span>
+                </p>
               </div>
-              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/2 transition-colors">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-[#22C55E15]">
-                  <Activity size={14} className="text-[#22C55E]" />
-                </div>
-                <span className="text-lg text-white flex-1">Wallet Address</span>
-                {isLoading ? <Skeleton className="h-4 w-32" /> : <WalletAddress address={me?.userAddress ?? ''} className="font-mono font-semibold text-lg text-[#22C55E]" />}
+              <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-green-400/[0.06] border border-green-400/10">
+                <Activity size={14} className="text-green-400" />
+                <span className="text-sm text-white/50">Today:</span>
+                <span className="text-base font-bold text-green-400">{isLoading ? '—' : `${(me?.todaysIncome?.total ?? 0).toFixed(4)} USDT`}</span>
               </div>
-              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/2 transition-colors">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-[#F5A62315]">
-                  <Users size={14} className="text-[#F5A623]" />
-                </div>
-                <span className="text-lg text-white flex-1">Referred ID</span>
-                {isLoading ? <Skeleton className="h-4 w-24" /> : <span className="font-mono font-semibold text-lg text-[#F5A623]">{me?.referredByContractRegId ?? '—'}</span>}
-              </div>
-              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/2 transition-colors">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-[#8B5CF615]">
-                  <Globe size={14} className="text-[#8B5CF6]" />
-                </div>
-                <span className="text-lg text-white flex-1">Referred Address</span>
-                {isLoading ? <Skeleton className="h-4 w-32" /> : <WalletAddress address={me?.referredBy ?? ''} className="font-mono font-semibold text-lg text-[#8B5CF6]" />}
-              </div>
+
+              {!isLoading && !onChainLoadingIncome && totalLostIncome > 0 && (
+                <>
+                  {lostIncomeCards.map(({ label, value }) => (
+                    <motion.div
+                      key={label}
+                      animate={{
+                        opacity: [1, 0.55, 1],
+                        boxShadow: [
+                          '0 0 0px rgba(239,68,68,0)',
+                          '0 0 18px rgba(239,68,68,0.55)',
+                          '0 0 0px rgba(239,68,68,0)',
+                        ],
+                      }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                      className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-red-500/40 bg-red-500/10"
+                      data-testid={`wallet-${label.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
+                      <AlertTriangle size={14} className="text-red-400" />
+                      <span className="text-sm text-red-300/80">{label.replace(' Income', '')}:</span>
+                      <span className="text-base font-bold text-red-400">{(value ?? 0).toFixed(2)} USDT</span>
+                    </motion.div>
+                  ))}
+                </>
+              )}
             </div>
           </div>
         </motion.div>
 
         <motion.div
           initial="hidden" animate="visible" custom={2} variants={fadeUp}
-          className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-3"
+          className="rounded-[24px] border border-white/10 bg-[#080F26] p-5 sm:p-6"
+          data-testid="identity-card"
         >
-          <GradientStatCard
-            data-testid="stat-total-earnings"
-            title="Total Earnings"
-            value={isLoading || onChainLoading ? '—' : totalEarnedCombined.toFixed(2)}
-            subtitle="USDT"
-            gradient="bg-gradient-to-br from-[#0D2B6E] via-[#1244A6] to-[#1B4FD8]"
-            icon={<DollarSign size={16} />}
-          />
-          <GradientStatCard
-            data-testid="stat-direct-team"
-            title="My Direct Team"
-            value={isLoading ? '—' : String(me?.directTeamCount ?? 0)}
-            subtitle=""
-            gradient="bg-gradient-to-br from-[#3B1D8F] via-[#5B21B6] to-[#7C3AED]"
-            icon={<Users size={16} />}
-          />
-      
-           <GradientStatCard
-            data-testid="stat-my-generation"
-            title="My Matrix Team"
-            value={isLoading ? '—' : String(me?.totalGenerationTeam ?? 0)}
-            subtitle=""
-            gradient="bg-gradient-to-br from-[#78340A] via-[#B45309] to-[#F59E0B]"
-            icon={<Activity size={16} />}
-          />
-          <GradientStatCard
-            data-testid="stat-community"
-            title="My Generation Team"
-            value={isLoading ? '—' : String(me?.totalTeamCount ?? 0)}
-            gradient="bg-gradient-to-br from-[#78340A] via-[#B45309] to-[#F59E0B]"
-            icon={<Activity size={16} />}
-          />
-              <GradientStatCard
-            data-testid="stat-active-package"
-            title="Active Package"
-            value={isLoading ? '—' : String(me?.highestPackage ?? 0)}
-            // subtitle={isLoading ? '' : new Date(me!.packagePurchaseDate).toLocaleDateString()}
-            gradient="bg-gradient-to-br from-[#065F5F] via-[#0891B2] to-[#06B6D4]"
-            icon={<Package size={16} />}
-          />
-
-             <GradientStatCard
-            data-testid="stat-active-royalty"
-            title="Active Royalty Pool"
-            value={isLoading || onChainLoading ? '—' : activeRoyaltyPoolLabel}
-            gradient="bg-gradient-to-br from-[#065F5F] via-[#0891B2] to-[#06B6D4]"
-            icon={<CardSimIcon size={16} />}
-          />
+          <p className="text-xs font-semibold tracking-widest uppercase text-white/50 mb-4">Account Details</p>
+          <div className="space-y-2">
+            <div className="flex items-center gap-4 py-2.5 px-1">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-[#38BDF815]"><Users size={18} className="text-[#38BDF8]" /></div>
+              <span className="text-sm text-white/50 flex-1">User ID</span>
+              {isLoading ? <Skeleton className="h-5 w-16" /> : <span className="font-mono font-bold text-lg sm:text-xl text-[#38BDF8]">{me?.contractRegId}</span>}
+            </div>
+            <div className="flex items-center gap-4 py-2.5 px-1">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-[#22C55E15]"><Activity size={18} className="text-[#22C55E]" /></div>
+              <span className="text-sm text-white/50 flex-1">Wallet</span>
+              {isLoading ? <Skeleton className="h-5 w-24" /> : <WalletAddress address={me?.userAddress ?? ''} className="font-mono font-bold text-base sm:text-lg text-[#22C55E]" />}
+            </div>
+            <div className="flex items-center gap-4 py-2.5 px-1">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-[#F5A62315]"><Users size={18} className="text-[#F5A623]" /></div>
+              <span className="text-sm text-white/50 flex-1">Referred ID</span>
+              {isLoading ? <Skeleton className="h-5 w-16" /> : <span className="font-mono font-bold text-lg sm:text-xl text-[#F5A623]">{me?.referredByContractRegId ?? '—'}</span>}
+            </div>
+            <div className="flex items-center gap-4 py-2.5 px-1">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-[#8B5CF615]"><Globe size={18} className="text-[#8B5CF6]" /></div>
+              <span className="text-sm text-white/50 flex-1">Referred By</span>
+              {isLoading ? <Skeleton className="h-5 w-24" /> : <WalletAddress address={me?.referredBy ?? ''} className="font-mono font-bold text-base sm:text-lg text-[#8B5CF6]" />}
+            </div>
+          </div>
         </motion.div>
       </div>
 
-      {/* ── Overall income breakdown (all-time, NOT daily) ── */}
+      {/* ── Team & Package quick stats ── */}
+      <motion.div initial="hidden" animate="visible" custom={3} variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        {quickStats.map(({ testId, label, value, icon: Icon, color }) => (
+          <div key={label} data-testid={testId} className="rounded-2xl border border-white/10 bg-[#080F26] p-4 sm:p-5 flex items-center gap-3.5 shadow-[0_8px_20px_-12px_rgba(0,0,0,0.6)]">
+            <div className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${color}1a` }}>
+              <Icon size={20} style={{ color }} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold tracking-widest uppercase text-white/40 truncate mb-0.5">{label}</p>
+              <p className="text-2xl sm:text-3xl font-black text-white truncate" style={{ fontFamily: 'Outfit' }}>{value}</p>
+            </div>
+          </div>
+        ))}
+      </motion.div>
+
+      {/* ── Lost Income — never received, blinking red alert (front and center) ── */}
+      <motion.div initial="hidden" animate="visible" custom={3.5} variants={fadeUp} data-testid="lost-income-alert">
+        <motion.div
+          animate={{
+            opacity: [1, 0.65, 1],
+            boxShadow: [
+              '0 0 0px rgba(239,68,68,0)',
+              '0 0 40px rgba(239,68,68,0.55)',
+              '0 0 0px rgba(239,68,68,0)',
+            ],
+          }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="relative rounded-3xl border-2 border-red-500/50 bg-gradient-to-br from-[#4A0917] to-[#170406] p-6 sm:p-8 overflow-hidden"
+        >
+          <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-red-500/10 blur-3xl pointer-events-none" />
+          <div className="relative z-10 flex items-center gap-2.5 mb-6">
+            <ShieldAlert size={24} className="text-red-400 shrink-0" />
+            <p className="text-base sm:text-lg font-black tracking-wide text-red-400">Lost Income — Never Received</p>
+          </div>
+          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
+            {lostIncomeCards.map(({ label, value }) => (
+              <div key={label} data-testid={`dist-${label.toLowerCase().replace(/\s+/g, '-')}`} className="rounded-2xl border border-red-500/25 bg-black/20 p-4 sm:p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle size={14} className="text-red-400" />
+                  <p className="text-xs font-bold tracking-widest uppercase text-red-300/80">{label}</p>
+                </div>
+                <p className="text-4xl sm:text-5xl font-black text-red-400" style={{ fontFamily: 'Outfit' }}>
+                  {isLoading || onChainLoadingIncome ? '—' : (value ?? 0).toFixed(2)}
+                  <span className="text-sm font-normal ml-2 text-red-400/70">USDT</span>
+                </p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* ── Core Income ── */}
       <motion.div initial="hidden" animate="visible" custom={4} variants={fadeUp}>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {distributionCards.map(({ label, value, color, bg, loading }) => (
-            <div key={label} data-testid={`dist-${label.toLowerCase().replace(/\s+/g, '-')}`} className={`rounded-xl p-4 bg-gradient-to-br ${bg}/30 border border-white/8`}>
-              <p className="text-[10px] font-semibold tracking-widest uppercase mb-2" style={{ color }}>{label}</p>
-              <p className="text-2xl font-black text-white">
+        <div className="flex items-center gap-2 mb-3 px-0.5">
+          <div className="w-1 h-4 rounded-full bg-gradient-to-b from-[#38BDF8] to-[#1B4FD8]" />
+          <p className="text-xs font-bold tracking-widest uppercase text-white/50">Core Income</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {coreIncomeCards.map(({ label, value, color, icon: Icon, loading }) => (
+            <div
+              key={label}
+              data-testid={`dist-${label.toLowerCase().replace(/\s+/g, '-')}`}
+              className="relative rounded-2xl p-5 sm:p-6 overflow-hidden border border-white/10 bg-[#080F26] shadow-[0_8px_20px_-12px_rgba(0,0,0,0.6)] transition-transform duration-300 hover:-translate-y-0.5"
+            >
+              <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${color}66, transparent)` }} />
+              <div className="flex items-start justify-between gap-2 mb-4">
+                <p className="text-xs font-bold tracking-widest uppercase" style={{ color }}>{label}</p>
+                <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${color}1a` }}>
+                  <Icon size={18} style={{ color }} />
+                </div>
+              </div>
+              <p className="text-3xl sm:text-4xl font-black text-white" style={{ fontFamily: 'Outfit' }}>
                 {isLoading || loading ? '—' : (value ?? 0).toFixed(2)}
-                <span className="text-sm font-normal ml-1.5" style={{ color }}>USDT</span>
+                <span className="text-sm font-normal ml-2" style={{ color }}>USDT</span>
               </p>
             </div>
           ))}
         </div>
       </motion.div>
 
-      <PackageBuyPage/>
+      {/* ── Lapsed Income ── */}
+      <motion.div initial="hidden" animate="visible" custom={5} variants={fadeUp}>
+        <div className="flex items-center gap-2 mb-3 px-0.5">
+          <div className="w-1 h-4 rounded-full bg-gradient-to-b from-amber-400 to-amber-600" />
+          <p className="text-xs font-bold tracking-widest uppercase text-white/50">Lapsed Income</p>
+          <span className="text-[10px] text-white/30 hidden sm:inline">— delayed, not yet released</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {lapsedIncomeCards.map(({ label, value, color, icon: Icon, loading }) => (
+            <div key={label} data-testid={`dist-${label.toLowerCase().replace(/\s+/g, '-')}`} className="relative rounded-2xl p-5 sm:p-6 overflow-hidden border border-white/10 bg-[#080F26]">
+              <div className="flex items-center gap-4">
+                <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${color}1a` }}>
+                  <Icon size={20} style={{ color }} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color }}>{label}</p>
+                  <p className="text-2xl sm:text-3xl font-black text-white" style={{ fontFamily: 'Outfit' }}>
+                    {isLoading || loading ? '—' : (value ?? 0).toFixed(2)}
+                    <span className="text-sm font-normal ml-2" style={{ color }}>USDT</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
 
-      
+      <PackageBuyPage/>
     </div>
   )
 }

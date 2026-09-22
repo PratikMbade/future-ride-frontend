@@ -294,6 +294,75 @@ export interface LostIncomeResponse {
   records: LostIncomeRecord[]
 }
 
+export interface LevelIncomeRecord {
+  id: string
+  contractRegId: number | null
+  fromUserAddress: string
+  packageNumber: number
+  packageName: string
+  amount: number
+  level: number
+  creditedAt: string
+  transactionHash: string
+}
+
+export interface LevelIncomeResponse {
+  success: boolean
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  records: LevelIncomeRecord[]
+}
+
+export interface LevelLostIncomeRecord {
+  id: string
+  contractRegId: number | null
+  lostAddress: string
+  fromAddress: string
+  packageNumber: number
+  packageName: string
+  amount: number
+  level: number
+  missedAt: string
+  transactionHash: string
+}
+
+export interface LevelLostIncomeResponse {
+  success: boolean
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  records: LevelLostIncomeRecord[]
+}
+
+// ─── GET /api/preview/:userAddress/info ────────────────────
+// Summary lookup — any registered address, DB-only totals (no live
+// on-chain balances, unlike the logged-in user's own dashboard).
+export interface UserIncomeLookupInfo {
+  success: boolean
+  userAddress: string
+  contractRegId: number | null
+  isRegistered: boolean
+  joinedAt: string
+  highestPackage: number
+  packageName: string
+  packagePurchaseDate: string
+  referredBy: string | null
+  referredByContractRegId: string | null
+  referralLink: string
+  directTeamCount: number
+  totalCommunityTeam: number
+  directIncome: number
+  generationIncome: number
+  lapsIncome: number
+  levelIncome: number
+  levelLapseIncome: number
+  lostIncome: number
+  upgradeHoldingIncome: number
+}
+
 export interface DubaiTourRequirementStat {
   required: number
   current: number

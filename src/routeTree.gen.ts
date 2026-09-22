@@ -16,6 +16,7 @@ import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardUserIncomeLookupRouteImport } from './routes/dashboard/user-income-lookup'
 import { Route as DashboardUpgradeHoldingHistoryRouteImport } from './routes/dashboard/upgrade-holding-history'
 import { Route as DashboardRoyaltyRouteImport } from './routes/dashboard/royalty'
 import { Route as DashboardPackageBuyHistoryRouteImport } from './routes/dashboard/package-buy-history'
@@ -28,6 +29,9 @@ import { Route as DashboardTeamTotalTeamRouteImport } from './routes/dashboard/t
 import { Route as DashboardTeamGenerationTeamRouteImport } from './routes/dashboard/team/generation-team'
 import { Route as DashboardTeamDirectTeamRouteImport } from './routes/dashboard/team/direct-team'
 import { Route as DashboardIncomeLostIncomeRouteImport } from './routes/dashboard/income/lost-income'
+import { Route as DashboardIncomeLevelLostIncomeRouteImport } from './routes/dashboard/income/level-lost-income'
+import { Route as DashboardIncomeLevelLapseIncomeRouteImport } from './routes/dashboard/income/level-lapse-income'
+import { Route as DashboardIncomeLevelIncomeRouteImport } from './routes/dashboard/income/level-income'
 import { Route as DashboardIncomeLapsIncomeRouteImport } from './routes/dashboard/income/laps-income'
 import { Route as DashboardIncomeGenerationIncomeRouteImport } from './routes/dashboard/income/generation-income'
 import { Route as DashboardIncomeDirectIncomeRouteImport } from './routes/dashboard/income/direct-income'
@@ -67,6 +71,12 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardUserIncomeLookupRoute =
+  DashboardUserIncomeLookupRouteImport.update({
+    id: '/user-income-lookup',
+    path: '/user-income-lookup',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 const DashboardUpgradeHoldingHistoryRoute =
   DashboardUpgradeHoldingHistoryRouteImport.update({
     id: '/upgrade-holding-history',
@@ -132,6 +142,24 @@ const DashboardIncomeLostIncomeRoute =
     path: '/income/lost-income',
     getParentRoute: () => DashboardRouteRoute,
   } as any)
+const DashboardIncomeLevelLostIncomeRoute =
+  DashboardIncomeLevelLostIncomeRouteImport.update({
+    id: '/income/level-lost-income',
+    path: '/income/level-lost-income',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
+const DashboardIncomeLevelLapseIncomeRoute =
+  DashboardIncomeLevelLapseIncomeRouteImport.update({
+    id: '/income/level-lapse-income',
+    path: '/income/level-lapse-income',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
+const DashboardIncomeLevelIncomeRoute =
+  DashboardIncomeLevelIncomeRouteImport.update({
+    id: '/income/level-income',
+    path: '/income/level-income',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 const DashboardIncomeLapsIncomeRoute =
   DashboardIncomeLapsIncomeRouteImport.update({
     id: '/income/laps-income',
@@ -165,11 +193,15 @@ export interface FileRoutesByFullPath {
   '/dashboard/package-buy-history': typeof DashboardPackageBuyHistoryRoute
   '/dashboard/royalty': typeof DashboardRoyaltyRoute
   '/dashboard/upgrade-holding-history': typeof DashboardUpgradeHoldingHistoryRoute
+  '/dashboard/user-income-lookup': typeof DashboardUserIncomeLookupRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
   '/dashboard/income/direct-income': typeof DashboardIncomeDirectIncomeRoute
   '/dashboard/income/generation-income': typeof DashboardIncomeGenerationIncomeRoute
   '/dashboard/income/laps-income': typeof DashboardIncomeLapsIncomeRoute
+  '/dashboard/income/level-income': typeof DashboardIncomeLevelIncomeRoute
+  '/dashboard/income/level-lapse-income': typeof DashboardIncomeLevelLapseIncomeRoute
+  '/dashboard/income/level-lost-income': typeof DashboardIncomeLevelLostIncomeRoute
   '/dashboard/income/lost-income': typeof DashboardIncomeLostIncomeRoute
   '/dashboard/team/direct-team': typeof DashboardTeamDirectTeamRoute
   '/dashboard/team/generation-team': typeof DashboardTeamGenerationTeamRoute
@@ -187,11 +219,15 @@ export interface FileRoutesByTo {
   '/dashboard/package-buy-history': typeof DashboardPackageBuyHistoryRoute
   '/dashboard/royalty': typeof DashboardRoyaltyRoute
   '/dashboard/upgrade-holding-history': typeof DashboardUpgradeHoldingHistoryRoute
+  '/dashboard/user-income-lookup': typeof DashboardUserIncomeLookupRoute
   '/dashboard': typeof DashboardIndexRoute
   '/login': typeof LoginIndexRoute
   '/dashboard/income/direct-income': typeof DashboardIncomeDirectIncomeRoute
   '/dashboard/income/generation-income': typeof DashboardIncomeGenerationIncomeRoute
   '/dashboard/income/laps-income': typeof DashboardIncomeLapsIncomeRoute
+  '/dashboard/income/level-income': typeof DashboardIncomeLevelIncomeRoute
+  '/dashboard/income/level-lapse-income': typeof DashboardIncomeLevelLapseIncomeRoute
+  '/dashboard/income/level-lost-income': typeof DashboardIncomeLevelLostIncomeRoute
   '/dashboard/income/lost-income': typeof DashboardIncomeLostIncomeRoute
   '/dashboard/team/direct-team': typeof DashboardTeamDirectTeamRoute
   '/dashboard/team/generation-team': typeof DashboardTeamGenerationTeamRoute
@@ -212,11 +248,15 @@ export interface FileRoutesById {
   '/dashboard/package-buy-history': typeof DashboardPackageBuyHistoryRoute
   '/dashboard/royalty': typeof DashboardRoyaltyRoute
   '/dashboard/upgrade-holding-history': typeof DashboardUpgradeHoldingHistoryRoute
+  '/dashboard/user-income-lookup': typeof DashboardUserIncomeLookupRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
   '/dashboard/income/direct-income': typeof DashboardIncomeDirectIncomeRoute
   '/dashboard/income/generation-income': typeof DashboardIncomeGenerationIncomeRoute
   '/dashboard/income/laps-income': typeof DashboardIncomeLapsIncomeRoute
+  '/dashboard/income/level-income': typeof DashboardIncomeLevelIncomeRoute
+  '/dashboard/income/level-lapse-income': typeof DashboardIncomeLevelLapseIncomeRoute
+  '/dashboard/income/level-lost-income': typeof DashboardIncomeLevelLostIncomeRoute
   '/dashboard/income/lost-income': typeof DashboardIncomeLostIncomeRoute
   '/dashboard/team/direct-team': typeof DashboardTeamDirectTeamRoute
   '/dashboard/team/generation-team': typeof DashboardTeamGenerationTeamRoute
@@ -238,11 +278,15 @@ export interface FileRouteTypes {
     | '/dashboard/package-buy-history'
     | '/dashboard/royalty'
     | '/dashboard/upgrade-holding-history'
+    | '/dashboard/user-income-lookup'
     | '/dashboard/'
     | '/login/'
     | '/dashboard/income/direct-income'
     | '/dashboard/income/generation-income'
     | '/dashboard/income/laps-income'
+    | '/dashboard/income/level-income'
+    | '/dashboard/income/level-lapse-income'
+    | '/dashboard/income/level-lost-income'
     | '/dashboard/income/lost-income'
     | '/dashboard/team/direct-team'
     | '/dashboard/team/generation-team'
@@ -260,11 +304,15 @@ export interface FileRouteTypes {
     | '/dashboard/package-buy-history'
     | '/dashboard/royalty'
     | '/dashboard/upgrade-holding-history'
+    | '/dashboard/user-income-lookup'
     | '/dashboard'
     | '/login'
     | '/dashboard/income/direct-income'
     | '/dashboard/income/generation-income'
     | '/dashboard/income/laps-income'
+    | '/dashboard/income/level-income'
+    | '/dashboard/income/level-lapse-income'
+    | '/dashboard/income/level-lost-income'
     | '/dashboard/income/lost-income'
     | '/dashboard/team/direct-team'
     | '/dashboard/team/generation-team'
@@ -284,11 +332,15 @@ export interface FileRouteTypes {
     | '/dashboard/package-buy-history'
     | '/dashboard/royalty'
     | '/dashboard/upgrade-holding-history'
+    | '/dashboard/user-income-lookup'
     | '/dashboard/'
     | '/login/'
     | '/dashboard/income/direct-income'
     | '/dashboard/income/generation-income'
     | '/dashboard/income/laps-income'
+    | '/dashboard/income/level-income'
+    | '/dashboard/income/level-lapse-income'
+    | '/dashboard/income/level-lost-income'
     | '/dashboard/income/lost-income'
     | '/dashboard/team/direct-team'
     | '/dashboard/team/generation-team'
@@ -352,6 +404,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/user-income-lookup': {
+      id: '/dashboard/user-income-lookup'
+      path: '/user-income-lookup'
+      fullPath: '/dashboard/user-income-lookup'
+      preLoaderRoute: typeof DashboardUserIncomeLookupRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/upgrade-holding-history': {
@@ -438,6 +497,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIncomeLostIncomeRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/income/level-lost-income': {
+      id: '/dashboard/income/level-lost-income'
+      path: '/income/level-lost-income'
+      fullPath: '/dashboard/income/level-lost-income'
+      preLoaderRoute: typeof DashboardIncomeLevelLostIncomeRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/income/level-lapse-income': {
+      id: '/dashboard/income/level-lapse-income'
+      path: '/income/level-lapse-income'
+      fullPath: '/dashboard/income/level-lapse-income'
+      preLoaderRoute: typeof DashboardIncomeLevelLapseIncomeRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/income/level-income': {
+      id: '/dashboard/income/level-income'
+      path: '/income/level-income'
+      fullPath: '/dashboard/income/level-income'
+      preLoaderRoute: typeof DashboardIncomeLevelIncomeRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/income/laps-income': {
       id: '/dashboard/income/laps-income'
       path: '/income/laps-income'
@@ -471,10 +551,14 @@ interface DashboardRouteRouteChildren {
   DashboardPackageBuyHistoryRoute: typeof DashboardPackageBuyHistoryRoute
   DashboardRoyaltyRoute: typeof DashboardRoyaltyRoute
   DashboardUpgradeHoldingHistoryRoute: typeof DashboardUpgradeHoldingHistoryRoute
+  DashboardUserIncomeLookupRoute: typeof DashboardUserIncomeLookupRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardIncomeDirectIncomeRoute: typeof DashboardIncomeDirectIncomeRoute
   DashboardIncomeGenerationIncomeRoute: typeof DashboardIncomeGenerationIncomeRoute
   DashboardIncomeLapsIncomeRoute: typeof DashboardIncomeLapsIncomeRoute
+  DashboardIncomeLevelIncomeRoute: typeof DashboardIncomeLevelIncomeRoute
+  DashboardIncomeLevelLapseIncomeRoute: typeof DashboardIncomeLevelLapseIncomeRoute
+  DashboardIncomeLevelLostIncomeRoute: typeof DashboardIncomeLevelLostIncomeRoute
   DashboardIncomeLostIncomeRoute: typeof DashboardIncomeLostIncomeRoute
   DashboardTeamDirectTeamRoute: typeof DashboardTeamDirectTeamRoute
   DashboardTeamGenerationTeamRoute: typeof DashboardTeamGenerationTeamRoute
@@ -490,10 +574,14 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardPackageBuyHistoryRoute: DashboardPackageBuyHistoryRoute,
   DashboardRoyaltyRoute: DashboardRoyaltyRoute,
   DashboardUpgradeHoldingHistoryRoute: DashboardUpgradeHoldingHistoryRoute,
+  DashboardUserIncomeLookupRoute: DashboardUserIncomeLookupRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardIncomeDirectIncomeRoute: DashboardIncomeDirectIncomeRoute,
   DashboardIncomeGenerationIncomeRoute: DashboardIncomeGenerationIncomeRoute,
   DashboardIncomeLapsIncomeRoute: DashboardIncomeLapsIncomeRoute,
+  DashboardIncomeLevelIncomeRoute: DashboardIncomeLevelIncomeRoute,
+  DashboardIncomeLevelLapseIncomeRoute: DashboardIncomeLevelLapseIncomeRoute,
+  DashboardIncomeLevelLostIncomeRoute: DashboardIncomeLevelLostIncomeRoute,
   DashboardIncomeLostIncomeRoute: DashboardIncomeLostIncomeRoute,
   DashboardTeamDirectTeamRoute: DashboardTeamDirectTeamRoute,
   DashboardTeamGenerationTeamRoute: DashboardTeamGenerationTeamRoute,

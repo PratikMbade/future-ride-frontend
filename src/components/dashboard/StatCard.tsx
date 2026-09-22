@@ -62,15 +62,20 @@ interface GradientStatCardProps {
 
 export function GradientStatCard({ title, value, subtitle, gradient, icon, bottomText, 'data-testid': testId }: GradientStatCardProps) {
   return (
-    <div data-testid={testId} className={`relative rounded-xl p-4 overflow-hidden ${gradient}`} style={{ minHeight: 120 }}>
+    <div
+      data-testid={testId}
+      className={`relative rounded-2xl p-3.5 sm:p-4 overflow-hidden border border-white/10 shadow-[0_8px_24px_-10px_rgba(0,0,0,0.5)] transition-transform duration-300 hover:-translate-y-0.5 ${gradient}`}
+      style={{ minHeight: 108 }}
+    >
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
       <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.8) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.8) 1px,transparent 1px)', backgroundSize: '20px 20px' }} />
       <div className="relative z-10 flex flex-col h-full">
-        <div className="flex items-center justify-between mb-1">
-          <p className="text-[15px] font-semibold tracking-widest uppercase text-white/60">{title}</p>
-          {icon && <div className="text-white/50">{icon}</div>}
+        <div className="flex items-center justify-between mb-1 gap-1">
+          <p className="text-[10px] sm:text-[13px] font-semibold tracking-widest uppercase text-white/60 truncate">{title}</p>
+          {icon && <div className="text-white/50 shrink-0">{icon}</div>}
         </div>
-        <p className="text-5xl font-black text-white mt-auto">{value}</p>
-        {subtitle && <p className="text-md text-white/80 mt-0.5">{subtitle}</p>}
+        <p className="text-2xl sm:text-4xl font-black text-white mt-auto tracking-tight" style={{ fontFamily: 'Outfit' }}>{value}</p>
+        {subtitle && <p className="text-xs sm:text-sm text-white/80 mt-0.5">{subtitle}</p>}
         {bottomText && <p className="text-xs text-white/80 mt-1">{bottomText}</p>}
       </div>
     </div>

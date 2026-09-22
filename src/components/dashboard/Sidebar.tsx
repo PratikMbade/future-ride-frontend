@@ -32,6 +32,7 @@ const NAV: NavItem[] = [
     { label: 'Royalty',href: '/dashboard/royalty',  icon: <Layers size={17} /> },
     { label: 'Dubai Tour',href: '/dashboard/dubai-tour',  icon: <Plane size={17} /> },
     { label: 'User Register & Package Buy',href: '/dashboard/other-user',  icon: <Users size={17} /> },
+    { label: 'User Income Lookup',href: '/dashboard/user-income-lookup',  icon: <Search size={17} /> },
 
     
    {
@@ -52,6 +53,9 @@ const NAV: NavItem[] = [
             { label: 'Laps Income', href: '/dashboard/income/laps-income',    icon: <DollarSign size={14} /> },
                   // { label: 'Royalty Income', href: '/dashboard/income/royalty-income',    icon: <LucideCardSim size={14} /> },
                   { label: 'Lost Income', href: '/dashboard/income/lost-income',    icon: <DollarSign size={14} /> },
+                  { label: 'Level Income', href: '/dashboard/income/level-income',    icon: <TrendingUp size={14} /> },
+                  { label: 'Level Lapsed Income', href: '/dashboard/income/level-lapse-income',    icon: <DollarSign size={14} /> },
+                  { label: 'Level Lost Income', href: '/dashboard/income/level-lost-income',    icon: <DollarSign size={14} /> },
                   { label: 'Upgrade Holding', href: '/dashboard/upgrade-holding-history',    icon: <DollarSign size={14} /> },
 
     ],
