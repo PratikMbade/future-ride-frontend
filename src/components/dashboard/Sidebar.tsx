@@ -32,7 +32,6 @@ const NAV: NavItem[] = [
     { label: 'Royalty',href: '/dashboard/royalty',  icon: <Layers size={17} /> },
     { label: 'Dubai Tour',href: '/dashboard/dubai-tour',  icon: <Plane size={17} /> },
     { label: 'User Register & Package Buy',href: '/dashboard/other-user',  icon: <Users size={17} /> },
-    { label: 'User Income Lookup',href: '/dashboard/user-income-lookup',  icon: <Search size={17} /> },
 
     
    {
