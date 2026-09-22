@@ -394,7 +394,7 @@ export default function PackageBuyPage() {
       setStep("buying");
       const contract = await contractInstance(account);
       if (!contract) throw new Error("Failed to get contract instance");
-      const tx = await contract.packageBuy_user(account.address, false);
+      const tx = await contract.packageBuy_user(account.address);
       setLastTxHash(tx.hash);
       await tx.wait();
     },

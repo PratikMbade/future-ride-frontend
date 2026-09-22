@@ -471,7 +471,7 @@ function BuyPackageOtherUserTab({ account }: { account: any }) {
     try {
       const contract = await contractInstance(account);
       if (!contract) throw new Error('Could not initialize contract');
-      const tx = await contract.packageBuy_user(targetAddress, false);
+      const tx = await contract.packageBuy_user(targetAddress);
       setTxHash(tx.hash);
       await tx.wait();
       setStep('done');
