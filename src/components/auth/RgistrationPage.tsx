@@ -437,7 +437,7 @@ useEffect(() => {
 
       setTxState('pending');
       setTxHash('');
-      const tx = await ficonContract.registrations(account.address, referrer.userAddress);
+      const tx = await ficonContract.registrations(account.address, referrer.userAddress, false);
       setTxState('mining');
       setTxHash(tx.hash);
       await tx.wait(1);

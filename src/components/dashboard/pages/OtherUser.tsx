@@ -254,7 +254,7 @@ function RegisterOtherUserTab({ account }: { account: any }) {
       setTxHash('');
       // first arg is the user BEING registered (target), not the admin
       // wallet paying for it — second is the sponsor's on-chain address
-      const tx = await ficonContract.registrations(targetAddress, referrer.userAddress);
+      const tx = await ficonContract.registrations(targetAddress, referrer.userAddress, false);
       setTxState('mining');
       setTxHash(tx.hash);
       await tx.wait(1);

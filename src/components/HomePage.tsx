@@ -50,7 +50,6 @@ export function HomePage() {
           <PackageShowcase/>
           <Packages />
           <TreeStructure/>
-          <RoyaltyCards />
           <Benefits />
           <StatsSection />
           <FAQAccordion />

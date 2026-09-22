@@ -133,7 +133,7 @@ const CONTRACTS: ContractDef[] = [
     label: "MATRIX",
     name: "FutureRide Matrix",
     subtitle: "Community Reward Contract",
-    address: "0x4b723b4E500d99493ed4003705Bd7840927AEa62",
+    address: "0x68a018465b2cCdB23b8d1a5Bb1888c2837F7864f",
     description:
       "The core matrix smart contract powering FutureRide's community reward ecosystem. Handles package purchases, multi-level referral tracking, and automatic on-chain reward distribution across 12 package tiers.",
     features: [
