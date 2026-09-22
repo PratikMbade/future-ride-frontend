@@ -12,7 +12,6 @@ type ClaimTxState = 'idle' | 'pending' | 'mining' | 'success' | 'error'
 
 interface HoldingInfo {
   amount: number
-  releaseAt: number
 }
 
 function toNum(bn: ethers.BigNumber) {
@@ -22,7 +21,7 @@ function toNum(bn: ethers.BigNumber) {
 // Sibling section to the identity strip on the dashboard home page — lets a
 // connected wallet claim their auto-upgrade holding balance directly from
 // the AUTO_UPGRADE_CONTRACT_ADDRESS contract, mirroring the claim flow in
-// RoyaltyPage.tsx (claimReward → claimUpgradeHoldingUser).
+// RoyaltyPage.tsx (claimReward → claimUpgradeHolding).
 export function ClaimAutoUpgradeHoldingCard({ index = 0.5 }: { index?: number }) {
   const account = useActiveAccount()
   const walletAddress = account?.address
@@ -47,10 +46,10 @@ export function ClaimAutoUpgradeHoldingCard({ index = 0.5 }: { index?: number })
   const holdingQ = useQuery<HoldingInfo>({
     queryKey: ['on-chain', 'auto-upgrade-holding', walletAddress],
     queryFn: async () => {
-      const [amountWei, releaseWei] = await contract!.autoUpgradeHolding(walletAddress)
+      const amountWei = await contract!.autoUpgradeHolding(walletAddress)
+
       return {
         amount: toNum(amountWei as ethers.BigNumber),
-        releaseAt: (releaseWei as ethers.BigNumber).toNumber(),
       }
     },
     enabled: !!contract && !!walletAddress,
@@ -70,7 +69,7 @@ export function ClaimAutoUpgradeHoldingCard({ index = 0.5 }: { index?: number })
     setTxState('pending')
     setTxError('')
     try {
-      const tx = await contract.claimUpgradeHoldingUser(walletAddress)
+      const tx = await contract.claimUpgradeHolding(walletAddress)
       setTxState('mining')
       await tx.wait(1)
       setTxState('success')

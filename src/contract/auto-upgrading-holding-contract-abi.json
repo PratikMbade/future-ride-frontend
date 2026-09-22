@@ -1,8 +1,45 @@
 [
     {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "target",
+                "type": "address"
+            }
+        ],
+        "name": "AddressEmptyCode",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "implementation",
+                "type": "address"
+            }
+        ],
+        "name": "ERC1967InvalidImplementation",
+        "type": "error"
+    },
+    {
         "inputs": [],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
+        "name": "ERC1967NonPayable",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "FailedInnerCall",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidInitialization",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotInitializing",
+        "type": "error"
     },
     {
         "inputs": [
@@ -24,6 +61,22 @@
             }
         ],
         "name": "OwnableUnauthorizedAccount",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "UUPSUnauthorizedCallContext",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "slot",
+                "type": "bytes32"
+            }
+        ],
+        "name": "UUPSUnsupportedProxiableUUID",
         "type": "error"
     },
     {
@@ -116,6 +169,19 @@
         "anonymous": false,
         "inputs": [
             {
+                "indexed": false,
+                "internalType": "uint64",
+                "name": "version",
+                "type": "uint64"
+            }
+        ],
+        "name": "Initialized",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
                 "indexed": true,
                 "internalType": "address",
                 "name": "from",
@@ -153,172 +219,12 @@
             },
             {
                 "indexed": false,
-                "internalType": "address[]",
+                "internalType": "address",
                 "name": "lapAdd",
-                "type": "address[]"
+                "type": "address"
             }
         ],
         "name": "LapsPayEV",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "lvl",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "time",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "package",
-                "type": "uint256"
-            }
-        ],
-        "name": "LevelIncomeEV",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address[]",
-                "name": "to",
-                "type": "address[]"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "lvl",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "time",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "package",
-                "type": "uint256"
-            }
-        ],
-        "name": "LevelLostIncomeEV",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "lvl",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "time",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "package",
-                "type": "uint256"
-            }
-        ],
-        "name": "LevellapseIncomeEV",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            },
-            {
-                "indexed": true,
-                "internalType": "uint256",
-                "name": "timestamp",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "package",
-                "type": "uint256"
-            }
-        ],
-        "name": "LostPayEv",
         "type": "event"
     },
     {
@@ -507,6 +413,19 @@
             {
                 "indexed": true,
                 "internalType": "address",
+                "name": "implementation",
+                "type": "address"
+            }
+        ],
+        "name": "Upgraded",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
                 "name": "previousOwner",
                 "type": "address"
             },
@@ -524,18 +443,81 @@
         "inputs": [
             {
                 "internalType": "address[]",
-                "name": "user",
+                "name": "users",
                 "type": "address[]"
-            },
-            {
-                "internalType": "uint256[]",
-                "name": "package",
-                "type": "uint256[]"
             }
         ],
         "name": "BulkbuyPackage",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "Feedetails",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -590,24 +572,6 @@
             }
         ],
         "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "total",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "oldAdd",
-                "type": "address"
-            }
-        ],
-        "name": "Migration",
-        "outputs": [],
-        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -693,6 +657,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "UPGRADE_INTERFACE_VERSION",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
@@ -747,24 +724,6 @@
         "outputs": [
             {
                 "internalType": "uint256",
-                "name": "autoUpgradeHolding",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "autoUpgradeHoldingRelease",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "autoUpgradeHoldingReleaseTime",
-        "outputs": [
-            {
-                "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
             }
@@ -793,45 +752,14 @@
     {
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "start",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "end",
-                "type": "uint256"
-            }
-        ],
-        "name": "claimMigrationUpgradeHolding",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
                 "internalType": "address",
                 "name": "user",
                 "type": "address"
             }
         ],
-        "name": "claimUpgradeHoldingUser",
+        "name": "claimUpgradeHolding",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "dailyRoyaltyPool",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -909,6 +837,13 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "initialize",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
@@ -922,38 +857,6 @@
                 "internalType": "bool",
                 "name": "",
                 "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "matrixDetails",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "migrationCounter",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -978,6 +881,11 @@
                 "internalType": "address",
                 "name": "_user",
                 "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "upgradeFlag",
+                "type": "bool"
             }
         ],
         "name": "packageBuy_user",
@@ -999,6 +907,19 @@
                 "internalType": "address",
                 "name": "",
                 "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "proxiableUUID",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
             }
         ],
         "stateMutability": "view",
@@ -1033,69 +954,48 @@
                 "type": "address"
             },
             {
-                "internalType": "uint64",
+                "internalType": "uint256",
                 "name": "_time",
-                "type": "uint64"
+                "type": "uint256"
             },
             {
-                "internalType": "uint32",
+                "internalType": "uint256",
                 "name": "_regId",
-                "type": "uint32"
+                "type": "uint256"
             },
             {
-                "internalType": "uint32",
+                "internalType": "uint256",
                 "name": "_referal",
-                "type": "uint32"
+                "type": "uint256"
             },
             {
-                "internalType": "uint32",
+                "internalType": "uint256",
                 "name": "_teamcount",
-                "type": "uint32"
+                "type": "uint256"
             },
             {
                 "internalType": "address",
                 "name": "_referalAdd",
                 "type": "address"
-            },
-            {
-                "internalType": "uint32",
-                "name": "_eTeamCount",
-                "type": "uint32"
-            },
-            {
-                "internalType": "uint256",
-                "name": "Direct",
-                "type": "uint256"
-            },
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
             {
                 "internalType": "uint256",
-                "name": "Upgrade",
+                "name": "",
                 "type": "uint256"
-            },
+            }
+        ],
+        "name": "registerByid",
+        "outputs": [
             {
-                "internalType": "uint256",
-                "name": "UpLps",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "LVLIn",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "LVLLPSIn",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "UPLOST",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "LVLLOST",
-                "type": "uint256"
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
         "stateMutability": "view",
@@ -1112,11 +1012,6 @@
                 "internalType": "address",
                 "name": "referrerAddress",
                 "type": "address"
-            },
-            {
-                "internalType": "bool",
-                "name": "isBulk",
-                "type": "bool"
             }
         ],
         "name": "registrations",
@@ -1132,16 +1027,16 @@
         "type": "function"
     },
     {
-        "inputs": [
+        "inputs": [],
+        "name": "royaltyAdd",
+        "outputs": [
             {
-                "internalType": "uint256",
-                "name": "_releaseTime",
-                "type": "uint256"
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
-        "name": "setAutoUpgradeHoldingReleaseTime",
-        "outputs": [],
-        "stateMutability": "nonpayable",
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -1153,19 +1048,6 @@
             }
         ],
         "name": "setContracts",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_dailyRoyalty",
-                "type": "address"
-            }
-        ],
-        "name": "setDailyRoyaltyPool",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -1192,6 +1074,19 @@
             }
         ],
         "name": "setPremiumAdd",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_royalty",
+                "type": "address"
+            }
+        ],
+        "name": "setRoyalty",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -1240,6 +1135,24 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newImplementation",
+                "type": "address"
+            },
+            {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
+            }
+        ],
+        "name": "upgradeToAndCall",
+        "outputs": [],
+        "stateMutability": "payable",
         "type": "function"
     },
     {
