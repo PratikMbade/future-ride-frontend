@@ -15,6 +15,7 @@ import {
   Network,
   TreePalm,
   Plane,
+  Gift,
 } from 'lucide-react'
 import { useActiveAccount, useActiveWallet, useDisconnect } from 'thirdweb/react'
 import { LOGO_URL } from '../../constants/assets'
@@ -30,6 +31,7 @@ const NAV: NavItem[] = [
   { label: 'Home',              href: '/dashboard/',                icon: <Home size={17} /> },
   { label: 'Future Ride System',href: '/dashboard/future-ride-system',  icon: <Zap size={17} /> },
     { label: 'Royalty',href: '/dashboard/royalty',  icon: <Layers size={17} /> },
+    { label: 'Daily Royalty Pool',href: '/dashboard/daily-royalty-pool',  icon: <Gift size={17} /> },
     // { label: 'Dubai Tour',href: '/dashboard/dubai-tour',  icon: <Plane size={17} /> },
     { label: 'User Register & Package Buy',href: '/dashboard/other-user',  icon: <Users size={17} /> },
 

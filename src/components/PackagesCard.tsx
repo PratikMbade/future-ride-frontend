@@ -36,15 +36,19 @@ function formatUsd(n: number): string {
   return n.toLocaleString("en-US");
 }
 
-import { CheckCircle2, Zap, Crown } from "lucide-react";
+import {
+  CheckCircle2, Medal, Award, CircleDot, Trophy, Gem, Shield, Diamond, Heart, Hexagon, Castle, Crown, Star,
+  type LucideIcon,
+} from "lucide-react";
 
 interface Pkg {
   level: number;
   price: number;
   tag?: string;
   headline: string;
-  isRoyalty: boolean;
   sub: string;
+  icon: LucideIcon;
+  color: string;
 }
 
 const THEME = {
@@ -54,33 +58,26 @@ const THEME = {
   future: { c: "#38BDF8", soft: "rgba(56,189,248,0.05)", border: "rgba(56,189,248,0.16)", glow: "rgba(56,189,248,0.08)" },
 } as const;
 
-const ROYALTY_TIER: Record<number, { name: string; c: string }> = {
-  3: { name: "Silver royalty unlocked",   c: "#C0C7D1" },
-  5: { name: "Gold royalty unlocked",     c: "#F5A623" },
-  7: { name: "Platinum royalty unlocked", c: "#7DD3FC" },
-  9: { name: "Diamond royalty unlocked",  c: "#E879F9" },
-};
-
 const PKGS: Pkg[] = [
-  { level: 1,  price: 5,     headline: "Entry",       sub: "Activates direct income & matrix position", isRoyalty: false },
-  { level: 2,  price: 10,    headline: "Foundation",  sub: "Opens generation 2 matrix earnings",        isRoyalty: false },
-  { level: 3,  price: 20,    headline: "Builder",     sub: "Silver Royalty unlocked",                   isRoyalty: true  },
-  { level: 4,  price: 40,    tag: "Auto", headline: "Leverage", sub: "Auto-upgrade engine activates from here", isRoyalty: false },
-  { level: 5,  price: 80,    headline: "Growth",      sub: "Gold Royalty unlocked",                     isRoyalty: true  },
-  { level: 6,  price: 160,   headline: "Momentum",    sub: "Deep matrix unlocked — gen 6 active",       isRoyalty: false },
-  { level: 7,  price: 320,   headline: "Accelerator", sub: "Platinum Royalty unlocked",                 isRoyalty: true  },
-  { level: 8,  price: 640,   headline: "Elite",       sub: "Elite compounding — gen 8 active",          isRoyalty: false },
-  { level: 9,  price: 1280,  headline: "Apex",        sub: "Diamond Royalty unlocked",                  isRoyalty: true  },
-  { level: 10, price: 2560,  headline: "Summit",      sub: "Generation 10 compounding — near the top",  isRoyalty: false },
-  { level: 11, price: 5120,  headline: "Vanguard",    sub: "Generation 11 unlocked — elite tier",       isRoyalty: false },
-  { level: 12, price: 10240, tag: "Max", headline: "Pinnacle", sub: "All 12 generations active. Full matrix.", isRoyalty: false },
+  { level: 1,  price: 5,     headline: "Bronze",   sub: "Activates direct income & matrix position", icon: Medal,     color: "#CD7F32" },
+  { level: 2,  price: 10,    headline: "Silver",   sub: "Opens generation 2 matrix earnings",        icon: Award,     color: "#C0C7D1" },
+  { level: 3,  price: 20,    headline: "Pearl",    sub: "Generation 3 matrix unlocked",              icon: CircleDot, color: "#F1E5D8" },
+  { level: 4,  price: 40,    tag: "Auto", headline: "Gold", sub: "Auto-upgrade engine activates from here", icon: Trophy, color: "#F5B301" },
+  { level: 5,  price: 80,    headline: "Sapphire", sub: "Generation 5 matrix unlocked",              icon: Gem,       color: "#3B82F6" },
+  { level: 6,  price: 160,   headline: "Platinum", sub: "Deep matrix unlocked — gen 6 active",       icon: Shield,    color: "#7DD3FC" },
+  { level: 7,  price: 320,   headline: "Diamond",  sub: "Generation 7 matrix unlocked",              icon: Diamond,   color: "#E879F9" },
+  { level: 8,  price: 640,   headline: "Ruby",     sub: "Elite compounding — gen 8 active",          icon: Heart,     color: "#F43F5E" },
+  { level: 9,  price: 1280,  headline: "Emerald",  sub: "Generation 9 matrix unlocked",              icon: Hexagon,   color: "#10B981" },
+  { level: 10, price: 2560,  headline: "Royal",    sub: "Generation 10 compounding — near the top",  icon: Castle,    color: "#8B5CF6" },
+  { level: 11, price: 5120,  headline: "Crown",    sub: "Generation 11 unlocked — elite tier",       icon: Crown,     color: "#FBBF24" },
+  { level: 12, price: 10240, tag: "Max", headline: "Imperial", sub: "All 12 generations active. Full matrix.", icon: Star, color: "#FB923C" },
 ];
 
 const usd = (n: number) => `$${n.toLocaleString()}`;
 
 function PkgCard({ pkg }: { pkg: Pkg }) {
   const t = THEME.future;
-  const royalty = pkg.isRoyalty ? ROYALTY_TIER[pkg.level] : undefined;
+  const Icon = pkg.icon;
 
   return (
     <div
@@ -113,19 +110,6 @@ function PkgCard({ pkg }: { pkg: Pkg }) {
               </span>
             )}
 
-            {royalty && (
-              <span
-                className="flex items-center gap-1 font-mono text-[10px] font-bold uppercase tracking-[0.12em] px-1.5 py-[2px] rounded-[4px]"
-                style={{
-                  color: royalty.c,
-                  background: `${royalty.c}1F`,
-                  border: `1px solid ${royalty.c}4D`,
-                }}
-              >
-                <Crown size={9} />
-                {royalty.name}
-              </span>
-            )}
           </div>
 
           <Lock size={12} className="text-[#38bdf8] shrink-0 mt-0.5" />
@@ -142,10 +126,22 @@ function PkgCard({ pkg }: { pkg: Pkg }) {
           </div>
         </div>
 
-        {/* headline + sub */}
-        <div>
-          <p className="m-0 font-heading text-[14px] font-semibold text-white">{pkg.headline}</p>
-          <p className="mt-1 m-0 text-[11px] leading-relaxed text-white/40">{pkg.sub}</p>
+        {/* icon + name + sub */}
+        <div className="flex items-start gap-3">
+          <div
+            className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+            style={{
+              background: `radial-gradient(circle at 30% 25%, ${pkg.color}40, ${pkg.color}10 70%)`,
+              border: `1px solid ${pkg.color}66`,
+              boxShadow: `0 0 18px -4px ${pkg.color}80, inset 0 1px 0 rgba(255,255,255,0.12)`,
+            }}
+          >
+            <Icon size={22} strokeWidth={1.75} style={{ color: pkg.color }} />
+          </div>
+          <div className="min-w-0">
+            <p className="m-0 font-heading text-[17px] font-semibold text-white">{pkg.headline}</p>
+            <p className="mt-1 m-0 text-[11px] leading-relaxed text-white/40">{pkg.sub}</p>
+          </div>
         </div>
 
         <div className="flex-1" />
@@ -195,21 +191,6 @@ export default function PackagesTemplate() {
   <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3">
         {PKGS.map((pkg) => (
           <PkgCard key={pkg.level} pkg={pkg} />
-        ))}
-      </div>
-
-      {/* legend */}
-      <div className="flex items-center gap-6 flex-wrap">
-        {[
-          { rail: "#C0C7D1", label: "Silver royalty" },
-          { rail: "#F5A623", label: "Gold royalty" },
-          { rail: "#7DD3FC", label: "Platinum royalty" },
-          { rail: "#E879F9", label: "Diamond royalty" },
-        ].map(({ rail, label }) => (
-          <div key={label} className="flex items-center gap-2">
-            <div className="w-4 h-[2.5px] rounded-full" style={{ background: rail }} />
-            <span className="text-[11px] font-mono text-white/35">{label}</span>
-          </div>
         ))}
       </div>
 

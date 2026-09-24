@@ -14,8 +14,8 @@ const TRUST = [
 const STATS = [
   { val: '12', label: 'Package Levels' },
   { val: '$10K', label: 'Max Package' },
-  { val: '3', label: 'Income Streams' },
-  { val: '$8.8K', label: 'Royalty Cap' },
+  { val: '4', label: 'Income Streams' },
+  { val: '5%', label: 'Daily Royalty Pool' },
 ]
 
 export function Hero() {

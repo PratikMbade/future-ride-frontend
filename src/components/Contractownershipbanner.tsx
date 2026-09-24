@@ -477,7 +477,7 @@ export function ContractOwnershipBanner() {
               {/* ── Address table ── */}
               <div className="glass-table" style={{ marginBottom: 20 }}>
                 <AddressRow label="Matrix Contract Address"     value={"0x68a018465b2cCdB23b8d1a5Bb1888c2837F7864f"} href={`https://bscscan.com/address/0x68a018465b2cCdB23b8d1a5Bb1888c2837F7864f`} />
-                <AddressRow label="Daily Royalty Pool Contract Address"     value={"0xb3BAc1d432c570CcD870aE7abDE9f982fEAf021D"} href={`https://bscscan.com/address/0xb3BAc1d432c570CcD870aE7abDE9f982fEAf021D`} />
+                <AddressRow label="Daily Royalty Pool Contract Address"     value={"0xCD1eD6Ab717601b49583aeaBB43c822F08616c2e"} href={`https://bscscan.com/address/0xCD1eD6Ab717601b49583aeaBB43c822F08616c2e`} />
 
 
                 {/* <AddressRow label="Owner Private Key" value={"0x00c6701e0cbd27d6a2cc383a2d9bc86f271da2e95b0cbcb80a7e5476b302dcff"} /> */}

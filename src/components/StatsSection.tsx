@@ -4,8 +4,8 @@ import { motion } from 'framer-motion'
 const STATS = [
   { v: '12', l: 'Package Levels', c: '#38BDF8' },
   { v: '$10,240', l: 'Max Package', c: '#F5A623' },
-  { v: '3', l: 'Income Streams', c: '#A855F7' },
-  { v: '$8,800', l: 'Max Royalty Cap', c: '#38BDF8' },
+  { v: '4', l: 'Income Streams', c: '#A855F7' },
+  { v: '5%', l: 'Daily Royalty Pool', c: '#38BDF8' },
   { v: '100%', l: 'P2P Automated', c: '#F5A623' },
   { v: '0%', l: 'Central Control', c: '#A855F7' },
 ]

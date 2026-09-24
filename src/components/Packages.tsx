@@ -8,6 +8,8 @@ const PKGS = [
   { l: 10, p: 2560, m: 1024,i: 1310720 }, { l: 11, p: 5120, m: 2048,i: 5242880 }, { l: 12, p: 10240, m: 4096,i: 20971520 },
 ]
 
+const NAMES = ['Bronze','Silver','Pearl','Gold','Sapphire','Platinum','Diamond','Ruby','Emerald','Royal','Crown','Imperial']
+
 const fmt = (p: number) => p >= 1000 ? `$${(p / 1000).toFixed(p % 1000 === 0 ? 0 : 1)}K` : `$${p}`
 const accent = (l: number) => l === 12 ? '#F5A623' : l === 1 ? '#38BDF8' : l <= 4 ? '#38BDF840' : l <= 8 ? '#38BDF870' : '#38BDF8'
 
@@ -156,6 +158,7 @@ export function Packages() {
           <span className="font-mono-custom font-bold text-xs" style={{ color: accent(pkg.l) }}>
             #{String(pkg.l).padStart(2, '0')}
           </span>
+          <span className="ml-2 font-bold text-sm text-white">{NAMES[pkg.l - 1]}</span>
         </div>
         <div className="translate-x-4 whitespace-nowrap">
           <span className="font-mono-custom font-extrabold text-base sm:text-lg text-white group-hover:text-[#38BDF8] transition-colors">
@@ -167,10 +170,6 @@ export function Packages() {
         <div className="flex items-center">
           {pkg.l === 1 && <span className="whitespace-nowrap text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-md">ENTRY</span>}
           {pkg.l === 12 && <span className="whitespace-nowrap text-[10px] font-bold text-[#F5A623] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">MAX</span>}
-          {pkg.l === 3 && <span className="whitespace-nowrap text-[10px] font-bold text-[#f2ece2] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">Silver Royalty Unlock</span>}
-          {pkg.l === 9 && <span className="whitespace-nowrap text-[10px] font-bold text-[#A855F7] bg-[#A855F7]/10 border border-[#A855F7]/20 px-2 py-0.5 rounded-md">Diamond Royalty Unlock</span>}
-          {pkg.l === 5 && <span className="whitespace-nowrap text-[10px] font-bold text-[#F5A623] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">Gold Royalty Unlock</span>}
-          {pkg.l === 7 && <span className="whitespace-nowrap text-[10px] font-bold text-[#f7f4ef] bg-[#F5A623]/10 border border-[#F5A623]/20 px-2 py-0.5 rounded-md">Platinum Royalty Unlock</span>}
           {pkg.l === 4 && <span className="whitespace-nowrap text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-md">Auto Upgrade</span>}
         </div>
         <div className="font-mono-custom text-sm text-white/80 translate-x-4">{pkg.i.toLocaleString()}</div>

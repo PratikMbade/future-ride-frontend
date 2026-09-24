@@ -6,7 +6,7 @@ import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 const navLinks = [
   { label: 'Smart Contract', href: '#smart-contract' },
   { label: 'Features', href: '#features' },
-  { label: 'Marketing', href: '/marketing' },
+  // { label: 'Marketing', href: '/marketing' },
   { label: 'Packages', href: '#packages' },
   { label: 'Royalty', href: '#royalty' },
   { label: 'FAQ', href: '#faq' },

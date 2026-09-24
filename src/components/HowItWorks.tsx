@@ -6,7 +6,7 @@ const STEPS = [
   { n: '01', icon: Wallet, title: 'Connect Your Wallet', desc: 'Link your BNB Smart Chain wallet — MetaMask, Token Pocket, or SafePal. No sign-up required.', c: '#38BDF8' },
   { n: '02', icon: Package, title: 'Choose Your Package', desc: 'Select from 12 package levels starting at just $5. Each level unlocks greater rewards.', c: '#F5A623' },
   { n: '03', icon: Users, title: 'Build Your Network', desc: 'Refer others, grow your team, and activate upgrade income through collective participation.', c: '#38BDF8' },
-  { n: '04', icon: DollarSign, title: 'Earn & Scale', desc: 'Collect Direct (20%), Upgrade (50%), and Daily Royalty (30%) rewards — fully automated.', c: '#F5A623' },
+  { n: '04', icon: DollarSign, title: 'Earn & Scale', desc: 'Collect Direct (20%), Upgrade (50%), Level (20%), and Daily Royalty (5%) rewards — fully automated.', c: '#F5A623' },
 ]
 
 export function HowItWorks() {

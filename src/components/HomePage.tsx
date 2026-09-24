@@ -49,6 +49,7 @@ export function HomePage() {
           <IncomeDistribution />
           <PackageShowcase/>
           <Packages />
+          <RoyaltyCards />
           <TreeStructure/>
           <Benefits />
           <StatsSection />

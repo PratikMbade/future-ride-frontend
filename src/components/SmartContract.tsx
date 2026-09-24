@@ -147,15 +147,15 @@ const CONTRACTS: ContractDef[] = [
   },
   {
     id: "royalty",
-    label: "ROYALTY",
-    name: "Royalty Fund Pool",
+    label: "DAILY ROYALTY POOL",
+    name: "Daily Royalty Fund Pool",
     subtitle: "Royalty Distribution Contract",
-    address: "0x95c1A8a724472725e37aaaB939c101eD0Ba9c84b",
+    address: "0xCD1eD6Ab717601b49583aeaBB43c822F08616c2e",
     description:
-      "Manages the royalty pool distributions for qualifying FutureRide participants. Handles phase-based eligibility verification and proportional reward allocation across Silver, Gold, Platinum, and Diamond tiers.",
+      "Distributes 5% daily royalty income to qualified FutureRide participants. To qualify for the daily pool, you must have 2 direct referrals each day.",
     features: [
-      "4-Tier Royalty Levels",
-      "Phase-Based Eligibility",
+      "5% Daily Royalty Pool",
+      "Pool-Based Eligibility",
       "Claimable On-Demand",
       "Transparent Distribution",
     ],

@@ -13,8 +13,13 @@ const STREAMS = [
     c: '#F5A623', from: '#FCD34D', to: '#D97706',
   },
   {
-    pct: '30%', label: 'Daily Royalty',
-    desc: 'Passive income distributed daily from the global royalty pool based on your tier — Silver, Gold, Platinum, or Diamond.',
+    pct: '20%', label: 'Level Income',
+    desc: 'Earn from every level of your matrix as your team fills up — paid automatically by the smart contract.',
+    c: '#2DD4BF', from: '#5EEAD4', to: '#0D9488',
+  },
+  {
+    pct: '5%', label: 'Daily Royalty Income',
+    desc: 'Passive income from the 5% Daily Royalty Pool, shared equally among all qualified members and claimable on-chain.',
     c: '#A855F7', from: '#C084FC', to: '#7C3AED',
   },
 ]
@@ -34,14 +39,14 @@ export function IncomeDistribution() {
             Income Distribution
           </span>
           <h2 className="font-black text-white text-4xl sm:text-5xl lg:text-6xl leading-tight tracking-tight">
-            Three Automated<br /><span className="text-brand">Income Streams</span>
+            Four Automated<br /><span className="text-brand">Income Streams</span>
           </h2>
           <p className="text-white/55 text-base mt-4 max-w-xl">
-            Every transaction is automatically split across three income streams by smart contract — zero human involvement.
+            Every transaction is automatically split across four income streams by smart contract — zero human involvement.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {STREAMS.map((s, i) => (
             <motion.div
               key={s.label}
@@ -52,10 +57,10 @@ export function IncomeDistribution() {
               style={{ background: `linear-gradient(150deg, ${s.c}12 0%, rgba(3,13,40,0.95) 55%)`, border: `1px solid ${s.c}25` }}
             >
               <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(90deg, transparent, ${s.c}, transparent)` }} />
-              <div className="p-8 sm:p-10">
+              <div className="p-7 sm:p-8">
                 <div
                   className="font-black leading-none tracking-tight mb-3"
-                  style={{ fontSize: 'clamp(4rem, 9vw, 7rem)', background: `linear-gradient(135deg, ${s.from}, ${s.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
+                  style={{ fontSize: 'clamp(3.5rem, 6vw, 5rem)', background: `linear-gradient(135deg, ${s.from}, ${s.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
                 >
                   {s.pct}
                 </div>
@@ -76,9 +81,8 @@ export function IncomeDistribution() {
           className="mt-5 rounded-2xl border border-white/6 bg-white/[0.025] p-5 text-center"
         >
           <span className="text-white/45 text-sm">Total Distribution: </span>
-          <span className="font-mono-custom font-bold text-white text-sm">20% + 50% + 30% = </span>
-          <span className="text-gold font-mono-custom font-extrabold text-lg">100%</span>
-          <span className="text-white/30 text-sm ml-2">— Every satoshi goes back to participants.</span>
+          <span className="font-mono-custom font-bold text-white text-sm">20% + 50% + 20% + 5% = </span>
+          <span className="text-gold font-mono-custom font-extrabold text-lg">95%</span>
         </motion.div>
       </div>
     </section>
