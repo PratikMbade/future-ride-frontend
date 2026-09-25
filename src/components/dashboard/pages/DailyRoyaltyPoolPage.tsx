@@ -14,6 +14,7 @@ import {
 const ERC20_READ_ABI = [
   { constant: true, inputs: [], name: 'decimals', outputs: [{ name: '', type: 'uint8' }], stateMutability: 'view', type: 'function' },
   { constant: true, inputs: [], name: 'symbol', outputs: [{ name: '', type: 'string' }], stateMutability: 'view', type: 'function' },
+  { constant: true, inputs: [{ name: 'account', type: 'address' }], name: 'balanceOf', outputs: [{ name: '', type: 'uint256' }], stateMutability: 'view', type: 'function' },
 ]
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -43,7 +44,8 @@ interface PoolPageData {
   currentPoolNum: number
   claimablePoolId: number
   hasClaimablePool: boolean
-  poolIntervalSeconds: number
+  livePoolMembers: number
+  livePoolBalance: number
   timeLeftToClaimSeconds: number
   tokenSymbol: string
   isEligible: boolean
@@ -62,10 +64,9 @@ interface PoolPageData {
 // getPoolInfo / getUserClaimStatus) instead of the raw poolCount/poolDetails
 // mappings, since those stay stale on-chain until someone sends a tx.
 async function fetchPoolPageData(contract: ethers.Contract, walletAddress: string): Promise<PoolPageData | null> {
-  const [globalPool, currentPoolBn, poolIntervalBn, tokenAddr, claimStatus, globalUser] = await Promise.all([
+  const [globalPool, currentPoolBn, tokenAddr, claimStatus, globalUser] = await Promise.all([
     contract.GlobalPoolDetails(DAILY_ROYALTY_POOL_CONTRACT_ADDRESS),
     contract.currentPool(),
-    contract.poolIntervalTime(),
     contract.tokenAddress(),
     contract.getUserClaimStatus(walletAddress),
     contract.GlobalUserDetails(walletAddress),
@@ -77,12 +78,14 @@ async function fetchPoolPageData(contract: ethers.Contract, walletAddress: strin
   const claimablePoolId = (claimStatus.pool as ethers.BigNumber).toNumber()
   const tokenContract = new ethers.Contract(tokenAddr, ERC20_READ_ABI, contract.signer)
 
-  const [poolInfo, userInfoRaw, timeLeft, tokenDecimalsRaw, tokenSymbol] = await Promise.all([
+  const [poolInfo, userInfoRaw, timeLeft, tokenDecimalsRaw, tokenSymbol, liveMembers, liveBalanceBn] = await Promise.all([
     claimablePoolId > 0 ? contract.getPoolInfo(claimablePoolId) : null,
     claimablePoolId > 0 ? contract.userInfo(claimablePoolId, walletAddress) : null,
     contract.getTimeLeft().catch(() => null),
     tokenContract.decimals().catch(() => 18),
     tokenContract.symbol().catch(() => ''),
+    contract.eligibleUsers(currentPoolNum).catch(() => []) as Promise<string[]>,
+    tokenContract.balanceOf(DAILY_ROYALTY_POOL_CONTRACT_ADDRESS).catch(() => ethers.constants.Zero) as Promise<ethers.BigNumber>,
   ])
 
   const decimals = typeof tokenDecimalsRaw === 'number' ? tokenDecimalsRaw : Number(tokenDecimalsRaw)
@@ -94,7 +97,8 @@ async function fetchPoolPageData(contract: ethers.Contract, walletAddress: strin
     currentPoolNum,
     claimablePoolId,
     hasClaimablePool: claimablePoolId > 0,
-    poolIntervalSeconds: (poolIntervalBn as ethers.BigNumber).toNumber(),
+    livePoolMembers: liveMembers.length,
+    livePoolBalance: toNum(liveBalanceBn),
     timeLeftToClaimSeconds: timeLeft ? (timeLeft.timeLeftToClaim as ethers.BigNumber).toNumber() : 0,
     tokenSymbol,
     isEligible: claimStatus.qualified as boolean,
@@ -505,12 +509,13 @@ export default function DailyRoyaltyPoolPage() {
 
           <section>
           <SectionHeader icon={<Timer size={17} />} title="Pool Overview" subtitle="Live status of the daily royalty pool" accent="#F5A623" />
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-            <HeroStat index={0} icon={<Coins size={17} />} label="Total Supply" value={fmtAmt(data.totalSupplyAmount, data.tokenSymbol)} accent="#F5A623" />
-            <HeroStat index={1} icon={<TrendingUp size={17} />} label="Total Distributed" value={fmtAmt(data.totalDistributionAmount, data.tokenSymbol)} accent="#38BDF8" />
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <HeroStat index={0} icon={<Coins size={17} />} label="Total Supply" value={`$${fmtAmt(data.totalSupplyAmount, '')}`} accent="#F5A623" />
+            <HeroStat index={1} icon={<TrendingUp size={17} />} label="Total Distributed" value={`$${fmtAmt(data.totalDistributionAmount, '')}`} accent="#38BDF8" />
             <HeroStat index={2} icon={<Layers size={17} />} label="Current Pool" value={`#${data.currentPoolNum}`} accent="#38BDF8" />
-            <HeroStat index={3} icon={<Timer size={17} />} label="Pool Interval" value={fmtDuration(data.poolIntervalSeconds)} accent="#F5A623" />
-            <HeroStat index={4} icon={<Timer size={17} />} label="Pool Ends In" value={fmtDuration(remainingSeconds)} accent="#fb7185" pulse />
+            <HeroStat index={3} icon={<Users size={17} />} label="Live Pool Members" value={String(data.livePoolMembers)} accent="#A855F7" />
+            <HeroStat index={4} icon={<Wallet size={17} />} label="Live Pool Balance" value={`$${fmtAmt(data.livePoolBalance, '')}`} accent="#22C55E" />
+            <HeroStat index={5} icon={<Timer size={17} />} label="Pool Ends In" value={fmtDuration(remainingSeconds)} accent="#fb7185" pulse />
           </div>
           </section>
 
